@@ -169,6 +169,16 @@ tbody tr{cursor:pointer}
       </div>
     </div>
     <div class="box" style="margin-top:16px">
+      <h3>✉️ Cadência de mensagens — o que enviar e quando</h3>
+      <div class="muted" style="margin-bottom:14px;font-size:12px">A sequência pra um lead frio até a demo. Cada passo aponta o template a usar (pegue na aba 💬 Templates). O CRM já agenda o próximo toque sozinho quando você manda WhatsApp.</div>
+      <div id="homeSeq"></div>
+      <div style="border-top:1px solid var(--line);margin-top:8px;padding-top:14px">
+        <b style="font-size:13px">Depois da demo</b>
+        <div id="homeSeqPos" style="margin-top:10px"></div>
+      </div>
+    </div>
+
+    <div class="box" style="margin-top:16px">
       <h3>📚 Materiais de apoio</h3>
       <div class="muted" style="line-height:1.9">
         Playbook completo, demo tela a tela e transcrições do agente estão na pasta <b>Moove/Prospeccao-Maringa/</b> (no computador).
@@ -706,8 +716,30 @@ function renderHome(){
      <span style="background:#e0a83d22;color:#f3c969;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-weight:700;flex-shrink:0;font-size:13px">${i+1}</span>
      <div><b style="font-size:13px">${c[0]}</b><div class="muted" style="font-size:12px">${c[1]}</div></div></div>`).join('')
      +`<div class="muted" style="margin-top:8px;font-size:12px;border-top:1px solid var(--line);padding-top:10px">💡 Regra: um segmento por dia no começo (seg = barbearia, ter = odonto...) pra ficar fluente no pitch.</div>`;
+  document.getElementById('homeSeq').innerHTML=CADENCE_SEQ.map(seqRow).join('');
+  document.getElementById('homeSeqPos').innerHTML=CADENCE_POS.map(seqRow).join('');
 }
 function goView(v){document.querySelector(`.tab[data-view="${v}"]`).click();}
+const CADENCE_SEQ=[
+ ["Dia 0","Abertura","Primeiro toque","Mensagem curta + oferta de mostrar em 5 min. Ou já manda a isca: \"te mando um vídeo de 1 min?\"","#e0a83d"],
+ ["+2 dias","Follow-up 1 · o vídeo","Follow-up","Manda o Reels de 1 min do agente agendando e remarcando sozinho. Não cobra resposta, só mostra.","#4f8bf0"],
+ ["+5 dias","Follow-up 2 · prova","Follow-up","Um print do painel/agenda ou um número concreto (\"barbearia X recuperou Y clientes\"). Foco em valor, não em \"e aí?\".","#9b6cf0"],
+ ["+9 dias","Convite direto","Follow-up","Pergunta fácil de dar sim: \"te mostro funcionando hoje ou amanhã, 5 minutinhos?\"","#3fb368"],
+ ["+14 dias","Encerramento","Reativação","\"Não quero insistir, fico à disposição. Posso te chamar quando tiver uma novidade?\" O \"break-up\" costuma destravar resposta.","#e25563"]
+];
+const CADENCE_POS=[
+ ["Mesmo dia","Resumo + proposta","Pós-demo","Manda o resumo do que viu + preço (R$197/R$297) + \"quer que eu já monte a conta?\".","#e0a83d"],
+ ["+2 dias","Follow-up proposta","Pós-demo","\"Conseguiu pensar? Tiro qualquer dúvida.\"","#4f8bf0"],
+ ["+5 dias","Última chamada","Reativação","\"Vou seguir aqui à disposição. Se quiser, deixo rodando 7 dias pra você sentir.\"","#e25563"]
+];
+function seqRow(s){
+  return `<div style="display:flex;gap:12px;margin-bottom:13px;align-items:flex-start">
+    <span class="pill" style="background:${s[4]}22;color:${s[4]};min-width:64px;text-align:center;flex-shrink:0">${s[0]}</span>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:700">${s[1]} <span class="muted" style="font-weight:500;font-size:11px">→ template "${s[2]}"</span></div>
+      <div class="muted" style="font-size:12px;margin-top:2px">${s[3]}</div>
+    </div></div>`;
+}
 
 /* ============ BACKUP ============ */
 function exportJSON(){dl('moove-crm-'+today()+'.json',JSON.stringify(DB,null,2),'application/json');toast('Backup baixado');}
