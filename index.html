@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moove CRM — Prospecção Maringá</title>
+<style>
+:root{
+  --bg:#0f1115; --panel:#171a21; --panel2:#1e222c; --line:#2a2f3a;
+  --txt:#e8eaf0; --mut:#9aa3b2; --gold:#e0a83d; --gold2:#f3c969;
+  --green:#3fb368; --red:#e25563; --blue:#4f8bf0; --purple:#9b6cf0;
+  --radius:14px; --shadow:0 6px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:15px;-webkit-font-smoothing:antialiased}
+a{color:var(--gold2);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:10px;font-size:14px;font-weight:600;transition:.15s}
+input,select,textarea{font-family:inherit;font-size:14px;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px 12px;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+textarea{resize:vertical;min-height:90px;line-height:1.5}
+.btn{padding:10px 16px;background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+.btn:hover{border-color:var(--gold)}
+.btn.primary{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1206;border:none}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn.danger{background:transparent;border:1px solid var(--red);color:var(--red)}
+.btn.sm{padding:6px 10px;font-size:13px;border-radius:8px}
+.btn.wa{background:#1faf5a;color:#fff;border:none}
+.btn.wa:hover{filter:brightness(1.08)}
+
+/* layout */
+header{display:flex;align-items:center;gap:16px;padding:14px 22px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:.3px}
+.logo .dot{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:grid;place-items:center;color:#1a1206;font-weight:900}
+.logo small{display:block;font-size:11px;color:var(--mut);font-weight:500;letter-spacing:0}
+nav{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+.tab{padding:9px 15px;background:transparent;color:var(--mut);border-radius:10px;font-weight:600}
+.tab.active{background:var(--panel2);color:var(--gold2)}
+.tab:hover{color:var(--txt)}
+.actions{display:flex;gap:8px;align-items:center;position:relative}
+main{padding:22px;max-width:1500px;margin:0 auto}
+.view{display:none}.view.active{display:block}
+h2.title{font-size:20px;margin-bottom:4px}
+.sub{color:var(--mut);font-size:13px;margin-bottom:18px}
+
+/* dropdown */
+.menu{position:absolute;right:0;top:46px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;display:none;min-width:200px;z-index:30}
+.menu.open{display:block}
+.menu button{display:block;width:100%;text-align:left;padding:9px 12px;background:transparent;color:var(--txt);font-weight:500}
+.menu button:hover{background:var(--panel)}
+
+/* kanban */
+.board{display:flex;gap:14px;overflow-x:auto;padding-bottom:10px}
+.col{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);min-width:265px;width:265px;flex-shrink:0;display:flex;flex-direction:column;max-height:calc(100vh - 190px)}
+.col h3{padding:13px 14px;font-size:13px;text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+.col h3 .cnt{background:var(--panel2);color:var(--mut);border-radius:20px;padding:2px 9px;font-size:12px}
+.col .drop{padding:10px;overflow-y:auto;flex:1;min-height:60px}
+.col.over .drop{background:rgba(224,168,61,.06)}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-bottom:9px;cursor:grab;border-left:3px solid var(--line)}
+.card:active{cursor:grabbing}
+.card.hot{border-left-color:var(--red)}
+.card .nm{font-weight:700;font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;gap:6px;align-items:flex-start}
+.card .meta{font-size:12px;color:var(--mut);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pill{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap}
+.card .next{font-size:12px;margin-top:7px;color:var(--mut);display:flex;align-items:center;gap:5px}
+.card .next.due{color:var(--red);font-weight:600}
+.card .next.soon{color:var(--gold2)}
+.tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
+.tag{font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(155,108,240,.16);color:#c4a6ff;font-weight:600}
+
+/* table */
+table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:var(--radius);overflow:hidden}
+th,td{text-align:left;padding:11px 13px;border-bottom:1px solid var(--line);font-size:13px}
+th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;user-select:none}
+tr:hover td{background:var(--panel2)}
+tbody tr{cursor:pointer}
+.filters{display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap}
+.filters input,.filters select{width:auto;min-width:150px;flex:0 0 auto}
+.filters input[type=search]{flex:1;min-width:200px}
+
+/* kpi */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:13px;margin-bottom:22px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 17px}
+.kpi .v{font-size:30px;font-weight:800;line-height:1.1}
+.kpi .l{color:var(--mut);font-size:12px;margin-top:5px}
+.kpi .v.gold{color:var(--gold2)}.kpi .v.green{color:var(--green)}.kpi .v.blue{color:var(--blue)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:880px){.grid2{grid-template-columns:1fr}}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.box h3{font-size:15px;margin-bottom:14px}
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.bar .lab{width:130px;font-size:13px;color:var(--mut);flex-shrink:0}
+.bar .track{flex:1;background:var(--panel2);border-radius:8px;height:22px;overflow:hidden;position:relative}
+.bar .fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--gold),var(--gold2));min-width:2px;transition:width .4s}
+.bar .num{width:auto;font-size:13px;font-weight:700;min-width:62px;text-align:right}
+.goal .track .fill{background:linear-gradient(90deg,var(--green),#6fe39a)}
+.goal .track .fill.over{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:50;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);width:100%;max-width:620px;padding:24px}
+.modal h3{font-size:18px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.fg{margin-bottom:13px}
+.fg label{display:block;font-size:12px;color:var(--mut);margin-bottom:5px;font-weight:600}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.modal-foot{display:flex;justify-content:space-between;gap:9px;margin-top:20px;flex-wrap:wrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{font-size:12px;padding:4px 10px;border-radius:20px;background:var(--panel2);border:1px solid var(--line);display:flex;gap:6px;align-items:center}
+.chip x{cursor:pointer;color:var(--mut);font-weight:700}
+
+/* templates */
+.tpl{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:13px}
+.tpl .h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.tpl .h .nm{font-weight:700}
+.tpl textarea{min-height:78px;font-size:13px}
+.muted{color:var(--mut);font-size:12px}
+.seg-head{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--gold2);margin:20px 0 10px;font-weight:700}
+.empty{text-align:center;color:var(--mut);padding:40px 20px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#06210f;padding:12px 22px;border-radius:30px;font-weight:700;box-shadow:var(--shadow);transition:.3s;z-index:99;opacity:0}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+::-webkit-scrollbar{height:9px;width:9px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><span class="dot">M</span><div>Moove CRM<small>Prospecção · Maringá</small></div></div>
+  <nav>
+    <button class="tab active" data-view="pipeline">📋 Pipeline</button>
+    <button class="tab" data-view="contatos">👥 Contatos</button>
+    <button class="tab" data-view="followups">🔔 Follow-ups</button>
+    <button class="tab" data-view="templates">💬 Templates</button>
+    <button class="tab" data-view="analytics">📊 Analytics</button>
+  </nav>
+  <div class="actions">
+    <button class="btn primary" onclick="openLead()">+ Novo lead</button>
+    <button class="btn ghost" onclick="toggleMenu(event)">⋯</button>
+    <div class="menu" id="menu">
+      <button onclick="exportJSON()">⬇️ Backup (exportar JSON)</button>
+      <button onclick="document.getElementById('importf').click()">⬆️ Importar JSON</button>
+      <button onclick="exportCSV()">📄 Exportar CSV</button>
+      <button onclick="seedReset()">♻️ Restaurar leads-semente</button>
+      <button onclick="wipe()" style="color:var(--red)">🗑️ Apagar tudo</button>
+    </div>
+    <input type="file" id="importf" accept=".json" class="hide" onchange="importJSON(this)">
+  </div>
+</header>
+
+<main>
+  <!-- PIPELINE -->
+  <section class="view active" id="pipeline">
+    <h2 class="title">Pipeline de vendas</h2>
+    <div class="sub">Arraste os cards entre as etapas. Card com borda vermelha = lead esfriando (follow-up atrasado).</div>
+    <div class="board" id="board"></div>
+  </section>
+
+  <!-- CONTATOS -->
+  <section class="view" id="contatos">
+    <h2 class="title">Contatos</h2>
+    <div class="sub">Clique numa linha pra editar. Use os filtros pra focar num segmento ou etapa.</div>
+    <div class="filters">
+      <input type="search" id="search" placeholder="🔍 Buscar negócio, telefone, nota..." oninput="renderTable()">
+      <select id="fSeg" onchange="renderTable()"><option value="">Todos os segmentos</option></select>
+      <select id="fEtapa" onchange="renderTable()"><option value="">Todas as etapas</option></select>
+      <select id="fProd" onchange="renderTable()"><option value="">Todos os produtos</option></select>
+    </div>
+    <table id="tbl"><thead><tr>
+      <th onclick="sortBy('negocio')">Negócio</th><th onclick="sortBy('segmento')">Segmento</th>
+      <th onclick="sortBy('produto')">Produto</th><th onclick="sortBy('etapa')">Etapa</th>
+      <th>Contato</th><th onclick="sortBy('proximaData')">Próximo passo</th>
+    </tr></thead><tbody id="tblBody"></tbody></table>
+  </section>
+
+  <!-- FOLLOW-UPS -->
+  <section class="view" id="followups">
+    <h2 class="title">Follow-ups — não deixe esfriar</h2>
+    <div class="sub">O que precisa de ação hoje e os leads parados. A regra: nenhum lead ativo sem próximo passo marcado.</div>
+    <div class="grid2">
+      <div class="box"><h3>🔥 Atrasados / hoje</h3><div id="fuDue"></div></div>
+      <div class="box"><h3>🧊 Esfriando (sem contato há 5+ dias)</h3><div id="fuCold"></div></div>
+    </div>
+    <div class="box" style="margin-top:16px"><h3>📅 Próximos (esta semana)</h3><div id="fuNext"></div></div>
+  </section>
+
+  <!-- TEMPLATES -->
+  <section class="view" id="templates">
+    <h2 class="title">Templates de mensagem</h2>
+    <div class="sub">Editáveis. Use <code>{{negocio}}</code> e <code>{{produto}}</code> como atalhos. No card/contato, o botão "WhatsApp" já preenche e abre a conversa.</div>
+    <div style="margin-bottom:14px"><button class="btn primary sm" onclick="openTpl()">+ Novo template</button></div>
+    <div id="tplList"></div>
+  </section>
+
+  <!-- ANALYTICS -->
+  <section class="view" id="analytics">
+    <h2 class="title">Analytics & metas</h2>
+    <div class="sub">Atualiza sozinho conforme você move os leads. Metas mensais editáveis abaixo.</div>
+    <div class="kpis" id="kpis"></div>
+    <div class="grid2">
+      <div class="box"><h3>🎯 Metas do mês <button class="btn ghost sm" style="float:right" onclick="openGoals()">Editar metas</button></h3><div id="goals"></div></div>
+      <div class="box"><h3>Funil por etapa</h3><div id="funnel"></div></div>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="box"><h3>Por produto</h3><div id="byProd"></div></div>
+      <div class="box"><h3>Por segmento</h3><div id="bySeg"></div></div>
+    </div>
+  </section>
+</main>
+
+<div class="overlay" id="overlay"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DADOS ============ */
+const STAGES=[
+  {k:"A contatar",c:"#9aa3b2"},
+  {k:"Contato feito",c:"#4f8bf0"},
+  {k:"Demo agendada",c:"#9b6cf0"},
+  {k:"Proposta enviada",c:"#e0a83d"},
+  {k:"Fechado",c:"#3fb368"},
+  {k:"Perdido",c:"#e25563"}
+];
+const PRODUTOS={"Lava.AI":"#4f8bf0","Sorria.AI":"#3fb368","Realce.AI":"#9b6cf0","Corta.AI":"#e0a83d"};
+const PRECO=197; // mensalidade Standard p/ estimativa de MRR
+const KEY="moove_crm_v2";
+
+const SEED_LEADS=[
+ ["Estética automotiva","Lava.AI","Moderna Estética Automotiva Premium","(44) 99766-1480","@modernalavacar","Av Mauá 2427","A contatar","Premium - bom perfil",["quente"]],
+ ["Estética automotiva","Lava.AI","Estética Automotiva & Lava Car Laguna","(44) 99184-3169","lagunaesteticaautomotiva.com.br","Av Laguna 2037","A contatar","Tem site próprio",[]],
+ ["Estética automotiva","Lava.AI","2 P Estética Automotiva","(44) 9878-0361","","Av Colombo 6200, Zona 07","A contatar","Confirmar WhatsApp",[]],
+ ["Estética automotiva","Lava.AI","Esteticar","","","Av Brasil 5855, Zona 05","A contatar","Achar contato",[]],
+ ["Estética automotiva","Lava.AI","UP Estética Automotiva","","","R. Estados Unidos 1907, Jd Internorte","A contatar","Achar contato",[]],
+ ["Estética automotiva","Lava.AI","ZERO Centro de Estética Automotiva","","","Av Tamandaré 11520","A contatar","Achar contato",[]],
+ ["Odontologia","Sorria.AI","Sorrir Clínica Odontológica","(44) 98822-9844","@sorrirmaringa","","A contatar","WhatsApp direto disponível",["quente"]],
+ ["Odontologia","Sorria.AI","Dentz Maringá","(44) 99176-8475","rededentz.com.br","Av Paraná 805, Zona 01","A contatar","3 consultórios",[]],
+ ["Odontologia","Sorria.AI","Odonto Maringá (Zona 07)","","@odontomaringa","Zona 07","A contatar","DM Instagram",[]],
+ ["Odontologia","Sorria.AI","Odontoclinic Maringá","","odontoclinicmaringa.com","","A contatar","Form/site",[]],
+ ["Odontologia","Sorria.AI","Odontologia Peixoto","","odontologiapeixotomaringa.com.br","","A contatar","Clínica independente (alvo bom)",[]],
+ ["Estética","Realce.AI","Hamonir Maringá Centro","(44) 92001-9609","@hamonirmaringacentro","Av Tamandaré 331, Centro","A contatar","Harmonização + estética",["quente"]],
+ ["Estética","Realce.AI","Beautyclin Maringá","","@beautyclinmaringa","","A contatar","Harmonização facial/corporal",[]],
+ ["Estética","Realce.AI","Lady Estética","","ladyesteticamaringa.com.br","Praça dos Expedicionários, Zona 04","A contatar","Achar contato",[]],
+ ["Estética","Realce.AI","Clínica Beaunique","","beaunique.com.br","Tv Japurá 175, Zona 8","A contatar","Achar contato",[]],
+ ["Estética","Realce.AI","Dra. Sabrina Sasaki","","clinicadeesteticaemmaringa.com.br","","A contatar","Achar contato",[]],
+ ["Estética","Realce.AI","Spa Clin","","@spa.clin","Maringá PR","A contatar","DM Instagram",[]],
+ ["Barbearia","Corta.AI","Barbearia Magalhães","","@barbeariamagalhaes","","A contatar","+1200 atend/mês, 4.9 Google",["quente"]],
+ ["Barbearia","Corta.AI","Jacob's Barbearia","","@jacobsbarbeariamaringa","jacobsbarbearia.com.br","A contatar","250+ assinantes (já vê valor de recorrência)",["quente"]],
+ ["Barbearia","Corta.AI","Saint Patrick's","","@barberstpatricks","","A contatar","800+ membros, 2 unidades",[]],
+ ["Barbearia","Corta.AI","Sr. Calixto Barbearia","","srcalixtobarbearia.com.br","","A contatar","2 unidades ~20 profissionais (multi-agenda forte)",[]],
+ ["Barbearia","Corta.AI","GR Barbearia","","@grbarbeariamaringa","","A contatar","",[]],
+ ["Barbearia","Corta.AI","Will Barbearia","","willbarbearia.com.br","Av Brasil 4886, Zona 04","A contatar","Já tem agendamento online",[]]
+];
+function seedLeads(){return SEED_LEADS.map((r,i)=>({
+  id:"L"+(Date.now()+i),segmento:r[0],produto:r[1],negocio:r[2],telefone:r[3],
+  instagram:r[4],endereco:r[5],etapa:r[6],notas:r[7],tags:r[8],
+  proximoPasso:r[6]==="A contatar"?"Primeiro toque":"",proximaData:"",ultimoContato:"",valor:PRECO,createdAt:today()
+}));}
+
+const SEED_TPL=[
+ ["Lava — abertura","Estética automotiva","Primeiro toque","Oi! Aqui é a Marina, da Moove, a gente é daqui de Maringá. Vi o trabalho de vocês e queria te mostrar uma coisa que criamos pra lava-rápido: um sistema que abre OS, agenda e avisa o cliente quando o carro tá pronto, tudo dentro do WhatsApp, sem planilha. Te mostro funcionando em 5 minutinhos? Pode ser por call ou eu passo aí."],
+ ["Lava — isca de vídeo","Estética automotiva","Primeiro toque","Oi! Sou a Marina, da Moove (Maringá). Posso te mandar um vídeo de 1 minuto mostrando uma IA agendando e organizando tudo dentro do WhatsApp, do jeitinho que ficaria aí na {{negocio}}? Se curtir a gente marca, se não, sem problema nenhum."],
+ ["Lava — follow-up","Estética automotiva","Follow-up","Oi! Só voltando aqui rapidinho. Te mando aquele vídeo de 1 min mostrando o sistema abrindo uma OS no WhatsApp? Se fizer sentido a gente marca, se não, tranquilo."],
+ ["Sorria — abertura","Odontologia","Primeiro toque","Oi! Sou a Marina, da Moove (somos de Maringá). A gente criou uma atendente de IA pra consultório que agenda, confirma e remarca consulta sozinha no WhatsApp, por texto ou áudio, e ainda chama o paciente de volta pra limpeza no tempo certo. Posso te mostrar em 5 min como ficaria aí na {{negocio}}?"],
+ ["Sorria — follow-up","Odontologia","Follow-up","Oi! Passando pra saber se você viu minha mensagem. Posso te mandar um exemplo de como a IA confirma uma consulta? Se preferir, marco uma demo rapidinha no horário que for melhor pra você."],
+ ["Realce — abertura","Estética","Primeiro toque","Oi! Aqui é a Marina, da Moove, daqui de Maringá. Mostro pra você um sistema pra clínica de estética que controla pacote (sessão 3 de 10), organiza antes/depois por cliente e ainda lembra o retoque no tempo certo, tudo via WhatsApp. Te mostro funcionando em 5 min?"],
+ ["Realce — follow-up","Estética","Follow-up","Oi! Só retomando. Quer que eu te mande um print rápido de como fica o controle de pacote e o antes/depois? Se curtir, a gente marca uma demo curtinha."],
+ ["Corta — abertura","Barbearia","Primeiro toque","Fala! Aqui é a Marina, da Moove (Maringá). Criamos um sistema pra barbearia com agenda separada por barbeiro, um portfólio que mostra pro cliente o corte que o próprio barbeiro já fez, e que reativa cliente que sumiu. Roda tudo no WhatsApp. Posso te mostrar em 5 min?"],
+ ["Corta — isca de vídeo","Barbearia","Primeiro toque","Fala! Sou a Marina, da Moove. Te mando um vídeo de 1 min da nossa IA agendando, criando o horário na agenda e até remarcando sozinha, dentro do WhatsApp? É o que rodaria aí na {{negocio}}."],
+ ["Corta — follow-up","Barbearia","Follow-up","E aí, conseguiu ver? Te mando um vídeo curtinho da agenda funcionando por barbeiro? Se fizer sentido marco uma demo rápida."],
+ ["Pós-demo (todos)","Geral","Pós-demo","Obrigada pelo tempo! Como combinei: você viu a IA atendendo no WhatsApp e o painel completo. Fica R$197/mês com tudo rodando (ou R$297 com a sua logo e suas cores). Consigo deixar configurado e no ar em poucos dias. Quer que eu já comece a montar a conta da {{negocio}}?"]
+];
+function seedTpl(){return SEED_TPL.map((t,i)=>({id:"T"+(Date.now()+i),nome:t[0],segmento:t[1],etapa:t[2],texto:t[3]}));}
+
+let DB=load();
+function load(){
+  try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.leads)return d;}catch(e){}
+  return{leads:seedLeads(),templates:seedTpl(),goals:{toques:80,demos:12,fechamentos:4}};
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(DB));}
+function today(){return new Date().toISOString().slice(0,10);}
+function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/864e5);}
+function uid(p){return p+Math.random().toString(36).slice(2,9);}
+
+/* ============ NAV ============ */
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');document.getElementById(t.dataset.view).classList.add('active');
+  renderAll();
+});
+function toggleMenu(e){e.stopPropagation();document.getElementById('menu').classList.toggle('open');}
+document.body.onclick=()=>document.getElementById('menu').classList.remove('open');
+
+/* ============ PIPELINE ============ */
+function fuState(l){
+  if(["Fechado","Perdido"].includes(l.etapa))return"";
+  if(l.proximaData){const d=daysBetween(today(),l.proximaData);if(d<0)return"due";if(d<=2)return"soon";return"";}
+  if(l.ultimoContato&&daysBetween(l.ultimoContato,today())>=5)return"due";
+  if(!l.proximaData&&l.etapa!=="A contatar")return"due";
+  return"";
+}
+function renderBoard(){
+  const b=document.getElementById('board');b.innerHTML='';
+  STAGES.forEach(s=>{
+    const ls=DB.leads.filter(l=>l.etapa===s.k);
+    const col=document.createElement('div');col.className='col';col.dataset.stage=s.k;
+    col.innerHTML=`<h3><span style="color:${s.c}">●</span> ${s.k} <span class="cnt">${ls.length}</span></h3><div class="drop"></div>`;
+    const drop=col.querySelector('.drop');
+    ls.forEach(l=>drop.appendChild(cardEl(l)));
+    drop.ondragover=e=>{e.preventDefault();col.classList.add('over');};
+    drop.ondragleave=()=>col.classList.remove('over');
+    drop.ondrop=e=>{e.preventDefault();col.classList.remove('over');
+      const id=e.dataTransfer.getData('id');const l=DB.leads.find(x=>x.id===id);
+      if(l&&l.etapa!==s.k){l.etapa=s.k;l.ultimoContato=today();save();renderAll();toast('Movido pra '+s.k);}};
+    b.appendChild(col);
+  });
+}
+function cardEl(l){
+  const c=document.createElement('div');const fs=fuState(l);
+  c.className='card'+(fs==='due'?' hot':'');c.draggable=true;
+  c.ondragstart=e=>e.dataTransfer.setData('id',l.id);
+  c.onclick=()=>openLead(l.id);
+  const pc=PRODUTOS[l.produto]||'#888';
+  let nextHtml='';
+  if(l.proximaData){const d=daysBetween(today(),l.proximaData);
+    const cls=d<0?'due':(d<=2?'soon':'');
+    const txt=d<0?`atrasado ${Math.abs(d)}d`:(d===0?'hoje':(d===1?'amanhã':`em ${d}d`));
+    nextHtml=`<div class="next ${cls}">🔔 ${l.proximoPasso||'follow-up'} · ${txt}</div>`;
+  }else if(l.etapa!=="A contatar"&&!["Fechado","Perdido"].includes(l.etapa)){
+    nextHtml=`<div class="next due">⚠️ sem próximo passo</div>`;
+  }else if(l.proximoPasso){nextHtml=`<div class="next">▫️ ${l.proximoPasso}</div>`;}
+  c.innerHTML=`<div class="nm">${l.negocio}<span class="pill" style="background:${pc}22;color:${pc}">${l.produto.replace('.AI','')}</span></div>
+    <div class="meta">${l.telefone?'📞 '+l.telefone:(l.instagram?'📷 '+l.instagram:'<span style="color:#e25563">sem contato</span>')}</div>
+    ${nextHtml}
+    ${l.tags&&l.tags.length?`<div class="tags">${l.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`:''}`;
+  return c;
+}
+
+/* ============ TABELA ============ */
+let sortK='negocio',sortDir=1;
+function sortBy(k){if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=1;}renderTable();}
+function fillFilters(){
+  const segs=[...new Set(DB.leads.map(l=>l.segmento))].sort();
+  const prods=Object.keys(PRODUTOS);
+  setOpts('fSeg',segs);setOpts('fProd',prods);setOpts('fEtapa',STAGES.map(s=>s.k));
+}
+function setOpts(id,arr){const s=document.getElementById(id);const v=s.value;
+  s.innerHTML=s.children[0].outerHTML+arr.map(a=>`<option ${a===v?'selected':''}>${a}</option>`).join('');}
+function renderTable(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  const fs=document.getElementById('fSeg').value,fe=document.getElementById('fEtapa').value,fp=document.getElementById('fProd').value;
+  let rows=DB.leads.filter(l=>{
+    if(fs&&l.segmento!==fs)return false;if(fe&&l.etapa!==fe)return false;if(fp&&l.produto!==fp)return false;
+    if(q){const blob=(l.negocio+l.telefone+l.instagram+l.notas+l.endereco+(l.tags||[]).join(' ')).toLowerCase();if(!blob.includes(q))return false;}
+    return true;
+  });
+  rows.sort((a,b)=>((a[sortK]||'')>(b[sortK]||'')?1:-1)*sortDir);
+  const tb=document.getElementById('tblBody');
+  tb.innerHTML=rows.length?rows.map(l=>{
+    const st=STAGES.find(s=>s.k===l.etapa)||{c:'#888'};const pc=PRODUTOS[l.produto]||'#888';
+    let nd='';if(l.proximaData){const d=daysBetween(today(),l.proximaData);nd=`<span style="color:${d<0?'#e25563':(d<=2?'#f3c969':'#9aa3b2')}">${l.proximoPasso||'follow-up'} · ${l.proximaData}</span>`;}else nd='<span class="muted">—</span>';
+    return `<tr onclick="openLead('${l.id}')">
+      <td><b>${l.negocio}</b></td><td>${l.segmento}</td>
+      <td><span class="pill" style="background:${pc}22;color:${pc}">${l.produto.replace('.AI','')}</span></td>
+      <td><span class="pill" style="background:${st.c}22;color:${st.c}">${l.etapa}</span></td>
+      <td>${l.telefone||l.instagram||'<span class="muted">—</span>'}</td>
+      <td>${nd}</td></tr>`;
+  }).join(''):'<tr><td colspan="6" class="empty">Nenhum contato com esses filtros.</td></tr>';
+}
+
+/* ============ FOLLOW-UPS ============ */
+function renderFU(){
+  const active=DB.leads.filter(l=>!["Fechado","Perdido"].includes(l.etapa));
+  const due=active.filter(l=>{if(l.proximaData)return daysBetween(today(),l.proximaData)<=0;return l.etapa!=="A contatar"&&!l.proximaData;});
+  const cold=active.filter(l=>!due.includes(l)&&l.ultimoContato&&daysBetween(l.ultimoContato,today())>=5);
+  const next=active.filter(l=>l.proximaData&&daysBetween(today(),l.proximaData)>0&&daysBetween(today(),l.proximaData)<=7);
+  document.getElementById('fuDue').innerHTML=fuList(due,'Tudo em dia por aqui 🎉');
+  document.getElementById('fuCold').innerHTML=fuList(cold,'Nenhum lead esfriando.');
+  document.getElementById('fuNext').innerHTML=fuList(next,'Sem follow-ups agendados pra semana.');
+}
+function fuList(arr,empty){
+  if(!arr.length)return`<div class="empty">${empty}</div>`;
+  return arr.sort((a,b)=>(a.proximaData||'9')>(b.proximaData||'9')?1:-1).map(l=>{
+    const pc=PRODUTOS[l.produto]||'#888';
+    let when='';if(l.proximaData){const d=daysBetween(today(),l.proximaData);when=d<0?`<span style="color:#e25563">atrasado ${Math.abs(d)}d</span>`:(d===0?'<span style="color:#f3c969">hoje</span>':`em ${d}d`);}
+    else when='<span style="color:#e25563">sem data</span>';
+    return `<div class="card" style="cursor:default;margin-bottom:8px">
+      <div class="nm" style="cursor:pointer" onclick="openLead('${l.id}')">${l.negocio}
+        <span class="pill" style="background:${pc}22;color:${pc}">${l.produto.replace('.AI','')}</span></div>
+      <div class="meta">${l.proximoPasso||'follow-up'} · ${when} · ${l.etapa}</div>
+      <div style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap">
+        ${waBtn(l)}
+        <button class="btn sm ghost" onclick="markDone('${l.id}')">✓ Feito hoje</button>
+        <button class="btn sm ghost" onclick="snooze('${l.id}',2)">+2 dias</button>
+        <button class="btn sm ghost" onclick="openLead('${l.id}')">Abrir</button>
+      </div></div>`;
+  }).join('');
+}
+function markDone(id){const l=DB.leads.find(x=>x.id===id);l.ultimoContato=today();
+  const d=new Date();d.setDate(d.getDate()+3);l.proximaData=d.toISOString().slice(0,10);
+  save();renderAll();toast('Marcado. Próximo toque em 3 dias.');}
+function snooze(id,n){const l=DB.leads.find(x=>x.id===id);const base=l.proximaData&&new Date(l.proximaData)>new Date()?new Date(l.proximaData):new Date();
+  base.setDate(base.getDate()+n);l.proximaData=base.toISOString().slice(0,10);save();renderAll();toast('Adiado '+n+' dias.');}
+
+/* ============ WHATSAPP ============ */
+function fill(txt,l){return txt.replace(/\{\{negocio\}\}/g,l.negocio).replace(/\{\{produto\}\}/g,l.produto.replace('.AI','')).replace(/\{\{nome\}\}/g,l.negocio);}
+function waLink(l,txt){
+  let ph=(l.telefone||'').replace(/\D/g,'');if(ph&&!ph.startsWith('55'))ph='55'+ph;
+  const t=encodeURIComponent(txt||'');
+  return ph?`https://wa.me/${ph}?text=${t}`:(l.instagram?`https://instagram.com/${l.instagram.replace('@','')}`:'');
+}
+function waBtn(l){
+  const tpls=DB.templates.filter(t=>t.segmento===l.segmento||t.segmento==='Geral');
+  const def=tpls[0];if(!def&&!l.telefone&&!l.instagram)return'';
+  if(l.telefone){
+    return `<button class="btn sm wa" onclick="openWA('${l.id}')">💬 WhatsApp</button>`;
+  }
+  if(l.instagram)return `<a class="btn sm" style="background:#c13584;color:#fff" href="https://instagram.com/${l.instagram.replace('@','')}" target="_blank">📷 Instagram DM</a>`;
+  return '';
+}
+function openWA(id){
+  const l=DB.leads.find(x=>x.id===id);
+  const tpls=DB.templates.filter(t=>t.segmento===l.segmento||t.segmento==='Geral');
+  let html=`<div class="modal"><h3>Enviar WhatsApp — ${l.negocio} <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
+    <div class="fg"><label>Escolha o template</label><select id="waTpl" onchange="waPrev('${id}')">
+    ${tpls.map((t,i)=>`<option value="${t.id}">${t.nome}</option>`).join('')}</select></div>
+    <div class="fg"><label>Mensagem (edite à vontade)</label><textarea id="waMsg" style="min-height:140px"></textarea></div>
+    <div class="modal-foot"><button class="btn ghost" onclick="copyMsg()">📋 Copiar texto</button>
+    <a class="btn wa" id="waGo" target="_blank" onclick="afterWA('${id}')">Abrir no WhatsApp →</a></div></div>`;
+  ov(html);waPrev(id);
+}
+function waPrev(id){const l=DB.leads.find(x=>x.id===id);const t=DB.templates.find(x=>x.id===document.getElementById('waTpl').value);
+  const msg=fill(t.texto,l);document.getElementById('waMsg').value=msg;document.getElementById('waGo').href=waLink(l,msg);}
+function copyMsg(){navigator.clipboard.writeText(document.getElementById('waMsg').value);toast('Texto copiado!');}
+function afterWA(id){const l=DB.leads.find(x=>x.id===id);l.ultimoContato=today();
+  if(l.etapa==="A contatar"){l.etapa="Contato feito";}
+  if(!l.proximaData||new Date(l.proximaData)<new Date()){const d=new Date();d.setDate(d.getDate()+3);l.proximaData=d.toISOString().slice(0,10);l.proximoPasso=l.proximoPasso||"Follow-up";}
+  save();setTimeout(()=>{closeOv();renderAll();},400);}
+
+/* ============ MODAL LEAD ============ */
+function openLead(id){
+  const l=id?DB.leads.find(x=>x.id===id):{id:uid('L'),segmento:'Barbearia',produto:'Corta.AI',negocio:'',telefone:'',instagram:'',endereco:'',etapa:'A contatar',notas:'',tags:[],proximoPasso:'Primeiro toque',proximaData:'',ultimoContato:'',valor:PRECO,createdAt:today()};
+  const isNew=!id;
+  let html=`<div class="modal"><h3>${isNew?'Novo lead':l.negocio||'Editar lead'} <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
+   <div class="fg"><label>Negócio *</label><input id="m_negocio" value="${esc(l.negocio)}"></div>
+   <div class="row2">
+     <div class="fg"><label>Segmento</label><select id="m_segmento">${['Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza','Outro'].map(s=>`<option ${s===l.segmento?'selected':''}>${s}</option>`).join('')}</select></div>
+     <div class="fg"><label>Produto</label><select id="m_produto">${Object.keys(PRODUTOS).map(p=>`<option ${p===l.produto?'selected':''}>${p}</option>`).join('')}</select></div>
+   </div>
+   <div class="row2">
+     <div class="fg"><label>Telefone / WhatsApp</label><input id="m_telefone" value="${esc(l.telefone)}" placeholder="(44) 9xxxx-xxxx"></div>
+     <div class="fg"><label>Instagram / site</label><input id="m_instagram" value="${esc(l.instagram)}" placeholder="@perfil"></div>
+   </div>
+   <div class="fg"><label>Endereço</label><input id="m_endereco" value="${esc(l.endereco)}"></div>
+   <div class="row2">
+     <div class="fg"><label>Etapa</label><select id="m_etapa">${STAGES.map(s=>`<option ${s.k===l.etapa?'selected':''}>${s.k}</option>`).join('')}</select></div>
+     <div class="fg"><label>Valor mensal estimado (R$)</label><input id="m_valor" type="number" value="${l.valor||PRECO}"></div>
+   </div>
+   <div class="row2">
+     <div class="fg"><label>Próximo passo</label><input id="m_proximoPasso" value="${esc(l.proximoPasso)}" placeholder="Ex: Mandar vídeo / Ligar"></div>
+     <div class="fg"><label>Data do próximo passo</label><input id="m_proximaData" type="date" value="${l.proximaData||''}"></div>
+   </div>
+   <div class="fg"><label>Tags (separe por vírgula)</label><input id="m_tags" value="${esc((l.tags||[]).join(', '))}" placeholder="quente, indicação, voltar mês que vem"></div>
+   <div class="fg"><label>Notas</label><textarea id="m_notas">${esc(l.notas)}</textarea></div>
+   ${l.ultimoContato?`<div class="muted">Último contato: ${l.ultimoContato} · criado ${l.createdAt||'—'}</div>`:''}
+   <div class="modal-foot">
+     <div style="display:flex;gap:7px;flex-wrap:wrap">${!isNew?`<button class="btn danger sm" onclick="delLead('${l.id}')">Excluir</button>`:''}
+       ${!isNew&&l.telefone?`<button class="btn wa sm" onclick="saveLead('${l.id}',${isNew});openWA('${l.id}')">💬 WhatsApp</button>`:''}</div>
+     <div style="display:flex;gap:7px"><button class="btn ghost" onclick="closeOv()">Cancelar</button>
+       <button class="btn primary" onclick="saveLead('${l.id}',${isNew})">Salvar</button></div>
+   </div></div>`;
+  ov(html);
+}
+function saveLead(id,isNew){
+  const g=k=>document.getElementById('m_'+k).value;
+  if(!g('negocio').trim()){toast('Coloca o nome do negócio');return;}
+  let l=DB.leads.find(x=>x.id===id);
+  if(!l){l={id};DB.leads.push(l);}
+  l.negocio=g('negocio');l.segmento=g('segmento');l.produto=g('produto');l.telefone=g('telefone');
+  l.instagram=g('instagram');l.endereco=g('endereco');l.etapa=g('etapa');l.valor=+g('valor')||PRECO;
+  l.proximoPasso=g('proximoPasso');l.proximaData=g('proximaData');l.notas=g('notas');
+  l.tags=g('tags').split(',').map(t=>t.trim()).filter(Boolean);
+  if(!l.createdAt)l.createdAt=today();
+  save();closeOv();renderAll();toast(isNew?'Lead criado':'Salvo');
+}
+function delLead(id){if(!confirm('Excluir este lead?'))return;DB.leads=DB.leads.filter(x=>x.id!==id);save();closeOv();renderAll();toast('Excluído');}
+
+/* ============ TEMPLATES ============ */
+function renderTpl(){
+  const segs=['Geral',...new Set(DB.templates.map(t=>t.segmento).filter(s=>s!=='Geral'))];
+  const list=document.getElementById('tplList');list.innerHTML='';
+  segs.forEach(seg=>{
+    const ts=DB.templates.filter(t=>t.segmento===seg);if(!ts.length)return;
+    const h=document.createElement('div');h.className='seg-head';h.textContent=seg;list.appendChild(h);
+    ts.forEach(t=>{
+      const d=document.createElement('div');d.className='tpl';
+      d.innerHTML=`<div class="h"><span class="nm">${t.nome}</span>
+        <span><span class="pill" style="background:#2a2f3a;color:#9aa3b2">${t.etapa}</span>
+        <button class="btn ghost sm" onclick="copyTpl('${t.id}')">📋 Copiar</button>
+        <button class="btn danger sm" onclick="delTpl('${t.id}')">✕</button></span></div>
+        <textarea onchange="editTpl('${t.id}',this.value)">${esc(t.texto)}</textarea>`;
+      list.appendChild(d);
+    });
+  });
+}
+function editTpl(id,v){DB.templates.find(t=>t.id===id).texto=v;save();}
+function copyTpl(id){navigator.clipboard.writeText(DB.templates.find(t=>t.id===id).texto);toast('Template copiado!');}
+function delTpl(id){if(!confirm('Excluir template?'))return;DB.templates=DB.templates.filter(t=>t.id!==id);save();renderTpl();}
+function openTpl(){
+  let html=`<div class="modal"><h3>Novo template <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
+   <div class="fg"><label>Nome</label><input id="t_nome" placeholder="Ex: Lava — reativação"></div>
+   <div class="row2"><div class="fg"><label>Segmento</label><select id="t_seg">${['Geral','Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza'].map(s=>`<option>${s}</option>`).join('')}</select></div>
+   <div class="fg"><label>Etapa</label><select id="t_etapa">${['Primeiro toque','Follow-up','Pós-demo','Reativação'].map(s=>`<option>${s}</option>`).join('')}</select></div></div>
+   <div class="fg"><label>Texto (use {{negocio}} e {{produto}})</label><textarea id="t_texto" style="min-height:120px"></textarea></div>
+   <div class="modal-foot"><button class="btn ghost" onclick="closeOv()">Cancelar</button>
+   <button class="btn primary" onclick="addTpl()">Salvar</button></div></div>`;
+  ov(html);
+}
+function addTpl(){const n=document.getElementById('t_nome').value.trim();if(!n){toast('Dá um nome');return;}
+  DB.templates.push({id:uid('T'),nome:n,segmento:document.getElementById('t_seg').value,etapa:document.getElementById('t_etapa').value,texto:document.getElementById('t_texto').value});
+  save();closeOv();renderTpl();toast('Template criado');}
+
+/* ============ ANALYTICS ============ */
+function renderAnalytics(){
+  const L=DB.leads;const m=today().slice(0,7);
+  const cnt=k=>L.filter(l=>l.etapa===k).length;
+  const fechados=cnt('Fechado');
+  const toquesMes=L.filter(l=>l.ultimoContato&&l.ultimoContato.slice(0,7)===m).length;
+  const demos=L.filter(l=>["Demo agendada","Proposta enviada","Fechado"].includes(l.etapa)).length;
+  const contatados=L.filter(l=>l.etapa!=="A contatar").length;
+  const taxa=contatados?Math.round(fechados/contatados*100):0;
+  const mrr=L.filter(l=>l.etapa==='Fechado').reduce((s,l)=>s+(+l.valor||PRECO),0);
+  document.getElementById('kpis').innerHTML=`
+   ${kpi(L.length,'Leads no total','')}
+   ${kpi(L.filter(l=>l.etapa==='A contatar').length,'A contatar','')}
+   ${kpi(demos,'Demos no pipeline','blue')}
+   ${kpi(fechados,'Fechados','green')}
+   ${kpi(taxa+'%','Taxa de conversão','gold')}
+   ${kpi('R$ '+mrr.toLocaleString('pt-BR'),'MRR fechado','green')}`;
+  // metas
+  const g=DB.goals;
+  document.getElementById('goals').innerHTML=
+    goalBar('Toques no mês',toquesMes,g.toques)+
+    goalBar('Demos agendadas',demos,g.demos)+
+    goalBar('Fechamentos',fechados,g.fechamentos);
+  // funil
+  const max=Math.max(...STAGES.map(s=>cnt(s.k)),1);
+  document.getElementById('funnel').innerHTML=STAGES.map(s=>bar(s.k,cnt(s.k),max,s.c)).join('');
+  // por produto
+  const prods=Object.keys(PRODUTOS);const pmax=Math.max(...prods.map(p=>L.filter(l=>l.produto===p).length),1);
+  document.getElementById('byProd').innerHTML=prods.map(p=>bar(p.replace('.AI',''),L.filter(l=>l.produto===p).length,pmax,PRODUTOS[p])).join('');
+  // por segmento
+  const segs=[...new Set(L.map(l=>l.segmento))];const smax=Math.max(...segs.map(s=>L.filter(l=>l.segmento===s).length),1);
+  document.getElementById('bySeg').innerHTML=segs.map(s=>bar(s,L.filter(l=>l.segmento===s).length,smax,'#e0a83d')).join('');
+}
+function kpi(v,l,cls){return`<div class="kpi"><div class="v ${cls}">${v}</div><div class="l">${l}</div></div>`;}
+function bar(lab,val,max,c){return`<div class="bar"><div class="lab">${lab}</div><div class="track"><div class="fill" style="width:${val/max*100}%;background:linear-gradient(90deg,${c},${c})"></div></div><div class="num">${val}</div></div>`;}
+function goalBar(lab,val,goal){const pct=goal?Math.min(val/goal*100,100):0;const over=val>=goal;
+  return`<div class="bar goal"><div class="lab">${lab}</div><div class="track"><div class="fill ${over?'over':''}" style="width:${pct}%"></div></div><div class="num">${val}/${goal}</div></div>`;}
+function openGoals(){const g=DB.goals;
+  let html=`<div class="modal"><h3>Metas do mês <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
+   <div class="fg"><label>Toques (mensagens enviadas) no mês</label><input id="g_toques" type="number" value="${g.toques}"></div>
+   <div class="fg"><label>Demos agendadas</label><input id="g_demos" type="number" value="${g.demos}"></div>
+   <div class="fg"><label>Fechamentos</label><input id="g_fechamentos" type="number" value="${g.fechamentos}"></div>
+   <div class="modal-foot"><button class="btn ghost" onclick="closeOv()">Cancelar</button>
+   <button class="btn primary" onclick="saveGoals()">Salvar</button></div></div>`;ov(html);}
+function saveGoals(){DB.goals={toques:+document.getElementById('g_toques').value,demos:+document.getElementById('g_demos').value,fechamentos:+document.getElementById('g_fechamentos').value};save();closeOv();renderAnalytics();toast('Metas salvas');}
+
+/* ============ BACKUP ============ */
+function exportJSON(){dl('moove-crm-'+today()+'.json',JSON.stringify(DB,null,2),'application/json');toast('Backup baixado');}
+function exportCSV(){
+  const h=['Negócio','Segmento','Produto','Etapa','Telefone','Instagram','Endereço','Próximo passo','Data','Tags','Notas'];
+  const rows=DB.leads.map(l=>[l.negocio,l.segmento,l.produto,l.etapa,l.telefone,l.instagram,l.endereco,l.proximoPasso,l.proximaData,(l.tags||[]).join('|'),l.notas].map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(','));
+  dl('moove-leads-'+today()+'.csv',[h.join(','),...rows].join('\n'),'text/csv');toast('CSV baixado');}
+function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();
+  r.onload=e=>{try{const d=JSON.parse(e.target.result);if(d.leads){DB=d;save();renderAll();toast('Importado!');}else toast('Arquivo inválido');}catch(x){toast('Erro ao ler');}};
+  r.readAsText(f);inp.value='';}
+function seedReset(){if(!confirm('Isso adiciona os 23 leads-semente. Continuar?'))return;
+  const exist=new Set(DB.leads.map(l=>l.negocio));seedLeads().forEach(l=>{if(!exist.has(l.negocio))DB.leads.push(l);});save();renderAll();toast('Leads-semente adicionados');}
+function wipe(){if(!confirm('Apagar TODOS os dados? Isso não volta.'))return;localStorage.removeItem(KEY);DB=load();renderAll();toast('Tudo apagado');}
+function dl(name,content,type){const b=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
+
+/* ============ UTIL ============ */
+function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function ov(html){const o=document.getElementById('overlay');o.innerHTML=html;o.classList.add('open');o.onclick=e=>{if(e.target===o)closeOv();};}
+function closeOv(){document.getElementById('overlay').classList.remove('open');}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
+function renderAll(){renderBoard();fillFilters();renderTable();renderFU();renderTpl();renderAnalytics();}
+renderAll();
+</script>
+</body>
+</html>
