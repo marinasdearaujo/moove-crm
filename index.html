@@ -339,16 +339,19 @@ async function cloudPush(){
 }
 async function cloudPull(initial){
   try{
+    // Passo 1 (barato): baixa só o carimbo de data — poucos bytes. Poupa cota grátis.
+    const rt=await fetch(`${FB_URL}/${FB_PATH}/_updatedAt.json`,{cache:'no-store'});
+    if(!rt.ok){setSync('off');return;}
+    const remoteAt=await rt.json();
+    if(remoteAt===null){if(initial)cloudPush();setSync('ok');return;} // nuvem vazia: sobe o seed
+    if((remoteAt||0)<=(DB._updatedAt||0)){setSync('ok');return;} // nada novo, nem baixa o resto
+    if(document.getElementById('overlay').classList.contains('open')){setSync('ok');return;} // não atropela edição
+    // Passo 2 (só quando mudou): baixa o banco completo.
     const r=await fetch(`${FB_URL}/${FB_PATH}.json`,{cache:'no-store'});
     if(!r.ok){setSync('off');return;}
     const d=await r.json();
-    if(d&&d.leads){
-      if((d._updatedAt||0)>(DB._updatedAt||0)){
-        if(document.getElementById('overlay').classList.contains('open'))return; // não atropela edição aberta
-        applyingRemote=true;DB=d;localStorage.setItem(KEY,JSON.stringify(DB));renderAll();applyingRemote=false;
-      }
-      setSync('ok');
-    }else if(initial){cloudPush();} // nuvem vazia: sobe o que tem local (seed)
+    if(d&&d.leads){applyingRemote=true;DB=d;localStorage.setItem(KEY,JSON.stringify(DB));renderAll();applyingRemote=false;}
+    setSync('ok');
   }catch(e){setSync('off');}
 }
 function forceSync(){cloudPull().then(()=>cloudPush());}
