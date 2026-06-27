@@ -127,13 +127,15 @@ tbody tr{cursor:pointer}
 <header>
   <div class="logo"><span class="dot">M</span><div>Moove CRM<small>Prospecção · Maringá</small></div></div>
   <nav>
-    <button class="tab active" data-view="pipeline">📋 Pipeline</button>
+    <button class="tab active" data-view="inicio">🏠 Início</button>
+    <button class="tab" data-view="pipeline">📋 Pipeline</button>
     <button class="tab" data-view="contatos">👥 Contatos</button>
     <button class="tab" data-view="followups">🔔 Follow-ups</button>
     <button class="tab" data-view="templates">💬 Templates</button>
     <button class="tab" data-view="analytics">📊 Analytics</button>
   </nav>
   <div class="actions">
+    <button id="syncPill" class="btn ghost" style="font-size:13px" onclick="forceSync()" title="Status de sincronização (clique pra forçar)">☁︎ —</button>
     <button class="btn primary" onclick="openLead()">+ Novo lead</button>
     <button class="btn ghost" onclick="toggleMenu(event)">⋯</button>
     <div class="menu" id="menu">
@@ -148,10 +150,44 @@ tbody tr{cursor:pointer}
 </header>
 
 <main>
+  <!-- INÍCIO -->
+  <section class="view active" id="inicio">
+    <div id="homeHero"></div>
+    <div class="kpis" id="homeKpis"></div>
+    <div class="grid2">
+      <div class="box"><h3>🔔 Pra fazer agora</h3><div id="homeTodo"></div></div>
+      <div class="box"><h3>🎯 Metas do mês</h3><div id="homeGoals"></div></div>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="box">
+        <h3>🧭 A estratégia em 1 minuto</h3>
+        <div id="homeStrat"></div>
+      </div>
+      <div class="box">
+        <h3>⏱️ Cadência (cabe nas suas ~3h/dia)</h3>
+        <div id="homeCad"></div>
+      </div>
+    </div>
+    <div class="box" style="margin-top:16px">
+      <h3>📚 Materiais de apoio</h3>
+      <div class="muted" style="line-height:1.9">
+        Playbook completo, demo tela a tela e transcrições do agente estão na pasta <b>Moove/Prospeccao-Maringa/</b> (no computador).
+        Preço: <b>R$197/mês</b> (Standard) · <b>R$297/mês</b> (Premium, marca branca). Contato dos produtos: <b>44 98426-6280</b>.
+      </div>
+    </div>
+  </section>
+
   <!-- PIPELINE -->
-  <section class="view active" id="pipeline">
+  <section class="view" id="pipeline">
     <h2 class="title">Pipeline de vendas</h2>
     <div class="sub">Arraste os cards entre as etapas. Card com borda vermelha = lead esfriando (follow-up atrasado).</div>
+    <div class="filters">
+      <input type="search" id="pSearch" placeholder="🔍 Buscar no pipeline..." oninput="renderBoard()">
+      <select id="pSeg" onchange="renderBoard()"><option value="">Todos os segmentos</option></select>
+      <select id="pProd" onchange="renderBoard()"><option value="">Todos os produtos</option></select>
+      <select id="pTag" onchange="renderBoard()"><option value="">Todas as tags</option></select>
+      <label style="display:flex;align-items:center;gap:6px;color:var(--mut);font-size:13px;white-space:nowrap"><input type="checkbox" id="pHot" style="width:auto" onchange="renderBoard()"> só esfriando 🔥</label>
+    </div>
     <div class="board" id="board"></div>
   </section>
 
@@ -270,12 +306,59 @@ const SEED_TPL=[
 ];
 function seedTpl(){return SEED_TPL.map((t,i)=>({id:"T"+(Date.now()+i),nome:t[0],segmento:t[1],etapa:t[2],texto:t[3]}));}
 
+/* ---- Firebase Realtime Database (REST, sem SDK) ---- */
+/* Para um banco DEDICADO/seguro depois, troque só FB_URL pela URL do novo projeto. */
+const FB_URL="https://rifa-mae-default-rtdb.firebaseio.com";
+const FB_PATH="moove_crm/data";
+const DEVICE=(()=>{let d=localStorage.getItem('moove_device');if(!d){d=Math.random().toString(36).slice(2,9);localStorage.setItem('moove_device',d);}return d;})();
+let applyingRemote=false,pushTimer=null;
+
 let DB=load();
 function load(){
   try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.leads)return d;}catch(e){}
-  return{leads:seedLeads(),templates:seedTpl(),goals:{toques:80,demos:12,fechamentos:4}};
+  return{leads:seedLeads(),templates:seedTpl(),goals:{toques:80,demos:12,fechamentos:4},_updatedAt:0};
 }
-function save(){localStorage.setItem(KEY,JSON.stringify(DB));}
+function save(){
+  if(applyingRemote)return;
+  DB._updatedAt=Date.now();DB._by=DEVICE;
+  localStorage.setItem(KEY,JSON.stringify(DB));
+  schedulePush();
+}
+function setSync(state){
+  const p=document.getElementById('syncPill');if(!p)return;
+  const m={syncing:["↻ Sincronizando","#f3c969"],ok:["☁︎ Sincronizado","#3fb368"],off:["⚠︎ Offline (salvo local)","#e25563"]};
+  const[t,c]=m[state]||["☁︎ —","#9aa3b2"];p.textContent=t;p.style.color=c;
+}
+function schedulePush(){clearTimeout(pushTimer);pushTimer=setTimeout(cloudPush,700);}
+async function cloudPush(){
+  setSync('syncing');
+  try{
+    const r=await fetch(`${FB_URL}/${FB_PATH}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(DB)});
+    setSync(r.ok?'ok':'off');
+  }catch(e){setSync('off');}
+}
+async function cloudPull(initial){
+  try{
+    const r=await fetch(`${FB_URL}/${FB_PATH}.json`,{cache:'no-store'});
+    if(!r.ok){setSync('off');return;}
+    const d=await r.json();
+    if(d&&d.leads){
+      if((d._updatedAt||0)>(DB._updatedAt||0)){
+        if(document.getElementById('overlay').classList.contains('open'))return; // não atropela edição aberta
+        applyingRemote=true;DB=d;localStorage.setItem(KEY,JSON.stringify(DB));renderAll();applyingRemote=false;
+      }
+      setSync('ok');
+    }else if(initial){cloudPush();} // nuvem vazia: sobe o que tem local (seed)
+  }catch(e){setSync('off');}
+}
+function forceSync(){cloudPull().then(()=>cloudPush());}
+async function initSync(){
+  await cloudPull(true);
+  setInterval(()=>{if(!document.hidden)cloudPull();},20000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)cloudPull();});
+  window.addEventListener('online',forceSync);
+  window.addEventListener('offline',()=>setSync('off'));
+}
 function today(){return new Date().toISOString().slice(0,10);}
 function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/864e5);}
 function uid(p){return p+Math.random().toString(36).slice(2,9);}
@@ -298,10 +381,28 @@ function fuState(l){
   if(!l.proximaData&&l.etapa!=="A contatar")return"due";
   return"";
 }
+function fillPipeFilters(){
+  const segs=[...new Set(DB.leads.map(l=>l.segmento))].sort();
+  const tags=[...new Set(DB.leads.flatMap(l=>l.tags||[]))].sort();
+  setOpts('pSeg',segs);setOpts('pProd',Object.keys(PRODUTOS));setOpts('pTag',tags);
+}
+function pipeFiltered(){
+  const q=(document.getElementById('pSearch')?.value||'').toLowerCase();
+  const fs=document.getElementById('pSeg')?.value||'',fp=document.getElementById('pProd')?.value||'';
+  const ft=document.getElementById('pTag')?.value||'',hot=document.getElementById('pHot')?.checked;
+  return DB.leads.filter(l=>{
+    if(fs&&l.segmento!==fs)return false;if(fp&&l.produto!==fp)return false;
+    if(ft&&!(l.tags||[]).includes(ft))return false;
+    if(hot&&fuState(l)!=='due')return false;
+    if(q){const blob=(l.negocio+l.telefone+l.instagram+l.notas+(l.tags||[]).join(' ')).toLowerCase();if(!blob.includes(q))return false;}
+    return true;
+  });
+}
 function renderBoard(){
   const b=document.getElementById('board');b.innerHTML='';
+  const base=pipeFiltered();
   STAGES.forEach(s=>{
-    const ls=DB.leads.filter(l=>l.etapa===s.k);
+    const ls=base.filter(l=>l.etapa===s.k);
     const col=document.createElement('div');col.className='col';col.dataset.stage=s.k;
     col.innerHTML=`<h3><span style="color:${s.c}">●</span> ${s.k} <span class="cnt">${ls.length}</span></h3><div class="drop"></div>`;
     const drop=col.querySelector('.drop');
@@ -565,6 +666,46 @@ function openGoals(){const g=DB.goals;
    <button class="btn primary" onclick="saveGoals()">Salvar</button></div></div>`;ov(html);}
 function saveGoals(){DB.goals={toques:+document.getElementById('g_toques').value,demos:+document.getElementById('g_demos').value,fechamentos:+document.getElementById('g_fechamentos').value};save();closeOv();renderAnalytics();toast('Metas salvas');}
 
+/* ============ INÍCIO ============ */
+const STRAT=[
+ ["Lava.AI","Lava-rápido / estética automotiva","Some a planilha: OS, agenda e aviso de carro pronto no WhatsApp.","#4f8bf0"],
+ ["Sorria.AI","Consultórios odontológicos","Atendente IA que agenda, confirma e remarca, e traz o paciente de volta pra limpeza.","#3fb368"],
+ ["Realce.AI","Clínicas de estética","Pacote 3/10 no controle, antes/depois organizado e retoque lembrado no tempo certo.","#9b6cf0"],
+ ["Corta.AI","Barbearias (e salões)","Agenda por profissional, portfólio do corte que ele já fez e reativação de quem sumiu.","#e0a83d"]
+];
+const CADENCE=[
+ ["Manhã · 15 min","Abra o Início, veja os follow-ups do dia e separe os 10 alvos."],
+ ["Bloco de toque · 30-40 min","Dispare 10 primeiros toques + 2 follow-ups. Use o botão WhatsApp (já vem preenchido)."],
+ ["Tarde · 10 min","Responda quem voltou, agende as demos, mova os cards no pipeline."],
+ ["Demos","5-7 min cada (call) ou agrupe as presenciais num dia. Comece pela barbearia (demo já pronta)."]
+];
+function renderHome(){
+  const h=new Date().getHours();const oi=h<12?"Bom dia":(h<18?"Boa tarde":"Boa noite");
+  const L=DB.leads;const cnt=k=>L.filter(l=>l.etapa===k).length;
+  const acontatar=cnt('A contatar'),demos=L.filter(l=>["Demo agendada","Proposta enviada","Fechado"].includes(l.etapa)).length;
+  const fechados=cnt('Fechado');const mrr=L.filter(l=>l.etapa==='Fechado').reduce((s,l)=>s+(+l.valor||PRECO),0);
+  const due=L.filter(l=>!["Fechado","Perdido"].includes(l.etapa)).filter(l=>{if(l.proximaData)return daysBetween(today(),l.proximaData)<=0;return l.etapa!=="A contatar"&&!l.proximaData;});
+  const hero=document.getElementById('homeHero');
+  hero.innerHTML=`<div class="box" style="background:linear-gradient(135deg,#1e222c,#171a21);border-color:#2a2f3a;margin-bottom:18px">
+     <div style="font-size:22px;font-weight:800">${oi}, Marina 👋</div>
+     <div class="muted" style="margin-top:5px">Prospecção dos SaaS da Moove em Maringá. ${due.length?`Você tem <b style="color:#f3c969">${due.length}</b> follow-up(s) pra hoje.`:'Nenhum follow-up atrasado, dia limpo 🎉'}
+     <a onclick="goView('pipeline')" style="cursor:pointer">Abrir pipeline →</a></div></div>`;
+  document.getElementById('homeKpis').innerHTML=
+    kpi(L.length,'Leads no total','')+kpi(acontatar,'A contatar','')+kpi(demos,'Demos no pipeline','blue')+
+    kpi(fechados,'Fechados','green')+kpi('R$ '+mrr.toLocaleString('pt-BR'),'MRR fechado','green');
+  document.getElementById('homeTodo').innerHTML=due.length?fuList(due.slice(0,5),''):'<div class="empty">Tudo em dia 🎉</div>';
+  const g=DB.goals;const m=today().slice(0,7);const toquesMes=L.filter(l=>l.ultimoContato&&l.ultimoContato.slice(0,7)===m).length;
+  document.getElementById('homeGoals').innerHTML=goalBar('Toques no mês',toquesMes,g.toques)+goalBar('Demos',demos,g.demos)+goalBar('Fechamentos',fechados,g.fechamentos);
+  document.getElementById('homeStrat').innerHTML=STRAT.map(s=>`<div style="display:flex;gap:10px;margin-bottom:12px">
+     <span class="pill" style="background:${s[3]}22;color:${s[3]};height:fit-content">${s[0].replace('.AI','')}</span>
+     <div><b style="font-size:13px">${s[1]}</b><div class="muted" style="font-size:12px">${s[2]}</div></div></div>`).join('');
+  document.getElementById('homeCad').innerHTML=CADENCE.map((c,i)=>`<div style="display:flex;gap:11px;margin-bottom:12px">
+     <span style="background:#e0a83d22;color:#f3c969;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-weight:700;flex-shrink:0;font-size:13px">${i+1}</span>
+     <div><b style="font-size:13px">${c[0]}</b><div class="muted" style="font-size:12px">${c[1]}</div></div></div>`).join('')
+     +`<div class="muted" style="margin-top:8px;font-size:12px;border-top:1px solid var(--line);padding-top:10px">💡 Regra: um segmento por dia no começo (seg = barbearia, ter = odonto...) pra ficar fluente no pitch.</div>`;
+}
+function goView(v){document.querySelector(`.tab[data-view="${v}"]`).click();}
+
 /* ============ BACKUP ============ */
 function exportJSON(){dl('moove-crm-'+today()+'.json',JSON.stringify(DB,null,2),'application/json');toast('Backup baixado');}
 function exportCSV(){
@@ -584,8 +725,8 @@ function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt
 function ov(html){const o=document.getElementById('overlay');o.innerHTML=html;o.classList.add('open');o.onclick=e=>{if(e.target===o)closeOv();};}
 function closeOv(){document.getElementById('overlay').classList.remove('open');}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
-function renderAll(){renderBoard();fillFilters();renderTable();renderFU();renderTpl();renderAnalytics();}
-renderAll();
+function renderAll(){renderHome();renderBoard();fillFilters();fillPipeFilters();renderTable();renderFU();renderTpl();renderAnalytics();}
+renderAll();initSync();
 </script>
 </body>
 </html>
