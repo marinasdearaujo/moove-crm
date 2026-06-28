@@ -3,24 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Moove CRM — Prospecção Maringá</title>
+<title>Moove CRM</title>
 <style>
 :root{
   --bg:#0f1115; --panel:#171a21; --panel2:#1e222c; --line:#2a2f3a;
   --txt:#e8eaf0; --mut:#9aa3b2; --gold:#e0a83d; --gold2:#f3c969;
   --green:#3fb368; --red:#e25563; --blue:#4f8bf0; --purple:#9b6cf0;
+  --accent:#e0a83d; --accent2:#f3c969;
   --radius:14px; --shadow:0 6px 24px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:15px;-webkit-font-smoothing:antialiased}
-a{color:var(--gold2);text-decoration:none}
+a{color:var(--accent2);text-decoration:none;cursor:pointer}
 button{font-family:inherit;cursor:pointer;border:none;border-radius:10px;font-size:14px;font-weight:600;transition:.15s}
 input,select,textarea{font-family:inherit;font-size:14px;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px 12px;width:100%}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
 textarea{resize:vertical;min-height:90px;line-height:1.5}
 .btn{padding:10px 16px;background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
-.btn:hover{border-color:var(--gold)}
-.btn.primary{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1206;border:none}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#1a1206;border:none}
 .btn.primary:hover{filter:brightness(1.08)}
 .btn.ghost{background:transparent;border:1px solid var(--line)}
 .btn.danger{background:transparent;border:1px solid var(--red);color:var(--red)}
@@ -28,30 +29,29 @@ textarea{resize:vertical;min-height:90px;line-height:1.5}
 .btn.wa{background:#1faf5a;color:#fff;border:none}
 .btn.wa:hover{filter:brightness(1.08)}
 
-/* layout */
-header{display:flex;align-items:center;gap:16px;padding:14px 22px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;flex-wrap:wrap}
+header{display:flex;align-items:center;gap:14px;padding:14px 22px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;flex-wrap:wrap}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:.3px}
-.logo .dot{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:grid;place-items:center;color:#1a1206;font-weight:900}
+.logo .dot{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#1a1206;font-weight:900}
 .logo small{display:block;font-size:11px;color:var(--mut);font-weight:500;letter-spacing:0}
+.ws{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:3px}
+.ws button{padding:7px 13px;background:transparent;color:var(--mut);border-radius:8px;font-size:13px}
+.ws button.on{background:var(--accent);color:#1a1206}
 nav{display:flex;gap:4px;flex:1;flex-wrap:wrap}
 .tab{padding:9px 15px;background:transparent;color:var(--mut);border-radius:10px;font-weight:600}
-.tab.active{background:var(--panel2);color:var(--gold2)}
+.tab.active{background:var(--panel2);color:var(--accent2)}
 .tab:hover{color:var(--txt)}
 .actions{display:flex;gap:8px;align-items:center;position:relative}
 main{padding:22px;max-width:1500px;margin:0 auto}
 .view{display:none}.view.active{display:block}
 h2.title{font-size:20px;margin-bottom:4px}
 .sub{color:var(--mut);font-size:13px;margin-bottom:18px}
-
-/* dropdown */
-.menu{position:absolute;right:0;top:46px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;display:none;min-width:200px;z-index:30}
+.menu{position:absolute;right:0;top:46px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;display:none;min-width:210px;z-index:30}
 .menu.open{display:block}
 .menu button{display:block;width:100%;text-align:left;padding:9px 12px;background:transparent;color:var(--txt);font-weight:500}
 .menu button:hover{background:var(--panel)}
 
-/* kanban */
 .board{display:flex;gap:14px;overflow-x:auto;padding-bottom:10px}
-.col{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);min-width:265px;width:265px;flex-shrink:0;display:flex;flex-direction:column;max-height:calc(100vh - 190px)}
+.col{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);min-width:265px;width:265px;flex-shrink:0;display:flex;flex-direction:column;max-height:calc(100vh - 210px)}
 .col h3{padding:13px 14px;font-size:13px;text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
 .col h3 .cnt{background:var(--panel2);color:var(--mut);border-radius:20px;padding:2px 9px;font-size:12px}
 .col .drop{padding:10px;overflow-y:auto;flex:1;min-height:60px}
@@ -64,11 +64,10 @@ h2.title{font-size:20px;margin-bottom:4px}
 .pill{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap}
 .card .next{font-size:12px;margin-top:7px;color:var(--mut);display:flex;align-items:center;gap:5px}
 .card .next.due{color:var(--red);font-weight:600}
-.card .next.soon{color:var(--gold2)}
+.card .next.soon{color:var(--accent2)}
 .tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
 .tag{font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(155,108,240,.16);color:#c4a6ff;font-weight:600}
 
-/* table */
 table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:var(--radius);overflow:hidden}
 th,td{text-align:left;padding:11px 13px;border-bottom:1px solid var(--line);font-size:13px}
 th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;user-select:none}
@@ -78,25 +77,23 @@ tbody tr{cursor:pointer}
 .filters input,.filters select{width:auto;min-width:150px;flex:0 0 auto}
 .filters input[type=search]{flex:1;min-width:200px}
 
-/* kpi */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:13px;margin-bottom:22px}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 17px}
-.kpi .v{font-size:30px;font-weight:800;line-height:1.1}
+.kpi .v{font-size:28px;font-weight:800;line-height:1.1}
 .kpi .l{color:var(--mut);font-size:12px;margin-top:5px}
-.kpi .v.gold{color:var(--gold2)}.kpi .v.green{color:var(--green)}.kpi .v.blue{color:var(--blue)}
+.kpi .v.gold{color:var(--accent2)}.kpi .v.green{color:var(--green)}.kpi .v.blue{color:var(--blue)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:880px){.grid2{grid-template-columns:1fr}}
 .box{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
 .box h3{font-size:15px;margin-bottom:14px}
 .bar{display:flex;align-items:center;gap:10px;margin-bottom:11px}
-.bar .lab{width:130px;font-size:13px;color:var(--mut);flex-shrink:0}
+.bar .lab{width:140px;font-size:13px;color:var(--mut);flex-shrink:0}
 .bar .track{flex:1;background:var(--panel2);border-radius:8px;height:22px;overflow:hidden;position:relative}
-.bar .fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--gold),var(--gold2));min-width:2px;transition:width .4s}
-.bar .num{width:auto;font-size:13px;font-weight:700;min-width:62px;text-align:right}
+.bar .fill{height:100%;border-radius:8px;min-width:2px;transition:width .4s}
+.bar .num{width:auto;font-size:13px;font-weight:700;min-width:74px;text-align:right}
 .goal .track .fill{background:linear-gradient(90deg,var(--green),#6fe39a)}
-.goal .track .fill.over{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.goal .track .fill.over{background:linear-gradient(90deg,var(--accent),var(--accent2))}
 
-/* modal */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:50;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto}
 .overlay.open{display:flex}
 .modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);width:100%;max-width:620px;padding:24px}
@@ -105,17 +102,12 @@ tbody tr{cursor:pointer}
 .fg label{display:block;font-size:12px;color:var(--mut);margin-bottom:5px;font-weight:600}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
 .modal-foot{display:flex;justify-content:space-between;gap:9px;margin-top:20px;flex-wrap:wrap}
-.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.chip{font-size:12px;padding:4px 10px;border-radius:20px;background:var(--panel2);border:1px solid var(--line);display:flex;gap:6px;align-items:center}
-.chip x{cursor:pointer;color:var(--mut);font-weight:700}
-
-/* templates */
 .tpl{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:13px}
 .tpl .h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .tpl .h .nm{font-weight:700}
 .tpl textarea{min-height:78px;font-size:13px}
 .muted{color:var(--mut);font-size:12px}
-.seg-head{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--gold2);margin:20px 0 10px;font-weight:700}
+.seg-head{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent2);margin:20px 0 10px;font-weight:700}
 .empty{text-align:center;color:var(--mut);padding:40px 20px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#06210f;padding:12px 22px;border-radius:30px;font-weight:700;box-shadow:var(--shadow);transition:.3s;z-index:99;opacity:0}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
@@ -125,7 +117,11 @@ tbody tr{cursor:pointer}
 </head>
 <body>
 <header>
-  <div class="logo"><span class="dot">M</span><div>Moove CRM<small>Prospecção · Maringá</small></div></div>
+  <div class="logo"><span class="dot">M</span><div>Moove CRM<small id="wsSub">Prospecção · Maringá</small></div></div>
+  <div class="ws">
+    <button id="wsLocal" class="on" onclick="setMode('local')">🏪 Local</button>
+    <button id="wsB2B" onclick="setMode('b2b')">🤝 B2B</button>
+  </div>
   <nav>
     <button class="tab active" data-view="inicio">🏠 Início</button>
     <button class="tab" data-view="pipeline">📋 Pipeline</button>
@@ -136,13 +132,13 @@ tbody tr{cursor:pointer}
   </nav>
   <div class="actions">
     <button id="syncPill" class="btn ghost" style="font-size:13px" onclick="forceSync()" title="Status de sincronização (clique pra forçar)">☁︎ —</button>
-    <button class="btn primary" onclick="openLead()">+ Novo lead</button>
+    <button id="addBtn" class="btn primary" onclick="openLead()">+ Novo</button>
     <button class="btn ghost" onclick="toggleMenu(event)">⋯</button>
     <div class="menu" id="menu">
-      <button onclick="exportJSON()">⬇️ Backup (exportar JSON)</button>
+      <button onclick="exportJSON()">⬇️ Backup completo (JSON)</button>
       <button onclick="document.getElementById('importf').click()">⬆️ Importar JSON</button>
-      <button onclick="exportCSV()">📄 Exportar CSV</button>
-      <button onclick="seedReset()">♻️ Restaurar leads-semente</button>
+      <button onclick="exportCSV()">📄 Exportar CSV (workspace atual)</button>
+      <button onclick="seedReset()">♻️ Restaurar leads-semente (Local)</button>
       <button onclick="wipe()" style="color:var(--red)">🗑️ Apagar tudo</button>
     </div>
     <input type="file" id="importf" accept=".json" class="hide" onchange="importJSON(this)">
@@ -150,7 +146,6 @@ tbody tr{cursor:pointer}
 </header>
 
 <main>
-  <!-- INÍCIO -->
   <section class="view active" id="inicio">
     <div id="homeHero"></div>
     <div class="kpis" id="homeKpis"></div>
@@ -159,69 +154,49 @@ tbody tr{cursor:pointer}
       <div class="box"><h3>🎯 Metas do mês</h3><div id="homeGoals"></div></div>
     </div>
     <div class="grid2" style="margin-top:16px">
-      <div class="box">
-        <h3>🧭 A estratégia em 1 minuto</h3>
-        <div id="homeStrat"></div>
-      </div>
-      <div class="box">
-        <h3>⏱️ Cadência (cabe nas suas ~3h/dia)</h3>
-        <div id="homeCad"></div>
-      </div>
+      <div class="box"><h3 id="homeStratH">🧭 A estratégia em 1 minuto</h3><div id="homeStrat"></div></div>
+      <div class="box"><h3 id="homeCadH">⏱️ Cadência (rotina)</h3><div id="homeCad"></div></div>
     </div>
     <div class="box" style="margin-top:16px">
       <h3>✉️ Cadência de mensagens — o que enviar e quando</h3>
-      <div class="muted" style="margin-bottom:14px;font-size:12px">A sequência pra um lead frio até a demo. Cada passo aponta o template a usar (pegue na aba 💬 Templates). O CRM já agenda o próximo toque sozinho quando você manda WhatsApp.</div>
+      <div class="muted" style="margin-bottom:14px;font-size:12px">A sequência de toques. Cada passo aponta o template a usar (aba 💬 Templates). O CRM já agenda o próximo toque quando você registra contato.</div>
       <div id="homeSeq"></div>
       <div style="border-top:1px solid var(--line);margin-top:8px;padding-top:14px">
-        <b style="font-size:13px">Depois da demo</b>
+        <b style="font-size:13px" id="homeSeqPosH">Depois da demo</b>
         <div id="homeSeqPos" style="margin-top:10px"></div>
       </div>
     </div>
-
-    <div class="box" style="margin-top:16px">
-      <h3>📚 Materiais de apoio</h3>
-      <div class="muted" style="line-height:1.9">
-        Playbook completo, demo tela a tela e transcrições do agente estão na pasta <b>Moove/Prospeccao-Maringa/</b> (no computador).
-        Preço: <b>R$197/mês</b> (Standard) · <b>R$297/mês</b> (Premium, marca branca). Contato dos produtos: <b>44 98426-6280</b>.
-      </div>
-    </div>
+    <div class="box" style="margin-top:16px"><h3>📚 Apoio</h3><div class="muted" id="homeMat" style="line-height:1.9"></div></div>
   </section>
 
-  <!-- PIPELINE -->
   <section class="view" id="pipeline">
-    <h2 class="title">Pipeline de vendas</h2>
-    <div class="sub">Arraste os cards entre as etapas. Card com borda vermelha = lead esfriando (follow-up atrasado).</div>
+    <h2 class="title" id="pipeTitle">Pipeline</h2>
+    <div class="sub">Arraste os cards entre as etapas. Borda vermelha = parado / follow-up atrasado.</div>
     <div class="filters">
       <input type="search" id="pSearch" placeholder="🔍 Buscar no pipeline..." oninput="renderBoard()">
-      <select id="pSeg" onchange="renderBoard()"><option value="">Todos os segmentos</option></select>
-      <select id="pProd" onchange="renderBoard()"><option value="">Todos os produtos</option></select>
+      <select id="pSeg" onchange="renderBoard()"></select>
+      <select id="pProd" onchange="renderBoard()"></select>
       <select id="pTag" onchange="renderBoard()"><option value="">Todas as tags</option></select>
       <label style="display:flex;align-items:center;gap:6px;color:var(--mut);font-size:13px;white-space:nowrap"><input type="checkbox" id="pHot" style="width:auto" onchange="renderBoard()"> só esfriando 🔥</label>
     </div>
     <div class="board" id="board"></div>
   </section>
 
-  <!-- CONTATOS -->
   <section class="view" id="contatos">
     <h2 class="title">Contatos</h2>
-    <div class="sub">Clique numa linha pra editar. Use os filtros pra focar num segmento ou etapa.</div>
+    <div class="sub">Clique numa linha pra editar. Use os filtros pra focar.</div>
     <div class="filters">
-      <input type="search" id="search" placeholder="🔍 Buscar negócio, telefone, nota..." oninput="renderTable()">
-      <select id="fSeg" onchange="renderTable()"><option value="">Todos os segmentos</option></select>
-      <select id="fEtapa" onchange="renderTable()"><option value="">Todas as etapas</option></select>
-      <select id="fProd" onchange="renderTable()"><option value="">Todos os produtos</option></select>
+      <input type="search" id="search" placeholder="🔍 Buscar..." oninput="renderTable()">
+      <select id="fSeg" onchange="renderTable()"></select>
+      <select id="fEtapa" onchange="renderTable()"></select>
+      <select id="fProd" onchange="renderTable()"></select>
     </div>
-    <table id="tbl"><thead><tr>
-      <th onclick="sortBy('negocio')">Negócio</th><th onclick="sortBy('segmento')">Segmento</th>
-      <th onclick="sortBy('produto')">Produto</th><th onclick="sortBy('etapa')">Etapa</th>
-      <th>Contato</th><th onclick="sortBy('proximaData')">Próximo passo</th>
-    </tr></thead><tbody id="tblBody"></tbody></table>
+    <table id="tbl"><thead id="tblHead"></thead><tbody id="tblBody"></tbody></table>
   </section>
 
-  <!-- FOLLOW-UPS -->
   <section class="view" id="followups">
     <h2 class="title">Follow-ups — não deixe esfriar</h2>
-    <div class="sub">O que precisa de ação hoje e os leads parados. A regra: nenhum lead ativo sem próximo passo marcado.</div>
+    <div class="sub">A regra de ouro: nenhum negócio ativo sem o próximo passo marcado (com data).</div>
     <div class="grid2">
       <div class="box"><h3>🔥 Atrasados / hoje</h3><div id="fuDue"></div></div>
       <div class="box"><h3>🧊 Esfriando (sem contato há 5+ dias)</h3><div id="fuCold"></div></div>
@@ -229,26 +204,24 @@ tbody tr{cursor:pointer}
     <div class="box" style="margin-top:16px"><h3>📅 Próximos (esta semana)</h3><div id="fuNext"></div></div>
   </section>
 
-  <!-- TEMPLATES -->
   <section class="view" id="templates">
     <h2 class="title">Templates de mensagem</h2>
-    <div class="sub">Editáveis. Use <code>{{negocio}}</code> e <code>{{produto}}</code> como atalhos. No card/contato, o botão "WhatsApp" já preenche e abre a conversa.</div>
+    <div class="sub" id="tplSub">Editáveis. Atalhos: <code>{{negocio}}</code>, <code>{{contato}}</code>, <code>{{produto}}</code>. O botão WhatsApp já preenche e abre a conversa.</div>
     <div style="margin-bottom:14px"><button class="btn primary sm" onclick="openTpl()">+ Novo template</button></div>
     <div id="tplList"></div>
   </section>
 
-  <!-- ANALYTICS -->
   <section class="view" id="analytics">
     <h2 class="title">Analytics & metas</h2>
-    <div class="sub">Atualiza sozinho conforme você move os leads. Metas mensais editáveis abaixo.</div>
+    <div class="sub">Atualiza sozinho conforme você move os cards.</div>
     <div class="kpis" id="kpis"></div>
     <div class="grid2">
-      <div class="box"><h3>🎯 Metas do mês <button class="btn ghost sm" style="float:right" onclick="openGoals()">Editar metas</button></h3><div id="goals"></div></div>
+      <div class="box"><h3>🎯 Metas do mês <button class="btn ghost sm" style="float:right" onclick="openGoals()">Editar</button></h3><div id="goals"></div></div>
       <div class="box"><h3>Funil por etapa</h3><div id="funnel"></div></div>
     </div>
     <div class="grid2" style="margin-top:16px">
-      <div class="box"><h3>Por produto</h3><div id="byProd"></div></div>
-      <div class="box"><h3>Por segmento</h3><div id="bySeg"></div></div>
+      <div class="box"><h3 id="anaBox1H">Dimensão 1</h3><div id="anaBox1"></div></div>
+      <div class="box"><h3 id="anaBox2H">Dimensão 2</h3><div id="anaBox2"></div></div>
     </div>
   </section>
 </main>
@@ -257,19 +230,40 @@ tbody tr{cursor:pointer}
 <div class="toast" id="toast"></div>
 
 <script>
-/* ============ DADOS ============ */
-const STAGES=[
-  {k:"A contatar",c:"#9aa3b2"},
-  {k:"Contato feito",c:"#4f8bf0"},
-  {k:"Demo agendada",c:"#9b6cf0"},
-  {k:"Proposta enviada",c:"#e0a83d"},
-  {k:"Fechado",c:"#3fb368"},
-  {k:"Perdido",c:"#e25563"}
-];
+/* ============ CONFIG POR WORKSPACE ============ */
 const PRODUTOS={"Lava.AI":"#4f8bf0","Sorria.AI":"#3fb368","Realce.AI":"#9b6cf0","Corta.AI":"#e0a83d"};
-const PRECO=197; // mensalidade Standard p/ estimativa de MRR
-const KEY="moove_crm_v2";
+const ORIGENS={"Network":"#4f8bf0","Indicação":"#3fb368","Inbound":"#9b6cf0","Evento":"#e0a83d","Frio":"#9aa3b2","Outro":"#9aa3b2"};
+const PRECO=197;
+const KEY="moove_crm_v3";
+let MODE=localStorage.getItem('moove_mode')||'local';
 
+const CFG={
+  local:{
+    accent:"#e0a83d",accent2:"#f3c969",sub:"Prospecção · Maringá",addLabel:"+ Novo lead",
+    pipeTitle:"Pipeline de vendas (Local)",
+    stages:[{k:"A contatar",c:"#9aa3b2"},{k:"Contato feito",c:"#4f8bf0"},{k:"Demo agendada",c:"#9b6cf0"},{k:"Proposta enviada",c:"#e0a83d"},{k:"Fechado",c:"#3fb368"},{k:"Perdido",c:"#e25563"}],
+    valueLabel:"Valor mensal estimado (R$)",defaultValue:PRECO,
+    dim1Label:"segmento",dim2Label:"produto"
+  },
+  b2b:{
+    accent:"#4f8bf0",accent2:"#7eacf6",sub:"Negociações B2B · Higor",addLabel:"+ Novo negócio",
+    pipeTitle:"Pipeline B2B (Higor)",
+    stages:[{k:"Contato iniciado",c:"#9aa3b2"},{k:"Reunião agendada",c:"#4f8bf0"},{k:"Reunião feita",c:"#9b6cf0"},{k:"Proposta enviada",c:"#e0a83d"},{k:"Negociação",c:"#f0894f"},{k:"Fechado",c:"#3fb368"},{k:"Perdido",c:"#e25563"}],
+    valueLabel:"Valor do negócio (R$)",defaultValue:0,
+    dim1Label:"origem",dim2Label:"interesse"
+  }
+};
+function cfg(){return CFG[MODE];}
+function stages(){return cfg().stages;}
+function firstStage(){return stages()[0].k;}
+function stageColor(k){const s=stages().find(x=>x.k===k);return s?s.c:'#888';}
+function isTerminal(k){return k==="Fechado"||k==="Perdido";}
+function B(){return DB.boards[MODE];}
+function LEADS(){return B().leads;}
+function GOALS(){return B().goals;}
+function TPLS(){return DB.templates[MODE];}
+
+/* ============ SEEDS ============ */
 const SEED_LEADS=[
  ["Estética automotiva","Lava.AI","Moderna Estética Automotiva Premium","(44) 99766-1480","@modernalavacar","Av Mauá 2427","A contatar","Premium - bom perfil",["quente"]],
  ["Estética automotiva","Lava.AI","Estética Automotiva & Lava Car Laguna","(44) 99184-3169","lagunaesteticaautomotiva.com.br","Av Laguna 2037","A contatar","Tem site próprio",[]],
@@ -298,10 +292,10 @@ const SEED_LEADS=[
 function seedLeads(){return SEED_LEADS.map((r,i)=>({
   id:"L"+(Date.now()+i),segmento:r[0],produto:r[1],negocio:r[2],telefone:r[3],
   instagram:r[4],endereco:r[5],etapa:r[6],notas:r[7],tags:r[8],
-  proximoPasso:r[6]==="A contatar"?"Primeiro toque":"",proximaData:"",ultimoContato:"",valor:PRECO,createdAt:today()
+  proximoPasso:"Primeiro toque",proximaData:"",ultimoContato:"",valor:PRECO,createdAt:today()
 }));}
 
-const SEED_TPL=[
+const SEED_TPL_LOCAL=[
  ["Lava — abertura","Estética automotiva","Primeiro toque","Oi! Aqui é a Marina, da Moove, a gente é daqui de Maringá. Vi o trabalho de vocês e queria te mostrar uma coisa que criamos pra lava-rápido: um sistema que abre OS, agenda e avisa o cliente quando o carro tá pronto, tudo dentro do WhatsApp, sem planilha. Te mostro funcionando em 5 minutinhos? Pode ser por call ou eu passo aí."],
  ["Lava — isca de vídeo","Estética automotiva","Primeiro toque","Oi! Sou a Marina, da Moove (Maringá). Posso te mandar um vídeo de 1 minuto mostrando uma IA agendando e organizando tudo dentro do WhatsApp, do jeitinho que ficaria aí na {{negocio}}? Se curtir a gente marca, se não, sem problema nenhum."],
  ["Lava — follow-up","Estética automotiva","Follow-up","Oi! Só voltando aqui rapidinho. Te mando aquele vídeo de 1 min mostrando o sistema abrindo uma OS no WhatsApp? Se fizer sentido a gente marca, se não, tranquilo."],
@@ -314,116 +308,147 @@ const SEED_TPL=[
  ["Corta — follow-up","Barbearia","Follow-up","E aí, conseguiu ver? Te mando um vídeo curtinho da agenda funcionando por barbeiro? Se fizer sentido marco uma demo rápida."],
  ["Pós-demo (todos)","Geral","Pós-demo","Obrigada pelo tempo! Como combinei: você viu a IA atendendo no WhatsApp e o painel completo. Fica R$197/mês com tudo rodando (ou R$297 com a sua logo e suas cores). Consigo deixar configurado e no ar em poucos dias. Quer que eu já comece a montar a conta da {{negocio}}?"]
 ];
-function seedTpl(){return SEED_TPL.map((t,i)=>({id:"T"+(Date.now()+i),nome:t[0],segmento:t[1],etapa:t[2],texto:t[3]}));}
+const SEED_TPL_B2B=[
+ ["Acionar contato (network)","Acionar","Opa {{contato}}, tudo bem? Faz um tempo! Tô tocando um projeto novo aqui na Moove, com IA pra empresas, e lembrei de você. Topa um café ou uma call rápida essa semana pra eu te mostrar? Acho que pode fazer sentido pro que vocês estão fazendo aí na {{empresa}}."],
+ ["Pedir indicação","Acionar","{{contato}}, beleza? Tô levando uma solução de IA pra empresas e queria te pedir uma força: você conhece alguém que tá penando com [atendimento / agendamento / processo manual] e que valeria eu conversar? Qualquer indicação ajuda demais."],
+ ["Convite pra reunião","Reunião","{{contato}}, consigo te mostrar em uns 20 min como a gente tá usando IA pra [resultado concreto]. Quarta 10h ou quinta 16h, qual fica melhor pra você?"],
+ ["Confirmar reunião","Reunião","Passando pra confirmar nossa conversa amanhã às [hora]. Te mando o link por aqui. Até lá, {{contato}}!"],
+ ["Resumo pós-reunião","Pós-reunião","{{contato}}, valeu demais pela conversa hoje! Resumão do que falamos: [pontos]. O próximo passo combinado é [x]. Te envio a proposta até [data]."],
+ ["Envio de proposta","Proposta","{{contato}}, segue a proposta conforme conversamos: [link]. Tentei deixar bem direto ao ponto. Posso te ligar [dia] pra alinhar os detalhes e ver como destravamos?"],
+ ["Follow-up proposta 1","Follow-up","{{contato}}, conseguiu dar uma olhada na proposta? Fico à disposição pra ajustar qualquer ponto que precise."],
+ ["Follow-up proposta 2 (valor)","Follow-up","{{contato}}, só reforçando o ganho principal: [resultado/número]. Faz sentido a gente destravar isso ainda esse mês? Consigo priorizar a entrega de vocês."],
+ ["Encerramento (break-up)","Reativação","{{contato}}, imagino que talvez o timing não esteja ideal agora. Vou deixar em aberto e te procuro mais pra frente, pode ser? Se mudar alguma coisa, é só me chamar que retomo na hora."]
+];
+function seedTplLocal(){return SEED_TPL_LOCAL.map((t,i)=>({id:"T"+(Date.now()+i),nome:t[0],segmento:t[1],etapa:t[2],texto:t[3]}));}
+function seedTplB2B(){return SEED_TPL_B2B.map((t,i)=>({id:"TB"+(Date.now()+i),nome:t[0],segmento:"B2B",etapa:t[1],texto:t[2]}));}
 
-/* ---- Firebase Realtime Database (REST, sem SDK) ---- */
-/* Para um banco DEDICADO/seguro depois, troque só FB_URL pela URL do novo projeto. */
+/* ============ FIREBASE (REST) ============ */
 const FB_URL="https://rifa-mae-default-rtdb.firebaseio.com";
 const FB_PATH="moove_crm/data";
 const DEVICE=(()=>{let d=localStorage.getItem('moove_device');if(!d){d=Math.random().toString(36).slice(2,9);localStorage.setItem('moove_device',d);}return d;})();
 let applyingRemote=false,pushTimer=null;
 
+function freshDB(){return{boards:{local:{leads:seedLeads(),goals:{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}}},templates:{local:seedTplLocal(),b2b:seedTplB2B()},_updatedAt:0};}
+function migrate(d){
+  if(!d)return freshDB();
+  if(d.boards){ // já é v3
+    d.boards.local=d.boards.local||{leads:[],goals:{toques:80,demos:12,fechamentos:4}};
+    d.boards.b2b=d.boards.b2b||{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}};
+    d.templates=d.templates||{}; d.templates.local=d.templates.local||seedTplLocal(); d.templates.b2b=d.templates.b2b||seedTplB2B();
+    return d;
+  }
+  if(d.leads){ // v2 antigo -> migra pra boards.local
+    return{boards:{local:{leads:d.leads,goals:d.goals||{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}}},
+      templates:{local:d.templates||seedTplLocal(),b2b:seedTplB2B()},_updatedAt:d._updatedAt||0};
+  }
+  return freshDB();
+}
 let DB=load();
-function load(){
-  try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.leads)return d;}catch(e){}
-  return{leads:seedLeads(),templates:seedTpl(),goals:{toques:80,demos:12,fechamentos:4},_updatedAt:0};
-}
-function save(){
-  if(applyingRemote)return;
-  DB._updatedAt=Date.now();DB._by=DEVICE;
-  localStorage.setItem(KEY,JSON.stringify(DB));
-  schedulePush();
-}
-function setSync(state){
-  const p=document.getElementById('syncPill');if(!p)return;
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d)return migrate(d);}catch(e){}
+  // tenta migrar do v2 antigo
+  try{const old=JSON.parse(localStorage.getItem('moove_crm_v2'));if(old&&old.leads)return migrate(old);}catch(e){}
+  return freshDB();}
+function save(){if(applyingRemote)return;DB._updatedAt=Date.now();DB._by=DEVICE;localStorage.setItem(KEY,JSON.stringify(DB));schedulePush();}
+function setSync(s){const p=document.getElementById('syncPill');if(!p)return;
   const m={syncing:["↻ Sincronizando","#f3c969"],ok:["☁︎ Sincronizado","#3fb368"],off:["⚠︎ Offline (salvo local)","#e25563"]};
-  const[t,c]=m[state]||["☁︎ —","#9aa3b2"];p.textContent=t;p.style.color=c;
-}
+  const[t,c]=m[s]||["☁︎ —","#9aa3b2"];p.textContent=t;p.style.color=c;}
 function schedulePush(){clearTimeout(pushTimer);pushTimer=setTimeout(cloudPush,700);}
-async function cloudPush(){
-  setSync('syncing');
-  try{
-    const r=await fetch(`${FB_URL}/${FB_PATH}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(DB)});
-    setSync(r.ok?'ok':'off');
-  }catch(e){setSync('off');}
-}
+async function cloudPush(){setSync('syncing');try{const r=await fetch(`${FB_URL}/${FB_PATH}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(DB)});setSync(r.ok?'ok':'off');}catch(e){setSync('off');}}
 async function cloudPull(initial){
   try{
-    // Passo 1 (barato): baixa só o carimbo de data — poucos bytes. Poupa cota grátis.
     const rt=await fetch(`${FB_URL}/${FB_PATH}/_updatedAt.json`,{cache:'no-store'});
     if(!rt.ok){setSync('off');return;}
     const remoteAt=await rt.json();
-    if(remoteAt===null){if(initial)cloudPush();setSync('ok');return;} // nuvem vazia: sobe o seed
-    if((remoteAt||0)<=(DB._updatedAt||0)){setSync('ok');return;} // nada novo, nem baixa o resto
-    if(document.getElementById('overlay').classList.contains('open')){setSync('ok');return;} // não atropela edição
-    // Passo 2 (só quando mudou): baixa o banco completo.
+    if(remoteAt===null){if(initial)cloudPush();setSync('ok');return;}
+    if((remoteAt||0)<=(DB._updatedAt||0)){setSync('ok');return;}
+    if(document.getElementById('overlay').classList.contains('open')){setSync('ok');return;}
     const r=await fetch(`${FB_URL}/${FB_PATH}.json`,{cache:'no-store'});
     if(!r.ok){setSync('off');return;}
     const d=await r.json();
-    if(d&&d.leads){applyingRemote=true;DB=d;localStorage.setItem(KEY,JSON.stringify(DB));renderAll();applyingRemote=false;}
+    if(d){applyingRemote=true;DB=migrate(d);localStorage.setItem(KEY,JSON.stringify(DB));renderAll();applyingRemote=false;}
     setSync('ok');
   }catch(e){setSync('off');}
 }
 function forceSync(){cloudPull().then(()=>cloudPush());}
-async function initSync(){
-  await cloudPull(true);
+async function initSync(){await cloudPull(true);
   setInterval(()=>{if(!document.hidden)cloudPull();},20000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)cloudPull();});
-  window.addEventListener('online',forceSync);
-  window.addEventListener('offline',()=>setSync('off'));
-}
+  window.addEventListener('online',forceSync);window.addEventListener('offline',()=>setSync('off'));}
 function today(){return new Date().toISOString().slice(0,10);}
 function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/864e5);}
 function uid(p){return p+Math.random().toString(36).slice(2,9);}
+
+/* ============ MODE SWITCH ============ */
+function setMode(m){MODE=m;localStorage.setItem('moove_mode',m);applyTheme();renderAll();}
+function applyTheme(){
+  const c=cfg();const r=document.documentElement.style;
+  r.setProperty('--accent',c.accent);r.setProperty('--accent2',c.accent2);
+  document.getElementById('wsSub').textContent=c.sub;
+  document.getElementById('addBtn').textContent=c.addLabel;
+  document.getElementById('pipeTitle').textContent=c.pipeTitle;
+  document.getElementById('wsLocal').classList.toggle('on',MODE==='local');
+  document.getElementById('wsB2B').classList.toggle('on',MODE==='b2b');
+}
 
 /* ============ NAV ============ */
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
-  t.classList.add('active');document.getElementById(t.dataset.view).classList.add('active');
-  renderAll();
+  t.classList.add('active');document.getElementById(t.dataset.view).classList.add('active');renderAll();
 });
+function goView(v){document.querySelector(`.tab[data-view="${v}"]`).click();}
 function toggleMenu(e){e.stopPropagation();document.getElementById('menu').classList.toggle('open');}
 document.body.onclick=()=>document.getElementById('menu').classList.remove('open');
 
+/* ============ HELPERS DE DIMENSÃO ============ */
+function dim1(l){return MODE==='local'?(l.segmento||''):(l.origem||'');}      // segmento / origem
+function dim2(l){return MODE==='local'?(l.produto||''):(l.interesse||'');}    // produto / interesse
+function pill(l){ // rótulo colorido no card
+  if(MODE==='local'){const p=l.produto||'';return{txt:p.replace('.AI',''),c:PRODUTOS[p]||'#888'};}
+  const o=l.origem||'—';return{txt:o,c:ORIGENS[o]||cfg().accent};
+}
+function dim1Opts(){return MODE==='local'?[...new Set(LEADS().map(l=>l.segmento).filter(Boolean))].sort():Object.keys(ORIGENS);}
+function dim2Opts(){return MODE==='local'?Object.keys(PRODUTOS):[...new Set(LEADS().map(l=>l.interesse).filter(Boolean))].sort();}
+
 /* ============ PIPELINE ============ */
 function fuState(l){
-  if(["Fechado","Perdido"].includes(l.etapa))return"";
+  if(isTerminal(l.etapa))return"";
   if(l.proximaData){const d=daysBetween(today(),l.proximaData);if(d<0)return"due";if(d<=2)return"soon";return"";}
   if(l.ultimoContato&&daysBetween(l.ultimoContato,today())>=5)return"due";
-  if(!l.proximaData&&l.etapa!=="A contatar")return"due";
+  if(!l.proximaData&&l.etapa!==firstStage())return"due";
   return"";
 }
 function fillPipeFilters(){
-  const segs=[...new Set(DB.leads.map(l=>l.segmento))].sort();
-  const tags=[...new Set(DB.leads.flatMap(l=>l.tags||[]))].sort();
-  setOpts('pSeg',segs);setOpts('pProd',Object.keys(PRODUTOS));setOpts('pTag',tags);
+  setOpts('pSeg',dim1Opts(),`Todos · ${cfg().dim1Label}`);
+  const d2=document.getElementById('pProd');
+  if(MODE==='local'){d2.style.display='';setOpts('pProd',dim2Opts(),'Todos os produtos');}else{d2.style.display='none';d2.value='';}
+  setOpts('pTag',[...new Set(LEADS().flatMap(l=>l.tags||[]))].sort(),'Todas as tags');
 }
 function pipeFiltered(){
   const q=(document.getElementById('pSearch')?.value||'').toLowerCase();
-  const fs=document.getElementById('pSeg')?.value||'',fp=document.getElementById('pProd')?.value||'';
+  const f1=document.getElementById('pSeg')?.value||'',f2=document.getElementById('pProd')?.value||'';
   const ft=document.getElementById('pTag')?.value||'',hot=document.getElementById('pHot')?.checked;
-  return DB.leads.filter(l=>{
-    if(fs&&l.segmento!==fs)return false;if(fp&&l.produto!==fp)return false;
+  return LEADS().filter(l=>{
+    if(f1&&dim1(l)!==f1)return false;
+    if(MODE==='local'&&f2&&l.produto!==f2)return false;
     if(ft&&!(l.tags||[]).includes(ft))return false;
     if(hot&&fuState(l)!=='due')return false;
-    if(q){const blob=(l.negocio+l.telefone+l.instagram+l.notas+(l.tags||[]).join(' ')).toLowerCase();if(!blob.includes(q))return false;}
+    if(q){const blob=(l.negocio+(l.contato||'')+(l.telefone||'')+(l.instagram||'')+(l.notas||'')+(l.tags||[]).join(' ')).toLowerCase();if(!blob.includes(q))return false;}
     return true;
   });
 }
 function renderBoard(){
-  const b=document.getElementById('board');b.innerHTML='';
-  const base=pipeFiltered();
-  STAGES.forEach(s=>{
+  const b=document.getElementById('board');b.innerHTML='';const base=pipeFiltered();
+  stages().forEach(s=>{
     const ls=base.filter(l=>l.etapa===s.k);
-    const col=document.createElement('div');col.className='col';col.dataset.stage=s.k;
+    const col=document.createElement('div');col.className='col';
     col.innerHTML=`<h3><span style="color:${s.c}">●</span> ${s.k} <span class="cnt">${ls.length}</span></h3><div class="drop"></div>`;
     const drop=col.querySelector('.drop');
     ls.forEach(l=>drop.appendChild(cardEl(l)));
     drop.ondragover=e=>{e.preventDefault();col.classList.add('over');};
     drop.ondragleave=()=>col.classList.remove('over');
     drop.ondrop=e=>{e.preventDefault();col.classList.remove('over');
-      const id=e.dataTransfer.getData('id');const l=DB.leads.find(x=>x.id===id);
+      const id=e.dataTransfer.getData('id');const l=LEADS().find(x=>x.id===id);
       if(l&&l.etapa!==s.k){l.etapa=s.k;l.ultimoContato=today();save();renderAll();toast('Movido pra '+s.k);}};
     b.appendChild(col);
   });
@@ -433,19 +458,19 @@ function cardEl(l){
   c.className='card'+(fs==='due'?' hot':'');c.draggable=true;
   c.ondragstart=e=>e.dataTransfer.setData('id',l.id);
   c.onclick=()=>openLead(l.id);
-  const pc=PRODUTOS[l.produto]||'#888';
+  const p=pill(l);
   let nextHtml='';
-  if(l.proximaData){const d=daysBetween(today(),l.proximaData);
-    const cls=d<0?'due':(d<=2?'soon':'');
+  if(l.proximaData){const d=daysBetween(today(),l.proximaData);const cls=d<0?'due':(d<=2?'soon':'');
     const txt=d<0?`atrasado ${Math.abs(d)}d`:(d===0?'hoje':(d===1?'amanhã':`em ${d}d`));
     nextHtml=`<div class="next ${cls}">🔔 ${l.proximoPasso||'follow-up'} · ${txt}</div>`;
-  }else if(l.etapa!=="A contatar"&&!["Fechado","Perdido"].includes(l.etapa)){
-    nextHtml=`<div class="next due">⚠️ sem próximo passo</div>`;
-  }else if(l.proximoPasso){nextHtml=`<div class="next">▫️ ${l.proximoPasso}</div>`;}
-  c.innerHTML=`<div class="nm">${l.negocio}<span class="pill" style="background:${pc}22;color:${pc}">${l.produto.replace('.AI','')}</span></div>
-    <div class="meta">${l.telefone?'📞 '+l.telefone:(l.instagram?'📷 '+l.instagram:'<span style="color:#e25563">sem contato</span>')}</div>
-    ${nextHtml}
-    ${l.tags&&l.tags.length?`<div class="tags">${l.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`:''}`;
+  }else if(l.etapa!==firstStage()&&!isTerminal(l.etapa)){nextHtml=`<div class="next due">⚠️ sem próximo passo</div>`;}
+  else if(l.proximoPasso){nextHtml=`<div class="next">▫️ ${l.proximoPasso}</div>`;}
+  let meta;
+  if(MODE==='local'){meta=l.telefone?'📞 '+l.telefone:(l.instagram?'📷 '+l.instagram:'<span style="color:#e25563">sem contato</span>');}
+  else{const parts=[];if(l.contato)parts.push('👤 '+l.contato);if(+l.valor>0)parts.push('💰 R$ '+(+l.valor).toLocaleString('pt-BR'));if(!parts.length&&l.telefone)parts.push('📞 '+l.telefone);meta=parts.join(' · ')||'<span style="color:#9aa3b2">sem dados</span>';}
+  c.innerHTML=`<div class="nm">${esc(l.negocio)}<span class="pill" style="background:${p.c}22;color:${p.c}">${esc(p.txt)}</span></div>
+    <div class="meta">${meta}</div>${nextHtml}
+    ${l.tags&&l.tags.length?`<div class="tags">${l.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}`;
   return c;
 }
 
@@ -453,306 +478,368 @@ function cardEl(l){
 let sortK='negocio',sortDir=1;
 function sortBy(k){if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=1;}renderTable();}
 function fillFilters(){
-  const segs=[...new Set(DB.leads.map(l=>l.segmento))].sort();
-  const prods=Object.keys(PRODUTOS);
-  setOpts('fSeg',segs);setOpts('fProd',prods);setOpts('fEtapa',STAGES.map(s=>s.k));
+  setOpts('fSeg',dim1Opts(),`Todos · ${cfg().dim1Label}`);
+  setOpts('fEtapa',stages().map(s=>s.k),'Todas as etapas');
+  const fp=document.getElementById('fProd');
+  if(MODE==='local'){fp.style.display='';setOpts('fProd',Object.keys(PRODUTOS),'Todos os produtos');}else{fp.style.display='none';fp.value='';}
 }
-function setOpts(id,arr){const s=document.getElementById(id);const v=s.value;
-  s.innerHTML=s.children[0].outerHTML+arr.map(a=>`<option ${a===v?'selected':''}>${a}</option>`).join('');}
+function setOpts(id,arr,allLabel){const s=document.getElementById(id);if(!s)return;const v=s.value;
+  s.innerHTML=`<option value="">${allLabel||'Todos'}</option>`+arr.map(a=>`<option ${a===v?'selected':''}>${a}</option>`).join('');}
 function renderTable(){
   const q=(document.getElementById('search').value||'').toLowerCase();
-  const fs=document.getElementById('fSeg').value,fe=document.getElementById('fEtapa').value,fp=document.getElementById('fProd').value;
-  let rows=DB.leads.filter(l=>{
-    if(fs&&l.segmento!==fs)return false;if(fe&&l.etapa!==fe)return false;if(fp&&l.produto!==fp)return false;
-    if(q){const blob=(l.negocio+l.telefone+l.instagram+l.notas+l.endereco+(l.tags||[]).join(' ')).toLowerCase();if(!blob.includes(q))return false;}
+  const f1=document.getElementById('fSeg').value,fe=document.getElementById('fEtapa').value,fp=document.getElementById('fProd').value;
+  let rows=LEADS().filter(l=>{
+    if(f1&&dim1(l)!==f1)return false;if(fe&&l.etapa!==fe)return false;
+    if(MODE==='local'&&fp&&l.produto!==fp)return false;
+    if(q){const blob=(l.negocio+(l.contato||'')+(l.telefone||'')+(l.instagram||'')+(l.notas||'')+(l.endereco||'')+(l.tags||[]).join(' ')).toLowerCase();if(!blob.includes(q))return false;}
     return true;
   });
-  rows.sort((a,b)=>((a[sortK]||'')>(b[sortK]||'')?1:-1)*sortDir);
+  rows.sort((a,b)=>(((a[sortK]||'')>(b[sortK]||''))?1:-1)*sortDir);
+  const head=document.getElementById('tblHead');
+  if(MODE==='local'){head.innerHTML=`<tr><th onclick="sortBy('negocio')">Negócio</th><th onclick="sortBy('segmento')">Segmento</th><th onclick="sortBy('produto')">Produto</th><th onclick="sortBy('etapa')">Etapa</th><th>Contato</th><th onclick="sortBy('proximaData')">Próximo passo</th></tr>`;}
+  else{head.innerHTML=`<tr><th onclick="sortBy('negocio')">Empresa</th><th onclick="sortBy('contato')">Contato</th><th onclick="sortBy('origem')">Origem</th><th onclick="sortBy('etapa')">Etapa</th><th onclick="sortBy('valor')">Valor</th><th onclick="sortBy('proximaData')">Próximo passo</th></tr>`;}
   const tb=document.getElementById('tblBody');
   tb.innerHTML=rows.length?rows.map(l=>{
-    const st=STAGES.find(s=>s.k===l.etapa)||{c:'#888'};const pc=PRODUTOS[l.produto]||'#888';
-    let nd='';if(l.proximaData){const d=daysBetween(today(),l.proximaData);nd=`<span style="color:${d<0?'#e25563':(d<=2?'#f3c969':'#9aa3b2')}">${l.proximoPasso||'follow-up'} · ${l.proximaData}</span>`;}else nd='<span class="muted">—</span>';
-    return `<tr onclick="openLead('${l.id}')">
-      <td><b>${l.negocio}</b></td><td>${l.segmento}</td>
-      <td><span class="pill" style="background:${pc}22;color:${pc}">${l.produto.replace('.AI','')}</span></td>
-      <td><span class="pill" style="background:${st.c}22;color:${st.c}">${l.etapa}</span></td>
-      <td>${l.telefone||l.instagram||'<span class="muted">—</span>'}</td>
-      <td>${nd}</td></tr>`;
-  }).join(''):'<tr><td colspan="6" class="empty">Nenhum contato com esses filtros.</td></tr>';
+    const sc=stageColor(l.etapa);const p=pill(l);
+    let nd=l.proximaData?(()=>{const d=daysBetween(today(),l.proximaData);return `<span style="color:${d<0?'#e25563':(d<=2?'#f3c969':'#9aa3b2')}">${esc(l.proximoPasso||'follow-up')} · ${l.proximaData}</span>`;})():'<span class="muted">—</span>';
+    const etapaCell=`<span class="pill" style="background:${sc}22;color:${sc}">${l.etapa}</span>`;
+    if(MODE==='local'){return `<tr onclick="openLead('${l.id}')"><td><b>${esc(l.negocio)}</b></td><td>${esc(l.segmento||'')}</td><td><span class="pill" style="background:${p.c}22;color:${p.c}">${esc(p.txt)}</span></td><td>${etapaCell}</td><td>${esc(l.telefone||l.instagram||'')||'<span class="muted">—</span>'}</td><td>${nd}</td></tr>`;}
+    return `<tr onclick="openLead('${l.id}')"><td><b>${esc(l.negocio)}</b></td><td>${esc(l.contato||'')||'<span class="muted">—</span>'}</td><td><span class="pill" style="background:${p.c}22;color:${p.c}">${esc(p.txt)}</span></td><td>${etapaCell}</td><td>${+l.valor>0?'R$ '+(+l.valor).toLocaleString('pt-BR'):'<span class="muted">—</span>'}</td><td>${nd}</td></tr>`;
+  }).join(''):'<tr><td colspan="6" class="empty">Nada por aqui ainda.</td></tr>';
 }
 
 /* ============ FOLLOW-UPS ============ */
 function renderFU(){
-  const active=DB.leads.filter(l=>!["Fechado","Perdido"].includes(l.etapa));
-  const due=active.filter(l=>{if(l.proximaData)return daysBetween(today(),l.proximaData)<=0;return l.etapa!=="A contatar"&&!l.proximaData;});
+  const active=LEADS().filter(l=>!isTerminal(l.etapa));
+  const due=active.filter(l=>{if(l.proximaData)return daysBetween(today(),l.proximaData)<=0;return l.etapa!==firstStage()&&!l.proximaData;});
   const cold=active.filter(l=>!due.includes(l)&&l.ultimoContato&&daysBetween(l.ultimoContato,today())>=5);
   const next=active.filter(l=>l.proximaData&&daysBetween(today(),l.proximaData)>0&&daysBetween(today(),l.proximaData)<=7);
-  document.getElementById('fuDue').innerHTML=fuList(due,'Tudo em dia por aqui 🎉');
-  document.getElementById('fuCold').innerHTML=fuList(cold,'Nenhum lead esfriando.');
-  document.getElementById('fuNext').innerHTML=fuList(next,'Sem follow-ups agendados pra semana.');
+  document.getElementById('fuDue').innerHTML=fuList(due,'Tudo em dia 🎉');
+  document.getElementById('fuCold').innerHTML=fuList(cold,'Nada esfriando.');
+  document.getElementById('fuNext').innerHTML=fuList(next,'Sem follow-ups pra semana.');
 }
 function fuList(arr,empty){
   if(!arr.length)return`<div class="empty">${empty}</div>`;
-  return arr.sort((a,b)=>(a.proximaData||'9')>(b.proximaData||'9')?1:-1).map(l=>{
-    const pc=PRODUTOS[l.produto]||'#888';
-    let when='';if(l.proximaData){const d=daysBetween(today(),l.proximaData);when=d<0?`<span style="color:#e25563">atrasado ${Math.abs(d)}d</span>`:(d===0?'<span style="color:#f3c969">hoje</span>':`em ${d}d`);}
-    else when='<span style="color:#e25563">sem data</span>';
+  return arr.slice().sort((a,b)=>((a.proximaData||'9')>(b.proximaData||'9')?1:-1)).map(l=>{
+    const p=pill(l);
+    let when=l.proximaData?(()=>{const d=daysBetween(today(),l.proximaData);return d<0?`<span style="color:#e25563">atrasado ${Math.abs(d)}d</span>`:(d===0?'<span style="color:#f3c969">hoje</span>':`em ${d}d`);})():'<span style="color:#e25563">sem data</span>';
     return `<div class="card" style="cursor:default;margin-bottom:8px">
-      <div class="nm" style="cursor:pointer" onclick="openLead('${l.id}')">${l.negocio}
-        <span class="pill" style="background:${pc}22;color:${pc}">${l.produto.replace('.AI','')}</span></div>
-      <div class="meta">${l.proximoPasso||'follow-up'} · ${when} · ${l.etapa}</div>
-      <div style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap">
-        ${waBtn(l)}
+      <div class="nm" style="cursor:pointer" onclick="openLead('${l.id}')">${esc(l.negocio)}<span class="pill" style="background:${p.c}22;color:${p.c}">${esc(p.txt)}</span></div>
+      <div class="meta">${esc(l.proximoPasso||'follow-up')} · ${when} · ${l.etapa}</div>
+      <div style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap">${waBtn(l)}
         <button class="btn sm ghost" onclick="markDone('${l.id}')">✓ Feito hoje</button>
         <button class="btn sm ghost" onclick="snooze('${l.id}',2)">+2 dias</button>
-        <button class="btn sm ghost" onclick="openLead('${l.id}')">Abrir</button>
-      </div></div>`;
+        <button class="btn sm ghost" onclick="openLead('${l.id}')">Abrir</button></div></div>`;
   }).join('');
 }
-function markDone(id){const l=DB.leads.find(x=>x.id===id);l.ultimoContato=today();
-  const d=new Date();d.setDate(d.getDate()+3);l.proximaData=d.toISOString().slice(0,10);
-  save();renderAll();toast('Marcado. Próximo toque em 3 dias.');}
-function snooze(id,n){const l=DB.leads.find(x=>x.id===id);const base=l.proximaData&&new Date(l.proximaData)>new Date()?new Date(l.proximaData):new Date();
+function markDone(id){const l=LEADS().find(x=>x.id===id);l.ultimoContato=today();
+  const d=new Date();d.setDate(d.getDate()+3);l.proximaData=d.toISOString().slice(0,10);save();renderAll();toast('Feito. Próximo toque em 3 dias.');}
+function snooze(id,n){const l=LEADS().find(x=>x.id===id);const base=l.proximaData&&new Date(l.proximaData)>new Date()?new Date(l.proximaData):new Date();
   base.setDate(base.getDate()+n);l.proximaData=base.toISOString().slice(0,10);save();renderAll();toast('Adiado '+n+' dias.');}
 
 /* ============ WHATSAPP ============ */
-function fill(txt,l){return txt.replace(/\{\{negocio\}\}/g,l.negocio).replace(/\{\{produto\}\}/g,l.produto.replace('.AI','')).replace(/\{\{nome\}\}/g,l.negocio);}
-function waLink(l,txt){
-  let ph=(l.telefone||'').replace(/\D/g,'');if(ph&&!ph.startsWith('55'))ph='55'+ph;
-  const t=encodeURIComponent(txt||'');
-  return ph?`https://wa.me/${ph}?text=${t}`:(l.instagram?`https://instagram.com/${l.instagram.replace('@','')}`:'');
-}
+function fill(txt,l){return(txt||'')
+  .replace(/\{\{negocio\}\}/g,l.negocio||'').replace(/\{\{empresa\}\}/g,l.negocio||'')
+  .replace(/\{\{contato\}\}/g,l.contato||l.negocio||'').replace(/\{\{nome\}\}/g,l.contato||l.negocio||'')
+  .replace(/\{\{produto\}\}/g,(l.produto||l.interesse||'').replace('.AI',''));}
+function waLink(l,txt){let ph=(l.telefone||'').replace(/\D/g,'');if(ph&&!ph.startsWith('55'))ph='55'+ph;
+  const t=encodeURIComponent(txt||'');return ph?`https://wa.me/${ph}?text=${t}`:(l.instagram?`https://instagram.com/${l.instagram.replace('@','')}`:'');}
+function tplsFor(l){return MODE==='b2b'?TPLS():TPLS().filter(t=>t.segmento===l.segmento||t.segmento==='Geral');}
 function waBtn(l){
-  const tpls=DB.templates.filter(t=>t.segmento===l.segmento||t.segmento==='Geral');
-  const def=tpls[0];if(!def&&!l.telefone&&!l.instagram)return'';
-  if(l.telefone){
-    return `<button class="btn sm wa" onclick="openWA('${l.id}')">💬 WhatsApp</button>`;
-  }
-  if(l.instagram)return `<a class="btn sm" style="background:#c13584;color:#fff" href="https://instagram.com/${l.instagram.replace('@','')}" target="_blank">📷 Instagram DM</a>`;
+  if(l.telefone)return `<button class="btn sm wa" onclick="openWA('${l.id}')">💬 WhatsApp</button>`;
+  if(l.instagram)return `<a class="btn sm" style="background:#c13584;color:#fff" href="https://instagram.com/${l.instagram.replace('@','')}" target="_blank">📷 Instagram</a>`;
   return '';
 }
-function openWA(id){
-  const l=DB.leads.find(x=>x.id===id);
-  const tpls=DB.templates.filter(t=>t.segmento===l.segmento||t.segmento==='Geral');
-  let html=`<div class="modal"><h3>Enviar WhatsApp — ${l.negocio} <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
-    <div class="fg"><label>Escolha o template</label><select id="waTpl" onchange="waPrev('${id}')">
-    ${tpls.map((t,i)=>`<option value="${t.id}">${t.nome}</option>`).join('')}</select></div>
+function openWA(id){const l=LEADS().find(x=>x.id===id);const tpls=tplsFor(l);
+  let html=`<div class="modal"><h3>WhatsApp — ${esc(l.negocio)} <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
+    <div class="fg"><label>Template</label><select id="waTpl" onchange="waPrev('${id}')">${tpls.map(t=>`<option value="${t.id}">${esc(t.nome)}</option>`).join('')}</select></div>
     <div class="fg"><label>Mensagem (edite à vontade)</label><textarea id="waMsg" style="min-height:140px"></textarea></div>
-    <div class="modal-foot"><button class="btn ghost" onclick="copyMsg()">📋 Copiar texto</button>
+    <div class="modal-foot"><button class="btn ghost" onclick="copyMsg()">📋 Copiar</button>
     <a class="btn wa" id="waGo" target="_blank" onclick="afterWA('${id}')">Abrir no WhatsApp →</a></div></div>`;
-  ov(html);waPrev(id);
-}
-function waPrev(id){const l=DB.leads.find(x=>x.id===id);const t=DB.templates.find(x=>x.id===document.getElementById('waTpl').value);
+  ov(html);waPrev(id);}
+function waPrev(id){const l=LEADS().find(x=>x.id===id);const t=TPLS().find(x=>x.id===document.getElementById('waTpl').value);if(!t)return;
   const msg=fill(t.texto,l);document.getElementById('waMsg').value=msg;document.getElementById('waGo').href=waLink(l,msg);}
-function copyMsg(){navigator.clipboard.writeText(document.getElementById('waMsg').value);toast('Texto copiado!');}
-function afterWA(id){const l=DB.leads.find(x=>x.id===id);l.ultimoContato=today();
-  if(l.etapa==="A contatar"){l.etapa="Contato feito";}
+function copyMsg(){navigator.clipboard.writeText(document.getElementById('waMsg').value);toast('Copiado!');}
+function afterWA(id){const l=LEADS().find(x=>x.id===id);l.ultimoContato=today();
+  if(MODE==='local'&&l.etapa===firstStage())l.etapa=stages()[1].k;
   if(!l.proximaData||new Date(l.proximaData)<new Date()){const d=new Date();d.setDate(d.getDate()+3);l.proximaData=d.toISOString().slice(0,10);l.proximoPasso=l.proximoPasso||"Follow-up";}
   save();setTimeout(()=>{closeOv();renderAll();},400);}
 
-/* ============ MODAL LEAD ============ */
+/* ============ MODAL LEAD/NEGÓCIO ============ */
 function openLead(id){
-  const l=id?DB.leads.find(x=>x.id===id):{id:uid('L'),segmento:'Barbearia',produto:'Corta.AI',negocio:'',telefone:'',instagram:'',endereco:'',etapa:'A contatar',notas:'',tags:[],proximoPasso:'Primeiro toque',proximaData:'',ultimoContato:'',valor:PRECO,createdAt:today()};
+  let l;
+  if(id){l=LEADS().find(x=>x.id===id);}
+  else if(MODE==='local'){l={id:uid('L'),negocio:'',segmento:'Barbearia',produto:'Corta.AI',telefone:'',instagram:'',endereco:'',etapa:firstStage(),notas:'',tags:[],proximoPasso:'Primeiro toque',proximaData:'',ultimoContato:'',valor:PRECO,createdAt:today()};}
+  else{l={id:uid('B'),negocio:'',contato:'',cargo:'',telefone:'',email:'',origem:'Network',interesse:'',etapa:firstStage(),notas:'',tags:[],proximoPasso:'Acionar contato',proximaData:'',proximaReuniao:'',ultimoContato:'',valor:0,createdAt:today()};}
   const isNew=!id;
-  let html=`<div class="modal"><h3>${isNew?'Novo lead':l.negocio||'Editar lead'} <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
-   <div class="fg"><label>Negócio *</label><input id="m_negocio" value="${esc(l.negocio)}"></div>
+  const stageSel=`<select id="m_etapa">${stages().map(s=>`<option ${s.k===l.etapa?'selected':''}>${s.k}</option>`).join('')}</select>`;
+  const common=`
    <div class="row2">
-     <div class="fg"><label>Segmento</label><select id="m_segmento">${['Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza','Outro'].map(s=>`<option ${s===l.segmento?'selected':''}>${s}</option>`).join('')}</select></div>
-     <div class="fg"><label>Produto</label><select id="m_produto">${Object.keys(PRODUTOS).map(p=>`<option ${p===l.produto?'selected':''}>${p}</option>`).join('')}</select></div>
-   </div>
-   <div class="row2">
-     <div class="fg"><label>Telefone / WhatsApp</label><input id="m_telefone" value="${esc(l.telefone)}" placeholder="(44) 9xxxx-xxxx"></div>
-     <div class="fg"><label>Instagram / site</label><input id="m_instagram" value="${esc(l.instagram)}" placeholder="@perfil"></div>
-   </div>
-   <div class="fg"><label>Endereço</label><input id="m_endereco" value="${esc(l.endereco)}"></div>
-   <div class="row2">
-     <div class="fg"><label>Etapa</label><select id="m_etapa">${STAGES.map(s=>`<option ${s.k===l.etapa?'selected':''}>${s.k}</option>`).join('')}</select></div>
-     <div class="fg"><label>Valor mensal estimado (R$)</label><input id="m_valor" type="number" value="${l.valor||PRECO}"></div>
-   </div>
-   <div class="row2">
-     <div class="fg"><label>Próximo passo</label><input id="m_proximoPasso" value="${esc(l.proximoPasso)}" placeholder="Ex: Mandar vídeo / Ligar"></div>
+     <div class="fg"><label>Próximo passo</label><input id="m_proximoPasso" value="${esc(l.proximoPasso)}" placeholder="${MODE==='b2b'?'Ex: Enviar proposta':'Ex: Mandar vídeo'}"></div>
      <div class="fg"><label>Data do próximo passo</label><input id="m_proximaData" type="date" value="${l.proximaData||''}"></div>
    </div>
-   <div class="fg"><label>Tags (separe por vírgula)</label><input id="m_tags" value="${esc((l.tags||[]).join(', '))}" placeholder="quente, indicação, voltar mês que vem"></div>
+   <div class="fg"><label>Tags (vírgula)</label><input id="m_tags" value="${esc((l.tags||[]).join(', '))}" placeholder="${MODE==='b2b'?'quente, decisor, indicação':'quente, indicação'}"></div>
    <div class="fg"><label>Notas</label><textarea id="m_notas">${esc(l.notas)}</textarea></div>
-   ${l.ultimoContato?`<div class="muted">Último contato: ${l.ultimoContato} · criado ${l.createdAt||'—'}</div>`:''}
+   ${l.ultimoContato?`<div class="muted">Último contato: ${l.ultimoContato} · criado ${l.createdAt||'—'}</div>`:''}`;
+  let fields;
+  if(MODE==='local'){
+    fields=`<div class="fg"><label>Negócio *</label><input id="m_negocio" value="${esc(l.negocio)}"></div>
+     <div class="row2">
+       <div class="fg"><label>Segmento</label><select id="m_segmento">${['Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza','Outro'].map(s=>`<option ${s===l.segmento?'selected':''}>${s}</option>`).join('')}</select></div>
+       <div class="fg"><label>Produto</label><select id="m_produto">${Object.keys(PRODUTOS).map(p=>`<option ${p===l.produto?'selected':''}>${p}</option>`).join('')}</select></div></div>
+     <div class="row2">
+       <div class="fg"><label>Telefone / WhatsApp</label><input id="m_telefone" value="${esc(l.telefone)}" placeholder="(44) 9xxxx-xxxx"></div>
+       <div class="fg"><label>Instagram / site</label><input id="m_instagram" value="${esc(l.instagram)}" placeholder="@perfil"></div></div>
+     <div class="fg"><label>Endereço</label><input id="m_endereco" value="${esc(l.endereco)}"></div>
+     <div class="row2"><div class="fg"><label>Etapa</label>${stageSel}</div>
+       <div class="fg"><label>${cfg().valueLabel}</label><input id="m_valor" type="number" value="${l.valor||PRECO}"></div></div>`;
+  }else{
+    fields=`<div class="row2">
+       <div class="fg"><label>Empresa *</label><input id="m_negocio" value="${esc(l.negocio)}"></div>
+       <div class="fg"><label>Contato (pessoa)</label><input id="m_contato" value="${esc(l.contato)}" placeholder="Nome de quem você fala"></div></div>
+     <div class="row2">
+       <div class="fg"><label>Cargo / decisor?</label><input id="m_cargo" value="${esc(l.cargo)}" placeholder="Ex: Sócio, Diretor"></div>
+       <div class="fg"><label>Origem</label><select id="m_origem">${Object.keys(ORIGENS).map(o=>`<option ${o===l.origem?'selected':''}>${o}</option>`).join('')}</select></div></div>
+     <div class="row2">
+       <div class="fg"><label>Telefone / WhatsApp</label><input id="m_telefone" value="${esc(l.telefone)}" placeholder="(44) 9xxxx-xxxx"></div>
+       <div class="fg"><label>E-mail</label><input id="m_email" value="${esc(l.email)}"></div></div>
+     <div class="fg"><label>Interesse (o que ele precisa)</label><input id="m_interesse" value="${esc(l.interesse)}" placeholder="Ex: Atendimento IA, automação, app sob medida"></div>
+     <div class="row2"><div class="fg"><label>Etapa</label>${stageSel}</div>
+       <div class="fg"><label>${cfg().valueLabel}</label><input id="m_valor" type="number" value="${l.valor||0}"></div></div>
+     <div class="fg"><label>Data da próxima reunião</label><input id="m_proximaReuniao" type="date" value="${l.proximaReuniao||''}"></div>`;
+  }
+  let html=`<div class="modal"><h3>${isNew?(MODE==='b2b'?'Novo negócio':'Novo lead'):esc(l.negocio)||'Editar'} <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
+   ${fields}${common}
    <div class="modal-foot">
      <div style="display:flex;gap:7px;flex-wrap:wrap">${!isNew?`<button class="btn danger sm" onclick="delLead('${l.id}')">Excluir</button>`:''}
-       ${!isNew&&l.telefone?`<button class="btn wa sm" onclick="saveLead('${l.id}',${isNew});openWA('${l.id}')">💬 WhatsApp</button>`:''}</div>
+       ${!isNew&&l.telefone?`<button class="btn wa sm" onclick="saveLead('${l.id}',false);openWA('${l.id}')">💬 WhatsApp</button>`:''}</div>
      <div style="display:flex;gap:7px"><button class="btn ghost" onclick="closeOv()">Cancelar</button>
-       <button class="btn primary" onclick="saveLead('${l.id}',${isNew})">Salvar</button></div>
-   </div></div>`;
-  ov(html);
+       <button class="btn primary" onclick="saveLead('${l.id}',${isNew})">Salvar</button></div></div></div>`;
+  ov(html);window._draft=l;
 }
 function saveLead(id,isNew){
-  const g=k=>document.getElementById('m_'+k).value;
-  if(!g('negocio').trim()){toast('Coloca o nome do negócio');return;}
-  let l=DB.leads.find(x=>x.id===id);
-  if(!l){l={id};DB.leads.push(l);}
-  l.negocio=g('negocio');l.segmento=g('segmento');l.produto=g('produto');l.telefone=g('telefone');
-  l.instagram=g('instagram');l.endereco=g('endereco');l.etapa=g('etapa');l.valor=+g('valor')||PRECO;
-  l.proximoPasso=g('proximoPasso');l.proximaData=g('proximaData');l.notas=g('notas');
-  l.tags=g('tags').split(',').map(t=>t.trim()).filter(Boolean);
+  const g=k=>{const e=document.getElementById('m_'+k);return e?e.value:undefined;};
+  if(!g('negocio').trim()){toast(MODE==='b2b'?'Coloca o nome da empresa':'Coloca o nome do negócio');return;}
+  let l=LEADS().find(x=>x.id===id);
+  if(!l){l=window._draft||{id};LEADS().push(l);}
+  l.negocio=g('negocio');l.etapa=g('etapa');l.proximoPasso=g('proximoPasso');l.proximaData=g('proximaData');
+  l.notas=g('notas');l.tags=g('tags').split(',').map(t=>t.trim()).filter(Boolean);l.telefone=g('telefone');l.valor=+g('valor')||0;
+  if(MODE==='local'){l.segmento=g('segmento');l.produto=g('produto');l.instagram=g('instagram');l.endereco=g('endereco');}
+  else{l.contato=g('contato');l.cargo=g('cargo');l.origem=g('origem');l.email=g('email');l.interesse=g('interesse');l.proximaReuniao=g('proximaReuniao');}
   if(!l.createdAt)l.createdAt=today();
-  save();closeOv();renderAll();toast(isNew?'Lead criado':'Salvo');
+  save();closeOv();renderAll();toast(isNew?'Criado':'Salvo');
 }
-function delLead(id){if(!confirm('Excluir este lead?'))return;DB.leads=DB.leads.filter(x=>x.id!==id);save();closeOv();renderAll();toast('Excluído');}
+function delLead(id){if(!confirm('Excluir?'))return;B().leads=LEADS().filter(x=>x.id!==id);save();closeOv();renderAll();toast('Excluído');}
 
 /* ============ TEMPLATES ============ */
 function renderTpl(){
-  const segs=['Geral',...new Set(DB.templates.map(t=>t.segmento).filter(s=>s!=='Geral'))];
   const list=document.getElementById('tplList');list.innerHTML='';
-  segs.forEach(seg=>{
-    const ts=DB.templates.filter(t=>t.segmento===seg);if(!ts.length)return;
-    const h=document.createElement('div');h.className='seg-head';h.textContent=seg;list.appendChild(h);
-    ts.forEach(t=>{
-      const d=document.createElement('div');d.className='tpl';
-      d.innerHTML=`<div class="h"><span class="nm">${t.nome}</span>
-        <span><span class="pill" style="background:#2a2f3a;color:#9aa3b2">${t.etapa}</span>
+  const groupKey=MODE==='b2b'?'etapa':'segmento';
+  const order=MODE==='b2b'?['Acionar','Reunião','Pós-reunião','Proposta','Follow-up','Reativação']:['Geral','Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza'];
+  const groups=[...new Set(TPLS().map(t=>t[groupKey]))].sort((a,b)=>order.indexOf(a)-order.indexOf(b));
+  groups.forEach(gr=>{
+    const ts=TPLS().filter(t=>t[groupKey]===gr);if(!ts.length)return;
+    const h=document.createElement('div');h.className='seg-head';h.textContent=gr;list.appendChild(h);
+    ts.forEach(t=>{const d=document.createElement('div');d.className='tpl';
+      d.innerHTML=`<div class="h"><span class="nm">${esc(t.nome)}</span>
+        <span><span class="pill" style="background:#2a2f3a;color:#9aa3b2">${esc(t.etapa)}</span>
         <button class="btn ghost sm" onclick="copyTpl('${t.id}')">📋 Copiar</button>
         <button class="btn danger sm" onclick="delTpl('${t.id}')">✕</button></span></div>
         <textarea onchange="editTpl('${t.id}',this.value)">${esc(t.texto)}</textarea>`;
-      list.appendChild(d);
-    });
+      list.appendChild(d);});
   });
+  if(!TPLS().length)list.innerHTML='<div class="empty">Nenhum template ainda. Crie o primeiro.</div>';
 }
-function editTpl(id,v){DB.templates.find(t=>t.id===id).texto=v;save();}
-function copyTpl(id){navigator.clipboard.writeText(DB.templates.find(t=>t.id===id).texto);toast('Template copiado!');}
-function delTpl(id){if(!confirm('Excluir template?'))return;DB.templates=DB.templates.filter(t=>t.id!==id);save();renderTpl();}
+function editTpl(id,v){TPLS().find(t=>t.id===id).texto=v;save();}
+function copyTpl(id){navigator.clipboard.writeText(TPLS().find(t=>t.id===id).texto);toast('Copiado!');}
+function delTpl(id){if(!confirm('Excluir template?'))return;DB.templates[MODE]=TPLS().filter(t=>t.id!==id);save();renderTpl();}
 function openTpl(){
+  const segOpts=MODE==='b2b'?['B2B']:['Geral','Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza'];
+  const etapaOpts=MODE==='b2b'?['Acionar','Reunião','Pós-reunião','Proposta','Follow-up','Reativação']:['Primeiro toque','Follow-up','Pós-demo','Reativação'];
   let html=`<div class="modal"><h3>Novo template <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
-   <div class="fg"><label>Nome</label><input id="t_nome" placeholder="Ex: Lava — reativação"></div>
-   <div class="row2"><div class="fg"><label>Segmento</label><select id="t_seg">${['Geral','Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza'].map(s=>`<option>${s}</option>`).join('')}</select></div>
-   <div class="fg"><label>Etapa</label><select id="t_etapa">${['Primeiro toque','Follow-up','Pós-demo','Reativação'].map(s=>`<option>${s}</option>`).join('')}</select></div></div>
-   <div class="fg"><label>Texto (use {{negocio}} e {{produto}})</label><textarea id="t_texto" style="min-height:120px"></textarea></div>
-   <div class="modal-foot"><button class="btn ghost" onclick="closeOv()">Cancelar</button>
-   <button class="btn primary" onclick="addTpl()">Salvar</button></div></div>`;
+   <div class="fg"><label>Nome</label><input id="t_nome" placeholder="Ex: ${MODE==='b2b'?'Follow-up proposta':'Lava — reativação'}"></div>
+   <div class="row2"><div class="fg"><label>Categoria</label><select id="t_seg">${segOpts.map(s=>`<option>${s}</option>`).join('')}</select></div>
+   <div class="fg"><label>Etapa</label><select id="t_etapa">${etapaOpts.map(s=>`<option>${s}</option>`).join('')}</select></div></div>
+   <div class="fg"><label>Texto (atalhos: {{empresa}}, {{contato}}, {{negocio}}, {{produto}})</label><textarea id="t_texto" style="min-height:120px"></textarea></div>
+   <div class="modal-foot"><button class="btn ghost" onclick="closeOv()">Cancelar</button><button class="btn primary" onclick="addTpl()">Salvar</button></div></div>`;
   ov(html);
 }
 function addTpl(){const n=document.getElementById('t_nome').value.trim();if(!n){toast('Dá um nome');return;}
-  DB.templates.push({id:uid('T'),nome:n,segmento:document.getElementById('t_seg').value,etapa:document.getElementById('t_etapa').value,texto:document.getElementById('t_texto').value});
+  TPLS().push({id:uid('T'),nome:n,segmento:document.getElementById('t_seg').value,etapa:document.getElementById('t_etapa').value,texto:document.getElementById('t_texto').value});
   save();closeOv();renderTpl();toast('Template criado');}
 
 /* ============ ANALYTICS ============ */
-function renderAnalytics(){
-  const L=DB.leads;const m=today().slice(0,7);
-  const cnt=k=>L.filter(l=>l.etapa===k).length;
-  const fechados=cnt('Fechado');
-  const toquesMes=L.filter(l=>l.ultimoContato&&l.ultimoContato.slice(0,7)===m).length;
-  const demos=L.filter(l=>["Demo agendada","Proposta enviada","Fechado"].includes(l.etapa)).length;
-  const contatados=L.filter(l=>l.etapa!=="A contatar").length;
-  const taxa=contatados?Math.round(fechados/contatados*100):0;
-  const mrr=L.filter(l=>l.etapa==='Fechado').reduce((s,l)=>s+(+l.valor||PRECO),0);
-  document.getElementById('kpis').innerHTML=`
-   ${kpi(L.length,'Leads no total','')}
-   ${kpi(L.filter(l=>l.etapa==='A contatar').length,'A contatar','')}
-   ${kpi(demos,'Demos no pipeline','blue')}
-   ${kpi(fechados,'Fechados','green')}
-   ${kpi(taxa+'%','Taxa de conversão','gold')}
-   ${kpi('R$ '+mrr.toLocaleString('pt-BR'),'MRR fechado','green')}`;
-  // metas
-  const g=DB.goals;
-  document.getElementById('goals').innerHTML=
-    goalBar('Toques no mês',toquesMes,g.toques)+
-    goalBar('Demos agendadas',demos,g.demos)+
-    goalBar('Fechamentos',fechados,g.fechamentos);
-  // funil
-  const max=Math.max(...STAGES.map(s=>cnt(s.k)),1);
-  document.getElementById('funnel').innerHTML=STAGES.map(s=>bar(s.k,cnt(s.k),max,s.c)).join('');
-  // por produto
-  const prods=Object.keys(PRODUTOS);const pmax=Math.max(...prods.map(p=>L.filter(l=>l.produto===p).length),1);
-  document.getElementById('byProd').innerHTML=prods.map(p=>bar(p.replace('.AI',''),L.filter(l=>l.produto===p).length,pmax,PRODUTOS[p])).join('');
-  // por segmento
-  const segs=[...new Set(L.map(l=>l.segmento))];const smax=Math.max(...segs.map(s=>L.filter(l=>l.segmento===s).length),1);
-  document.getElementById('bySeg').innerHTML=segs.map(s=>bar(s,L.filter(l=>l.segmento===s).length,smax,'#e0a83d')).join('');
-}
-function kpi(v,l,cls){return`<div class="kpi"><div class="v ${cls}">${v}</div><div class="l">${l}</div></div>`;}
-function bar(lab,val,max,c){return`<div class="bar"><div class="lab">${lab}</div><div class="track"><div class="fill" style="width:${val/max*100}%;background:linear-gradient(90deg,${c},${c})"></div></div><div class="num">${val}</div></div>`;}
+function kpi(v,l,cls){return`<div class="kpi"><div class="v ${cls||''}">${v}</div><div class="l">${l}</div></div>`;}
+function bar(lab,val,max,c,suffix){return`<div class="bar"><div class="lab">${lab}</div><div class="track"><div class="fill" style="width:${Math.round(val/max*100)}%;background:linear-gradient(90deg,${c},${c})"></div></div><div class="num">${suffix||val}</div></div>`;}
 function goalBar(lab,val,goal){const pct=goal?Math.min(val/goal*100,100):0;const over=val>=goal;
   return`<div class="bar goal"><div class="lab">${lab}</div><div class="track"><div class="fill ${over?'over':''}" style="width:${pct}%"></div></div><div class="num">${val}/${goal}</div></div>`;}
-function openGoals(){const g=DB.goals;
-  let html=`<div class="modal"><h3>Metas do mês <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
-   <div class="fg"><label>Toques (mensagens enviadas) no mês</label><input id="g_toques" type="number" value="${g.toques}"></div>
-   <div class="fg"><label>Demos agendadas</label><input id="g_demos" type="number" value="${g.demos}"></div>
-   <div class="fg"><label>Fechamentos</label><input id="g_fechamentos" type="number" value="${g.fechamentos}"></div>
-   <div class="modal-foot"><button class="btn ghost" onclick="closeOv()">Cancelar</button>
-   <button class="btn primary" onclick="saveGoals()">Salvar</button></div></div>`;ov(html);}
-function saveGoals(){DB.goals={toques:+document.getElementById('g_toques').value,demos:+document.getElementById('g_demos').value,fechamentos:+document.getElementById('g_fechamentos').value};save();closeOv();renderAnalytics();toast('Metas salvas');}
+function brl(n){return 'R$ '+(+n||0).toLocaleString('pt-BR');}
+function renderAnalytics(){
+  const L=LEADS();const m=today().slice(0,7);const cnt=k=>L.filter(l=>l.etapa===k).length;
+  const fechados=cnt('Fechado');const ac=cfg().accent;
+  const max=Math.max(...stages().map(s=>cnt(s.k)),1);
+  document.getElementById('funnel').innerHTML=stages().map(s=>bar(s.k,cnt(s.k),max,s.c)).join('');
+  const g=GOALS();
+  if(MODE==='local'){
+    const demos=L.filter(l=>["Demo agendada","Proposta enviada","Fechado"].includes(l.etapa)).length;
+    const toquesMes=L.filter(l=>l.ultimoContato&&l.ultimoContato.slice(0,7)===m).length;
+    const contatados=L.filter(l=>l.etapa!=="A contatar").length;const taxa=contatados?Math.round(fechados/contatados*100):0;
+    const mrr=L.filter(l=>l.etapa==='Fechado').reduce((s,l)=>s+(+l.valor||PRECO),0);
+    document.getElementById('kpis').innerHTML=kpi(L.length,'Leads')+kpi(cnt('A contatar'),'A contatar')+kpi(demos,'Demos','blue')+kpi(fechados,'Fechados','green')+kpi(taxa+'%','Conversão','gold')+kpi(brl(mrr),'MRR fechado','green');
+    document.getElementById('goals').innerHTML=goalBar('Toques no mês',toquesMes,g.toques||0)+goalBar('Demos',demos,g.demos||0)+goalBar('Fechamentos',fechados,g.fechamentos||0);
+    document.getElementById('anaBox1H').textContent='Por produto';
+    const prods=Object.keys(PRODUTOS);const pmax=Math.max(...prods.map(p=>L.filter(l=>l.produto===p).length),1);
+    document.getElementById('anaBox1').innerHTML=prods.map(p=>bar(p.replace('.AI',''),L.filter(l=>l.produto===p).length,pmax,PRODUTOS[p])).join('');
+    document.getElementById('anaBox2H').textContent='Por segmento';
+    const segs=[...new Set(L.map(l=>l.segmento))];const smax=Math.max(...segs.map(s=>L.filter(l=>l.segmento===s).length),1);
+    document.getElementById('anaBox2').innerHTML=segs.map(s=>bar(s,L.filter(l=>l.segmento===s).length,smax,ac)).join('')||'<div class="empty">—</div>';
+  }else{
+    const reun=L.filter(l=>["Reunião feita","Proposta enviada","Negociação","Fechado"].includes(l.etapa)).length;
+    const props=L.filter(l=>["Proposta enviada","Negociação","Fechado"].includes(l.etapa)).length;
+    const andamento=L.filter(l=>!isTerminal(l.etapa)&&l.etapa!==firstStage()).length;
+    const taxa=L.length?Math.round(fechados/L.length*100):0;
+    const valPipe=L.filter(l=>!isTerminal(l.etapa)).reduce((s,l)=>s+(+l.valor||0),0);
+    const valFech=L.filter(l=>l.etapa==='Fechado').reduce((s,l)=>s+(+l.valor||0),0);
+    document.getElementById('kpis').innerHTML=kpi(L.length,'Negócios')+kpi(andamento,'Em andamento','blue')+kpi(reun,'Reuniões feitas','blue')+kpi(fechados,'Fechados','green')+kpi(brl(valPipe),'Valor no pipeline','gold')+kpi(brl(valFech),'Valor fechado','green');
+    document.getElementById('goals').innerHTML=goalBar('Reuniões',reun,g.reunioes||0)+goalBar('Propostas',props,g.propostas||0)+goalBar('Fechamentos',fechados,g.fechamentos||0);
+    document.getElementById('anaBox1H').textContent='Por origem';
+    const ors=Object.keys(ORIGENS);const omax=Math.max(...ors.map(o=>L.filter(l=>l.origem===o).length),1);
+    document.getElementById('anaBox1').innerHTML=ors.map(o=>bar(o,L.filter(l=>l.origem===o).length,omax,ORIGENS[o])).join('');
+    document.getElementById('anaBox2H').textContent='Valor por etapa (R$)';
+    const vmax=Math.max(...stages().map(s=>L.filter(l=>l.etapa===s.k).reduce((a,l)=>a+(+l.valor||0),0)),1);
+    document.getElementById('anaBox2').innerHTML=stages().map(s=>{const v=L.filter(l=>l.etapa===s.k).reduce((a,l)=>a+(+l.valor||0),0);return bar(s.k,v,vmax,s.c,brl(v));}).join('');
+  }
+}
+function openGoals(){const g=GOALS();let html;
+  if(MODE==='local'){html=`<div class="modal"><h3>Metas do mês (Local) <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
+    <div class="fg"><label>Toques no mês</label><input id="g_a" type="number" value="${g.toques||0}"></div>
+    <div class="fg"><label>Demos</label><input id="g_b" type="number" value="${g.demos||0}"></div>
+    <div class="fg"><label>Fechamentos</label><input id="g_c" type="number" value="${g.fechamentos||0}"></div>
+    <div class="modal-foot"><button class="btn ghost" onclick="closeOv()">Cancelar</button><button class="btn primary" onclick="saveGoals('toques','demos','fechamentos')">Salvar</button></div></div>`;}
+  else{html=`<div class="modal"><h3>Metas do mês (B2B) <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
+    <div class="fg"><label>Reuniões</label><input id="g_a" type="number" value="${g.reunioes||0}"></div>
+    <div class="fg"><label>Propostas</label><input id="g_b" type="number" value="${g.propostas||0}"></div>
+    <div class="fg"><label>Fechamentos</label><input id="g_c" type="number" value="${g.fechamentos||0}"></div>
+    <div class="modal-foot"><button class="btn ghost" onclick="closeOv()">Cancelar</button><button class="btn primary" onclick="saveGoals('reunioes','propostas','fechamentos')">Salvar</button></div></div>`;}
+  ov(html);}
+function saveGoals(a,b,c){const G={};G[a]=+document.getElementById('g_a').value;G[b]=+document.getElementById('g_b').value;G[c]=+document.getElementById('g_c').value;
+  DB.boards[MODE].goals=G;save();closeOv();renderAll();toast('Metas salvas');}
 
 /* ============ INÍCIO ============ */
-const STRAT=[
- ["Lava.AI","Lava-rápido / estética automotiva","Some a planilha: OS, agenda e aviso de carro pronto no WhatsApp.","#4f8bf0"],
- ["Sorria.AI","Consultórios odontológicos","Atendente IA que agenda, confirma e remarca, e traz o paciente de volta pra limpeza.","#3fb368"],
- ["Realce.AI","Clínicas de estética","Pacote 3/10 no controle, antes/depois organizado e retoque lembrado no tempo certo.","#9b6cf0"],
- ["Corta.AI","Barbearias (e salões)","Agenda por profissional, portfólio do corte que ele já fez e reativação de quem sumiu.","#e0a83d"]
-];
-const CADENCE=[
- ["Manhã · 15 min","Abra o Início, veja os follow-ups do dia e separe os 10 alvos."],
- ["Bloco de toque · 30-40 min","Dispare 10 primeiros toques + 2 follow-ups. Use o botão WhatsApp (já vem preenchido)."],
- ["Tarde · 10 min","Responda quem voltou, agende as demos, mova os cards no pipeline."],
- ["Demos","5-7 min cada (call) ou agrupe as presenciais num dia. Comece pela barbearia (demo já pronta)."]
-];
+const HOME={
+ local:{
+  hero:["Marina","Prospecção dos SaaS da Moove em Maringá."],
+  stratH:"🧭 A estratégia em 1 minuto",
+  strat:[["Lava.AI","Lava-rápido / estética automotiva","Some a planilha: OS, agenda e aviso de carro pronto no WhatsApp.","#4f8bf0"],
+    ["Sorria.AI","Consultórios odontológicos","Atendente IA que agenda, confirma e remarca, e traz o paciente de volta pra limpeza.","#3fb368"],
+    ["Realce.AI","Clínicas de estética","Pacote 3/10 no controle, antes/depois organizado e retoque lembrado no tempo certo.","#9b6cf0"],
+    ["Corta.AI","Barbearias (e salões)","Agenda por profissional, portfólio do corte e reativação de quem sumiu.","#e0a83d"]],
+  cadH:"⏱️ Cadência (cabe nas ~3h/dia)",
+  cad:[["Manhã · 15 min","Veja os follow-ups do dia e separe os 10 alvos."],
+    ["Bloco de toque · 30-40 min","Dispare 10 primeiros toques + 2 follow-ups. Use o botão WhatsApp."],
+    ["Tarde · 10 min","Responda quem voltou, agende demos, mova os cards."],
+    ["Demos","5-7 min cada. Comece pela barbearia (demo já pronta)."]],
+  cadNote:"💡 Um segmento por dia no começo (seg = barbearia, ter = odonto...) pra ficar fluente no pitch.",
+  seq:[["Dia 0","Abertura","Primeiro toque","Mensagem curta + oferta de mostrar em 5 min. Ou já manda a isca: \"te mando um vídeo de 1 min?\"","#e0a83d"],
+    ["+2 dias","Follow-up 1 · o vídeo","Follow-up","Manda o Reels de 1 min do agente. Não cobra resposta, só mostra.","#4f8bf0"],
+    ["+5 dias","Follow-up 2 · prova","Follow-up","Print do painel ou um número concreto. Foco em valor, não em \"e aí?\".","#9b6cf0"],
+    ["+9 dias","Convite direto","Follow-up","Pergunta fácil de dar sim: \"te mostro hoje ou amanhã, 5 minutinhos?\"","#3fb368"],
+    ["+14 dias","Encerramento","Reativação","\"Não quero insistir, fico à disposição.\" O break-up costuma destravar resposta.","#e25563"]],
+  posH:"Depois da demo",
+  pos:[["Mesmo dia","Resumo + proposta","Pós-demo","Resumo do que viu + preço (R$197/R$297) + \"quer que eu monte a conta?\".","#e0a83d"],
+    ["+2 dias","Follow-up proposta","Pós-demo","\"Conseguiu pensar? Tiro qualquer dúvida.\"","#4f8bf0"],
+    ["+5 dias","Última chamada","Reativação","\"Sigo à disposição. Se quiser, deixo rodando 7 dias pra você sentir.\"","#e25563"]],
+  mat:"Playbook, demo tela a tela e transcrições do agente em <b>Moove/Prospeccao-Maringa/</b>. Preço: <b>R$197/mês</b> · <b>R$297/mês</b> (marca branca). Contato: <b>44 98426-6280</b>."
+ },
+ b2b:{
+  hero:["Higor","Negociações B2B: network, empresas maiores, reunião e fechamento."],
+  stratH:"🧭 O processo B2B (a base que faltava)",
+  strat:[["1","Acionar o network","Contatos e indicações. Empresas maiores. Mensagem pessoal, não pitch frio.","#9aa3b2"],
+    ["2","Reunião","Agende e faça. Primeiro entenda a dor, depois mostre a solução. Saia com próximo passo marcado.","#4f8bf0"],
+    ["3","Proposta","Envie rápido (24-48h após a reunião). Valor claro, direto ao ponto.","#e0a83d"],
+    ["4","Negociação e fechamento","Follow-up firme até o sim. O dinheiro está no follow-up: a maioria fecha entre o 2º e o 5º contato.","#3fb368"]],
+  cadH:"⏱️ Cadência (rotina do Higor)",
+  cad:[["Toda semana","Acione 5 contatos novos do network ou peça 2 indicações."],
+    ["Toda reunião","Resumo + próximo passo no MESMO dia. Nunca deixe esfriar."],
+    ["2x na semana","Revise o pipeline: nada parado sem data de próximo passo."],
+    ["Proposta enviada","Já agende o follow-up na hora (não confie na memória)."]],
+  cadNote:"💡 Regra de ouro: nunca saia de uma reunião sem o próximo passo agendado, com data, aqui no CRM.",
+  seq:[["Dia 0","Acionar contato","Acionar","Mensagem pessoal reativando o contato. Pede um café/call, não vende ainda.","#9aa3b2"],
+    ["+2 dias","Convite pra reunião","Reunião","Oferece 2 horários fechados (\"quarta 10h ou quinta 16h?\"). Facilita o sim.","#4f8bf0"],
+    ["Véspera","Confirmar reunião","Reunião","Confirma e manda o link. Reduz o no-show.","#9b6cf0"],
+    ["Pós-reunião (mesmo dia)","Resumo + próximo passo","Pós-reunião","Resumo do que foi falado + o que combinaram. Promete a proposta com data.","#e0a83d"],
+    ["+2 dias da reunião","Enviar proposta","Proposta","Proposta direta + sugere ligação pra alinhar detalhes.","#f0894f"],
+    ["+3 dias","Follow-up 1","Follow-up","\"Conseguiu olhar? Ajusto o que precisar.\"","#4f8bf0"],
+    ["+7 dias","Follow-up 2 (valor)","Follow-up","Reforça o ganho principal. \"Destravamos isso ainda esse mês?\"","#9b6cf0"],
+    ["+14 dias","Encerramento","Reativação","Break-up educado. Deixa a porta aberta pra retomar depois.","#e25563"]],
+  posH:"Regras de ouro do B2B",
+  pos:[["✓","Decisor mapeado","","Anote no campo \"cargo\" quem assina. Vender pra quem não decide é perder tempo."],
+    ["✓","Próximo passo sempre","","Todo negócio ativo tem data de próximo passo. Sem isso, ele esfria e morre."],
+    ["✓","Proposta com prazo","","Toda proposta enviada tem follow-up agendado e uma data pra decisão."]],
+  mat:"Dica: registre cada conversa em \"notas\" logo após acontecer. O follow-up bom é o que lembra do detalhe que o outro falou."
+ }
+};
+function seqRow(s){return `<div style="display:flex;gap:12px;margin-bottom:13px;align-items:flex-start">
+  <span class="pill" style="background:${(s[4]||cfg().accent)}22;color:${s[4]||cfg().accent};min-width:74px;text-align:center;flex-shrink:0">${s[0]}</span>
+  <div style="flex:1"><div style="font-size:13px;font-weight:700">${s[1]}${s[2]?` <span class="muted" style="font-weight:500;font-size:11px">→ template "${s[2]}"</span>`:''}</div>
+  <div class="muted" style="font-size:12px;margin-top:2px">${s[3]}</div></div></div>`;}
 function renderHome(){
-  const h=new Date().getHours();const oi=h<12?"Bom dia":(h<18?"Boa tarde":"Boa noite");
-  const L=DB.leads;const cnt=k=>L.filter(l=>l.etapa===k).length;
-  const acontatar=cnt('A contatar'),demos=L.filter(l=>["Demo agendada","Proposta enviada","Fechado"].includes(l.etapa)).length;
-  const fechados=cnt('Fechado');const mrr=L.filter(l=>l.etapa==='Fechado').reduce((s,l)=>s+(+l.valor||PRECO),0);
-  const due=L.filter(l=>!["Fechado","Perdido"].includes(l.etapa)).filter(l=>{if(l.proximaData)return daysBetween(today(),l.proximaData)<=0;return l.etapa!=="A contatar"&&!l.proximaData;});
-  const hero=document.getElementById('homeHero');
-  hero.innerHTML=`<div class="box" style="background:linear-gradient(135deg,#1e222c,#171a21);border-color:#2a2f3a;margin-bottom:18px">
-     <div style="font-size:22px;font-weight:800">${oi}, Marina 👋</div>
-     <div class="muted" style="margin-top:5px">Prospecção dos SaaS da Moove em Maringá. ${due.length?`Você tem <b style="color:#f3c969">${due.length}</b> follow-up(s) pra hoje.`:'Nenhum follow-up atrasado, dia limpo 🎉'}
-     <a onclick="goView('pipeline')" style="cursor:pointer">Abrir pipeline →</a></div></div>`;
-  document.getElementById('homeKpis').innerHTML=
-    kpi(L.length,'Leads no total','')+kpi(acontatar,'A contatar','')+kpi(demos,'Demos no pipeline','blue')+
-    kpi(fechados,'Fechados','green')+kpi('R$ '+mrr.toLocaleString('pt-BR'),'MRR fechado','green');
+  const H=HOME[MODE];const ac=cfg().accent;
+  const hh=new Date().getHours();const oi=hh<12?"Bom dia":(hh<18?"Boa tarde":"Boa noite");
+  const L=LEADS();const cnt=k=>L.filter(l=>l.etapa===k).length;
+  const due=L.filter(l=>!isTerminal(l.etapa)).filter(l=>{if(l.proximaData)return daysBetween(today(),l.proximaData)<=0;return l.etapa!==firstStage()&&!l.proximaData;});
+  document.getElementById('homeHero').innerHTML=`<div class="box" style="background:linear-gradient(135deg,#1e222c,#171a21);margin-bottom:18px">
+    <div style="font-size:22px;font-weight:800">${oi}, ${H.hero[0]} 👋</div>
+    <div class="muted" style="margin-top:5px">${H.hero[1]} ${due.length?`Você tem <b style="color:${ac}">${due.length}</b> follow-up(s) pra hoje.`:'Nenhum follow-up atrasado 🎉'} <a onclick="goView('pipeline')">Abrir pipeline →</a></div></div>`;
+  // KPIs
+  const fechados=cnt('Fechado');
+  if(MODE==='local'){const demos=L.filter(l=>["Demo agendada","Proposta enviada","Fechado"].includes(l.etapa)).length;
+    const mrr=L.filter(l=>l.etapa==='Fechado').reduce((s,l)=>s+(+l.valor||PRECO),0);
+    document.getElementById('homeKpis').innerHTML=kpi(L.length,'Leads')+kpi(cnt('A contatar'),'A contatar')+kpi(demos,'Demos','blue')+kpi(fechados,'Fechados','green')+kpi(brl(mrr),'MRR fechado','green');
+  }else{const andamento=L.filter(l=>!isTerminal(l.etapa)&&l.etapa!==firstStage()).length;
+    const valPipe=L.filter(l=>!isTerminal(l.etapa)).reduce((s,l)=>s+(+l.valor||0),0);
+    document.getElementById('homeKpis').innerHTML=kpi(L.length,'Negócios')+kpi(andamento,'Em andamento','blue')+kpi(cnt('Reunião agendada'),'Reuniões marcadas','blue')+kpi(fechados,'Fechados','green')+kpi(brl(valPipe),'Valor no pipeline','gold');}
   document.getElementById('homeTodo').innerHTML=due.length?fuList(due.slice(0,5),''):'<div class="empty">Tudo em dia 🎉</div>';
-  const g=DB.goals;const m=today().slice(0,7);const toquesMes=L.filter(l=>l.ultimoContato&&l.ultimoContato.slice(0,7)===m).length;
-  document.getElementById('homeGoals').innerHTML=goalBar('Toques no mês',toquesMes,g.toques)+goalBar('Demos',demos,g.demos)+goalBar('Fechamentos',fechados,g.fechamentos);
-  document.getElementById('homeStrat').innerHTML=STRAT.map(s=>`<div style="display:flex;gap:10px;margin-bottom:12px">
-     <span class="pill" style="background:${s[3]}22;color:${s[3]};height:fit-content">${s[0].replace('.AI','')}</span>
-     <div><b style="font-size:13px">${s[1]}</b><div class="muted" style="font-size:12px">${s[2]}</div></div></div>`).join('');
-  document.getElementById('homeCad').innerHTML=CADENCE.map((c,i)=>`<div style="display:flex;gap:11px;margin-bottom:12px">
-     <span style="background:#e0a83d22;color:#f3c969;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-weight:700;flex-shrink:0;font-size:13px">${i+1}</span>
-     <div><b style="font-size:13px">${c[0]}</b><div class="muted" style="font-size:12px">${c[1]}</div></div></div>`).join('')
-     +`<div class="muted" style="margin-top:8px;font-size:12px;border-top:1px solid var(--line);padding-top:10px">💡 Regra: um segmento por dia no começo (seg = barbearia, ter = odonto...) pra ficar fluente no pitch.</div>`;
-  document.getElementById('homeSeq').innerHTML=CADENCE_SEQ.map(seqRow).join('');
-  document.getElementById('homeSeqPos').innerHTML=CADENCE_POS.map(seqRow).join('');
-}
-function goView(v){document.querySelector(`.tab[data-view="${v}"]`).click();}
-const CADENCE_SEQ=[
- ["Dia 0","Abertura","Primeiro toque","Mensagem curta + oferta de mostrar em 5 min. Ou já manda a isca: \"te mando um vídeo de 1 min?\"","#e0a83d"],
- ["+2 dias","Follow-up 1 · o vídeo","Follow-up","Manda o Reels de 1 min do agente agendando e remarcando sozinho. Não cobra resposta, só mostra.","#4f8bf0"],
- ["+5 dias","Follow-up 2 · prova","Follow-up","Um print do painel/agenda ou um número concreto (\"barbearia X recuperou Y clientes\"). Foco em valor, não em \"e aí?\".","#9b6cf0"],
- ["+9 dias","Convite direto","Follow-up","Pergunta fácil de dar sim: \"te mostro funcionando hoje ou amanhã, 5 minutinhos?\"","#3fb368"],
- ["+14 dias","Encerramento","Reativação","\"Não quero insistir, fico à disposição. Posso te chamar quando tiver uma novidade?\" O \"break-up\" costuma destravar resposta.","#e25563"]
-];
-const CADENCE_POS=[
- ["Mesmo dia","Resumo + proposta","Pós-demo","Manda o resumo do que viu + preço (R$197/R$297) + \"quer que eu já monte a conta?\".","#e0a83d"],
- ["+2 dias","Follow-up proposta","Pós-demo","\"Conseguiu pensar? Tiro qualquer dúvida.\"","#4f8bf0"],
- ["+5 dias","Última chamada","Reativação","\"Vou seguir aqui à disposição. Se quiser, deixo rodando 7 dias pra você sentir.\"","#e25563"]
-];
-function seqRow(s){
-  return `<div style="display:flex;gap:12px;margin-bottom:13px;align-items:flex-start">
-    <span class="pill" style="background:${s[4]}22;color:${s[4]};min-width:64px;text-align:center;flex-shrink:0">${s[0]}</span>
-    <div style="flex:1">
-      <div style="font-size:13px;font-weight:700">${s[1]} <span class="muted" style="font-weight:500;font-size:11px">→ template "${s[2]}"</span></div>
-      <div class="muted" style="font-size:12px;margin-top:2px">${s[3]}</div>
-    </div></div>`;
+  // metas
+  const g=GOALS();const m=today().slice(0,7);
+  if(MODE==='local'){const demos=L.filter(l=>["Demo agendada","Proposta enviada","Fechado"].includes(l.etapa)).length;const toquesMes=L.filter(l=>l.ultimoContato&&l.ultimoContato.slice(0,7)===m).length;
+    document.getElementById('homeGoals').innerHTML=goalBar('Toques no mês',toquesMes,g.toques||0)+goalBar('Demos',demos,g.demos||0)+goalBar('Fechamentos',fechados,g.fechamentos||0);
+  }else{const reun=L.filter(l=>["Reunião feita","Proposta enviada","Negociação","Fechado"].includes(l.etapa)).length;const props=L.filter(l=>["Proposta enviada","Negociação","Fechado"].includes(l.etapa)).length;
+    document.getElementById('homeGoals').innerHTML=goalBar('Reuniões',reun,g.reunioes||0)+goalBar('Propostas',props,g.propostas||0)+goalBar('Fechamentos',fechados,g.fechamentos||0);}
+  // estratégia
+  document.getElementById('homeStratH').textContent=H.stratH;
+  document.getElementById('homeStrat').innerHTML=H.strat.map(s=>`<div style="display:flex;gap:10px;margin-bottom:12px">
+    <span class="pill" style="background:${s[3]}22;color:${s[3]};height:fit-content">${s[0].replace('.AI','')}</span>
+    <div><b style="font-size:13px">${s[1]}</b><div class="muted" style="font-size:12px">${s[2]}</div></div></div>`).join('');
+  // cadência rotina
+  document.getElementById('homeCadH').textContent=H.cadH;
+  document.getElementById('homeCad').innerHTML=H.cad.map((c,i)=>`<div style="display:flex;gap:11px;margin-bottom:12px">
+    <span style="background:${ac}22;color:${ac};width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-weight:700;flex-shrink:0;font-size:13px">${i+1}</span>
+    <div><b style="font-size:13px">${c[0]}</b><div class="muted" style="font-size:12px">${c[1]}</div></div></div>`).join('')
+    +`<div class="muted" style="margin-top:8px;font-size:12px;border-top:1px solid var(--line);padding-top:10px">${H.cadNote}</div>`;
+  // cadência de mensagens
+  document.getElementById('homeSeq').innerHTML=H.seq.map(seqRow).join('');
+  document.getElementById('homeSeqPosH').textContent=H.posH;
+  document.getElementById('homeSeqPos').innerHTML=H.pos.map(seqRow).join('');
+  document.getElementById('homeMat').innerHTML=H.mat;
 }
 
 /* ============ BACKUP ============ */
-function exportJSON(){dl('moove-crm-'+today()+'.json',JSON.stringify(DB,null,2),'application/json');toast('Backup baixado');}
+function exportJSON(){dl('moove-crm-'+today()+'.json',JSON.stringify(DB,null,2),'application/json');toast('Backup completo baixado');}
 function exportCSV(){
-  const h=['Negócio','Segmento','Produto','Etapa','Telefone','Instagram','Endereço','Próximo passo','Data','Tags','Notas'];
-  const rows=DB.leads.map(l=>[l.negocio,l.segmento,l.produto,l.etapa,l.telefone,l.instagram,l.endereco,l.proximoPasso,l.proximaData,(l.tags||[]).join('|'),l.notas].map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(','));
-  dl('moove-leads-'+today()+'.csv',[h.join(','),...rows].join('\n'),'text/csv');toast('CSV baixado');}
+  const L=LEADS();let h,rows;
+  if(MODE==='local'){h=['Negócio','Segmento','Produto','Etapa','Telefone','Instagram','Endereço','Próximo passo','Data','Tags','Notas'];
+    rows=L.map(l=>[l.negocio,l.segmento,l.produto,l.etapa,l.telefone,l.instagram,l.endereco,l.proximoPasso,l.proximaData,(l.tags||[]).join('|'),l.notas]);}
+  else{h=['Empresa','Contato','Cargo','Origem','Interesse','Etapa','Valor','Telefone','E-mail','Próxima reunião','Próximo passo','Data','Tags','Notas'];
+    rows=L.map(l=>[l.negocio,l.contato,l.cargo,l.origem,l.interesse,l.etapa,l.valor,l.telefone,l.email,l.proximaReuniao,l.proximoPasso,l.proximaData,(l.tags||[]).join('|'),l.notas]);}
+  const csv=[h.join(','),...rows.map(r=>r.map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');
+  dl('moove-'+MODE+'-'+today()+'.csv',csv,'text/csv');toast('CSV baixado');}
 function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();
-  r.onload=e=>{try{const d=JSON.parse(e.target.result);if(d.leads){DB=d;save();renderAll();toast('Importado!');}else toast('Arquivo inválido');}catch(x){toast('Erro ao ler');}};
+  r.onload=e=>{try{const d=JSON.parse(e.target.result);DB=migrate(d);save();renderAll();toast('Importado!');}catch(x){toast('Erro ao ler arquivo');}};
   r.readAsText(f);inp.value='';}
-function seedReset(){if(!confirm('Isso adiciona os 23 leads-semente. Continuar?'))return;
-  const exist=new Set(DB.leads.map(l=>l.negocio));seedLeads().forEach(l=>{if(!exist.has(l.negocio))DB.leads.push(l);});save();renderAll();toast('Leads-semente adicionados');}
-function wipe(){if(!confirm('Apagar TODOS os dados? Isso não volta.'))return;localStorage.removeItem(KEY);DB=load();renderAll();toast('Tudo apagado');}
+function seedReset(){if(!confirm('Adiciona os 23 leads-semente no workspace Local. Continuar?'))return;
+  const exist=new Set(DB.boards.local.leads.map(l=>l.negocio));seedLeads().forEach(l=>{if(!exist.has(l.negocio))DB.boards.local.leads.push(l);});save();renderAll();toast('Leads-semente adicionados');}
+function wipe(){if(!confirm('Apagar TODOS os dados (Local + B2B)? Não volta.'))return;localStorage.removeItem(KEY);DB=freshDB();save();renderAll();toast('Tudo apagado');}
 function dl(name,content,type){const b=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
 
 /* ============ UTIL ============ */
@@ -760,8 +847,8 @@ function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt
 function ov(html){const o=document.getElementById('overlay');o.innerHTML=html;o.classList.add('open');o.onclick=e=>{if(e.target===o)closeOv();};}
 function closeOv(){document.getElementById('overlay').classList.remove('open');}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
-function renderAll(){renderHome();renderBoard();fillFilters();fillPipeFilters();renderTable();renderFU();renderTpl();renderAnalytics();}
-renderAll();initSync();
+function renderAll(){applyTheme();renderHome();fillPipeFilters();renderBoard();fillFilters();renderTable();renderFU();renderTpl();renderAnalytics();}
+applyTheme();renderAll();initSync();
 </script>
 </body>
 </html>
