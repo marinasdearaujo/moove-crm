@@ -241,7 +241,7 @@ const PRODUTOS={"Lava.AI":"#4f8bf0","Sorria.AI":"#3fb368","Realce.AI":"#9b6cf0",
 const ORIGENS={"Network":"#4f8bf0","Indicação":"#3fb368","Inbound":"#9b6cf0","Evento":"#e0a83d","Frio":"#9aa3b2","Outro":"#9aa3b2"};
 const PRECO=197;
 const KEY="moove_crm_v3";
-const TPL_VERSION=6; // bump quando os templates padrão mudarem -> atualiza nos apps já existentes (1x)
+const TPL_VERSION=7; // bump quando os templates padrão mudarem -> atualiza nos apps já existentes (1x)
 let MODE=localStorage.getItem('moove_mode')||'local';
 
 const CFG={
@@ -318,7 +318,7 @@ function enrich(d){ // preenche gancho dos leads que ainda não têm (1x)
 }
 
 const SEED_TPL_LOCAL=[
- ["Cliente oculto · teste (lava)","Estética automotiva","Cliente oculto","Oi, bom dia! Vi vocês e queria saber como funciona pra agendar uma lavagem completa, e quanto fica. Tem horário essa semana?"],
+ ["Cliente oculto · teste (lava)","Estética automotiva","Cliente oculto","Olá, tudo bem? Queria saber sobre vitrificação pro meu carro, como funciona e quanto fica. Vocês fazem? Tava pensando em fazer uma higienização interna junto também."],
  ["Cliente oculto · teste (odonto)","Odontologia","Cliente oculto","Olá, bom dia! Gostaria de marcar uma avaliação. Vocês têm horário essa semana? E como funciona o atendimento de vocês?"],
  ["Cliente oculto · teste (estética)","Estética","Cliente oculto","Oi, tudo bem? Queria saber sobre os procedimentos de vocês e como faço pra agendar uma avaliação. Tem horário nos próximos dias?"],
  ["Cliente oculto · teste (barbearia)","Barbearia","Cliente oculto","Oi, tudo bem? Queria marcar um corte pra essa semana, como faço pra agendar? E quais horários vocês têm?"],
@@ -835,7 +835,7 @@ const COCHECK=[
  ["🙂","Tom do atendimento","Simpático, frio, robótico, demorado? → a IA responde rápido e no jeito da marca."]
 ];
 const CASES=[
- ["🚗","Lava-car","Cliente nova, primeira vez. Carro: Onix branco, hatch. Quer lavagem completa (por dentro e por fora).","\"Que serviço?\" → Queria uma lavagem completa, por dentro e por fora. Fazem higienização interna também? · \"Qual carro?\" → Um Onix, hatch, branco. · \"Quando?\" → Essa semana, sexta de manhã se tiver. · \"Já é cliente?\" → Primeira vez. · \"Nome?\" → Marina."],
+ ["🚗","Estética automotiva","Cliente nova, primeira vez. Carro: Corolla preto, 2022. Quer vitrificação + higienização interna (serviço de ticket alto testa bem o atendimento). Se for um lava-rápido simples, troque por \"lavagem completa + higienização\".","\"Que serviço?\" → Tava pensando em vitrificação de pintura, e talvez higienização interna junto. Como funciona? · \"Qual carro?\" → Um Corolla preto, 2022. · \"Estado?\" → Tem uns riscos leves e a pintura meio sem brilho, queria recuperar. · \"Quanto/prazo?\" → Quanto fica mais ou menos? Ficam com o carro quantos dias? · \"Primeira vez?\" → Sim."],
  ["🦷","Odonto","Paciente nova, particular. Quer avaliação (dente sensível) e talvez limpeza.","\"Que atendimento?\" → Queria uma avaliação, tô com um dente sensível, e aproveitar pra fazer uma limpeza. · \"Convênio?\" → Particular. · \"Quando?\" → Essa semana, fim de tarde. · \"Primeira vez?\" → Sim."],
  ["💆","Estética","Cliente nova. Quer limpeza de pele e saber de pacote.","\"Qual procedimento?\" → Queria fazer uma limpeza de pele e saber se têm pacote. Dá pra marcar uma avaliação? · \"Quando?\" → Essa semana, qualquer tarde. · \"Primeira vez?\" → Sim."],
  ["💈","Barbearia","Cliente novo. Quer corte + barba.","\"Que serviço?\" → Queria corte e barba. · \"Com qual barbeiro?\" → Qualquer um que tiver. · \"Quando?\" → Sábado de manhã, dá? · \"Primeira vez?\" → Primeira vez aí."]
