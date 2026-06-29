@@ -236,7 +236,7 @@ const PRODUTOS={"Lava.AI":"#4f8bf0","Sorria.AI":"#3fb368","Realce.AI":"#9b6cf0",
 const ORIGENS={"Network":"#4f8bf0","Indicação":"#3fb368","Inbound":"#9b6cf0","Evento":"#e0a83d","Frio":"#9aa3b2","Outro":"#9aa3b2"};
 const PRECO=197;
 const KEY="moove_crm_v3";
-const TPL_VERSION=3; // bump quando os templates padrão mudarem -> atualiza nos apps já existentes (1x)
+const TPL_VERSION=4; // bump quando os templates padrão mudarem -> atualiza nos apps já existentes (1x)
 let MODE=localStorage.getItem('moove_mode')||'local';
 
 const CFG={
@@ -291,23 +291,39 @@ const SEED_LEADS=[
  ["Barbearia","Corta.AI","GR Barbearia","","@grbarbeariamaringa","","A contatar","",[]],
  ["Barbearia","Corta.AI","Will Barbearia","","willbarbearia.com.br","Av Brasil 4886, Zona 04","A contatar","Já tem agendamento online",[]]
 ];
+// ganchos reais (fatos públicos já levantados) -> entram como abertura personalizada
+const GANCHOS={
+ "Barbearia Magalhães":"Vi que vocês têm nota 4,9 no Google e mais de 1200 atendimentos por mês, que coisa linda",
+ "Jacob's Barbearia":"Vi que vocês já têm mais de 250 assinantes no clube de corte",
+ "Saint Patrick's":"Vi que vocês passaram de 800 membros e já estão com duas unidades aqui em Maringá",
+ "Sr. Calixto Barbearia":"Vi que vocês cresceram pra duas unidades, com cerca de 20 profissionais",
+ "Will Barbearia":"Vi que vocês já trabalham com agendamento online no site de vocês",
+ "Hamonir Maringá Centro":"Acompanhei o trabalho de vocês com harmonização e estética ali na Tamandaré",
+ "Dentz Maringá":"Vi que a unidade de vocês tem três consultórios bem completos",
+ "Moderna Estética Automotiva Premium":"Vi o capricho de vocês nas fotos dos detalhamentos no Instagram"
+};
 function seedLeads(){return SEED_LEADS.map((r,i)=>({
   id:"L"+(Date.now()+i),segmento:r[0],produto:r[1],negocio:r[2],telefone:r[3],
-  instagram:r[4],endereco:r[5],etapa:r[6],notas:r[7],tags:r[8],
+  instagram:r[4],endereco:r[5],etapa:r[6],notas:r[7],tags:r[8],gancho:GANCHOS[r[2]]||'',
   proximoPasso:"Primeiro toque",proximaData:"",ultimoContato:"",valor:PRECO,createdAt:today()
 }));}
+function enrich(d){ // preenche gancho dos leads que ainda não têm (1x)
+  if(d._enrichV!==1){((d.boards&&d.boards.local&&d.boards.local.leads)||[]).forEach(l=>{if(!l.gancho&&GANCHOS[l.negocio])l.gancho=GANCHOS[l.negocio];});d._enrichV=1;}
+  return d;
+}
 
 const SEED_TPL_LOCAL=[
- ["Lava · abertura","Estética automotiva","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI. Lançamos faz pouco aqui em Maringá uma solução pra lava-rápido e estética automotiva, focada em duas dores do dia a dia: cliente que manda mensagem e fica sem resposta no corre, e a bagunça de anotar agendamento e cobrança na mão.\nTe procuro agora porque estamos começando pelos negócios daqui da cidade, montando os primeiros casos em Maringá, e a {{negocio}} tem a cara de um deles. Faz sentido eu te mostrar como funciona em uns 5 minutinhos? Pode ser por aqui mesmo."],
- ["Lava · isca de vídeo","Estética automotiva","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI. Lançamos faz pouco em Maringá uma solução pra lava-rápido e, em vez de te explicar por texto, queria te mandar um vídeo de 1 minuto mostrando ela respondendo cliente e organizando a agenda dentro do WhatsApp.\nComo estamos apresentando pros negócios daqui primeiro, ia adorar ter a sua opinião. Posso te mandar?"],
+ ["Lava · abertura","Estética automotiva","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI.{{?gancho}} {{gancho}}.{{/gancho}} Lançamos faz pouco aqui em Maringá uma solução pra lava-rápido e estética automotiva, focada em duas dores do dia a dia: cliente que manda mensagem e fica sem resposta no corre, e a bagunça de anotar agendamento e cobrança na mão.\nTe procuro agora porque estamos começando pelos negócios daqui da cidade, montando os primeiros casos em Maringá, e a {{negocio}} tem a cara de um deles. Faz sentido eu te mostrar como funciona em uns 5 minutinhos? Pode ser por aqui mesmo."],
+ ["Lava · isca de vídeo","Estética automotiva","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI.{{?gancho}} {{gancho}}.{{/gancho}} Lançamos faz pouco em Maringá uma solução pra lava-rápido e, em vez de te explicar por texto, queria te mandar um vídeo de 1 minuto mostrando ela respondendo cliente e organizando a agenda dentro do WhatsApp.\nComo estamos apresentando pros negócios daqui primeiro, ia adorar ter a sua opinião. Posso te mandar?"],
  ["Lava · follow-up","Estética automotiva","Follow-up","{{nome}}, {{saudacao}}! Voltando aqui com calma, sem querer te apertar.\nComo estamos pegando só os primeiros negócios de Maringá agora, não queria que a {{negocio}} ficasse de fora sem ao menos ver funcionando. Quer que eu te mande aquele vídeo de 1 minuto? Se não for a hora, me avisa que eu te procuro mais pra frente."],
- ["Sorria · abertura","Odontologia","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI. Lançamos faz pouco em Maringá uma atendente de inteligência artificial pra clínicas odontológicas, pensada pra dois perrengues comuns: o paciente que falta sem avisar e deixa o buraco na agenda, e a recepção sobrecarregada que não dá conta de confirmar e remarcar todo mundo.\nTe escrevo agora porque estamos implantando nas primeiras clínicas daqui da cidade, e gostaria que a {{negocio}} conhecesse antes. Posso te mostrar em uns 5 minutos como ficaria na prática?"],
+ ["Sorria · abertura","Odontologia","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI.{{?gancho}} {{gancho}}.{{/gancho}} Lançamos faz pouco em Maringá uma atendente de inteligência artificial pra clínicas odontológicas, pensada pra dois perrengues comuns: o paciente que falta sem avisar e deixa o buraco na agenda, e a recepção sobrecarregada que não dá conta de confirmar e remarcar todo mundo.\nTe escrevo agora porque estamos implantando nas primeiras clínicas daqui da cidade, e gostaria que a {{negocio}} conhecesse antes. Posso te mostrar em uns 5 minutos como ficaria na prática?"],
  ["Sorria · follow-up","Odontologia","Follow-up","{{nome}}, {{saudacao}}! Só retomando com calma.\nSe quiser, te mando um exemplo rápido da IA confirmando uma consulta sozinha, pra você sentir como funciona. Estamos implantando nas primeiras clínicas daqui de Maringá agora, e seria ótimo ter a {{negocio}} junto. Qualquer coisa marco uns 5 minutos no melhor horário pra você."],
- ["Realce · abertura","Estética","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI. Lançamos faz pouco em Maringá uma solução pra clínicas de estética, pensada pra duas coisas que escapam fácil no corrido: o controle de pacote (quem está na sessão 3 de 10) e o cliente que fez o procedimento e some na hora do retoque.\nTe procuro agora porque estamos começando pelas clínicas daqui da cidade, e queria que a {{negocio}} fosse uma das primeiras a ver. Posso te mostrar como funciona em uns 5 minutinhos?"],
+ ["Realce · abertura","Estética","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI.{{?gancho}} {{gancho}}.{{/gancho}} Lançamos faz pouco em Maringá uma solução pra clínicas de estética, pensada pra duas coisas que escapam fácil no corrido: o controle de pacote (quem está na sessão 3 de 10) e o cliente que fez o procedimento e some na hora do retoque.\nTe procuro agora porque estamos começando pelas clínicas daqui da cidade, e queria que a {{negocio}} fosse uma das primeiras a ver. Posso te mostrar como funciona em uns 5 minutinhos?"],
  ["Realce · follow-up","Estética","Follow-up","{{nome}}, {{saudacao}}! Passando pra não sumir.\nSe quiser, te mando um print de como fica o controle de pacote e o antes/depois organizado por cliente, acho que vale a olhada. Como estamos começando pelas clínicas de Maringá agora, queria muito que a {{negocio}} conhecesse antes."],
- ["Corta · abertura","Barbearia","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI. Lançamos faz pouco em Maringá uma solução pra barbearias, focada em duas dores que aparecem em quase toda: o cliente que some e não volta, e o tempo que se perde respondendo agendamento no meio do corte.\nTe escrevo agora porque estamos montando os primeiros casos aqui em Maringá, e a {{negocio}} tem tudo pra ser um deles. Faz sentido eu te mostrar funcionando em uns 5 minutos?"],
- ["Corta · isca de vídeo","Barbearia","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI. Lançamos faz pouco em Maringá uma solução pra barbearias e, em vez de explicar por texto, queria te mandar um vídeo de 1 minuto: é a IA marcando, criando o horário na agenda e até remarcando sozinha, dentro do WhatsApp.\nComo estamos mostrando pros negócios daqui primeiro, ia adorar te mostrar. Posso mandar?"],
+ ["Corta · abertura","Barbearia","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI.{{?gancho}} {{gancho}}.{{/gancho}} Lançamos faz pouco em Maringá uma solução pra barbearias, focada em duas dores que aparecem em quase toda: o cliente que some e não volta, e o tempo que se perde respondendo agendamento no meio do corte.\nTe escrevo agora porque estamos montando os primeiros casos aqui em Maringá, e a {{negocio}} tem tudo pra ser um deles. Faz sentido eu te mostrar funcionando em uns 5 minutos?"],
+ ["Corta · isca de vídeo","Barbearia","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI.{{?gancho}} {{gancho}}.{{/gancho}} Lançamos faz pouco em Maringá uma solução pra barbearias e, em vez de explicar por texto, queria te mandar um vídeo de 1 minuto: é a IA marcando, criando o horário na agenda e até remarcando sozinha, dentro do WhatsApp.\nComo estamos mostrando pros negócios daqui primeiro, ia adorar te mostrar. Posso mandar?"],
  ["Corta · follow-up","Barbearia","Follow-up","{{nome}}, {{saudacao}}! Retomando com calma, sem pressa.\nQuer que eu te mande um vídeo curto da agenda separada por barbeiro? Estamos montando os primeiros casos aqui de Maringá agora, e a {{negocio}} encaixa demais. Se fizer sentido, marco uma demo de 5 minutos."],
+ ["Cliente oculto","Geral","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI.{{?gancho}} Vou ser bem sincera com você: {{gancho}}.{{/gancho}} Foi justamente isso que me fez querer te chamar, porque é o tipo de coisa que a gente resolve. Lançamos faz pouco em Maringá uma solução que cuida do atendimento e da agenda dentro do WhatsApp, sem deixar cliente sem resposta. Posso te mostrar em uns 5 minutos como funcionaria aí na {{negocio}}?"],
  ["Pós-demo (todos)","Geral","Pós-demo","{{nome}}, {{saudacao}}! Obrigada pelo tempo de hoje, gostei muito de te mostrar.\nResumindo o que você viu: a IA atendendo seu cliente no WhatsApp e o painel com tudo num lugar só. Fica R$197 por mês com tudo rodando (ou R$297 com a sua logo e as suas cores). Como estamos montando os primeiros casos de Maringá agora, consigo te dar atenção total na implantação e deixar tudo pronto em poucos dias. Quer que eu já comece a montar a conta da {{negocio}}?"]
 ];
 const SEED_TPL_B2B=[
@@ -330,7 +346,7 @@ const FB_PATH="moove_crm/data";
 const DEVICE=(()=>{let d=localStorage.getItem('moove_device');if(!d){d=Math.random().toString(36).slice(2,9);localStorage.setItem('moove_device',d);}return d;})();
 let applyingRemote=false,pushTimer=null;
 
-function freshDB(){return{boards:{local:{leads:seedLeads(),goals:{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}}},templates:{local:seedTplLocal(),b2b:seedTplB2B()},_tplVersion:TPL_VERSION,_updatedAt:0};}
+function freshDB(){return{boards:{local:{leads:seedLeads(),goals:{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}}},templates:{local:seedTplLocal(),b2b:seedTplB2B()},_tplVersion:TPL_VERSION,_enrichV:1,_updatedAt:0};}
 function refreshTpl(d){ // atualiza os templates padrão quando a versão muda (não toca em leads/etapas)
   if(d._tplVersion!==TPL_VERSION){d.templates={local:seedTplLocal(),b2b:seedTplB2B()};d._tplVersion=TPL_VERSION;}
   return d;
@@ -341,11 +357,11 @@ function migrate(d){
     d.boards.local=d.boards.local||{leads:[],goals:{toques:80,demos:12,fechamentos:4}};
     d.boards.b2b=d.boards.b2b||{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}};
     d.templates=d.templates||{}; d.templates.local=d.templates.local||seedTplLocal(); d.templates.b2b=d.templates.b2b||seedTplB2B();
-    return refreshTpl(d);
+    return enrich(refreshTpl(d));
   }
   if(d.leads){ // v2 antigo -> migra pra boards.local
-    return refreshTpl({boards:{local:{leads:d.leads,goals:d.goals||{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}}},
-      templates:{local:d.templates||seedTplLocal(),b2b:seedTplB2B()},_updatedAt:d._updatedAt||0});
+    return enrich(refreshTpl({boards:{local:{leads:d.leads,goals:d.goals||{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}}},
+      templates:{local:d.templates||seedTplLocal(),b2b:seedTplB2B()},_updatedAt:d._updatedAt||0}));
   }
   return freshDB();
 }
@@ -439,7 +455,7 @@ function pipeFiltered(){
     if(MODE==='local'&&f2&&l.produto!==f2)return false;
     if(ft&&!(l.tags||[]).includes(ft))return false;
     if(hot&&fuState(l)!=='due')return false;
-    if(q){const blob=(l.negocio+(l.contato||'')+(l.telefone||'')+(l.instagram||'')+(l.notas||'')+(l.tags||[]).join(' ')).toLowerCase();if(!blob.includes(q))return false;}
+    if(q){const blob=(l.negocio+(l.contato||'')+(l.telefone||'')+(l.instagram||'')+(l.notas||'')+(l.gancho||'')+(l.tags||[]).join(' ')).toLowerCase();if(!blob.includes(q))return false;}
     return true;
   });
 }
@@ -476,6 +492,7 @@ function cardEl(l){
   else{const parts=[];if(l.contato)parts.push('👤 '+l.contato);if(+l.valor>0)parts.push('💰 R$ '+(+l.valor).toLocaleString('pt-BR'));if(!parts.length&&l.telefone)parts.push('📞 '+l.telefone);meta=parts.join(' · ')||'<span style="color:#9aa3b2">sem dados</span>';}
   c.innerHTML=`<div class="nm">${esc(l.negocio)}<span class="pill" style="background:${p.c}22;color:${p.c}">${esc(p.txt)}</span></div>
     <div class="meta">${meta}</div>${nextHtml}
+    ${l.gancho?`<div class="next" style="color:#c4a6ff">💡 ${esc(l.gancho)}</div>`:''}
     ${l.tags&&l.tags.length?`<div class="tags">${l.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}`;
   return c;
 }
@@ -545,11 +562,15 @@ function snooze(id,n){const l=LEADS().find(x=>x.id===id);const base=l.proximaDat
 
 /* ============ WHATSAPP ============ */
 function saudacao(){const h=new Date().getHours();return h<12?'bom dia':(h<18?'boa tarde':'boa noite');}
-function fill(txt,l){return(txt||'')
-  .replace(/\{\{saudacao\}\}/g,saudacao())
-  .replace(/\{\{negocio\}\}/g,l.negocio||'').replace(/\{\{empresa\}\}/g,l.negocio||'')
-  .replace(/\{\{contato\}\}/g,l.contato||l.negocio||'').replace(/\{\{nome\}\}/g,l.contato||l.negocio||'')
-  .replace(/\{\{produto\}\}/g,(l.produto||l.interesse||'').replace('.AI',''));}
+function fill(txt,l){
+  let s=(txt||'').replace(/\{\{\?gancho\}\}([\s\S]*?)\{\{\/gancho\}\}/g,(m,inner)=>l.gancho?inner:''); // bloco some se gancho vazio
+  return s
+   .replace(/\{\{saudacao\}\}/g,saudacao())
+   .replace(/\{\{gancho\}\}/g,l.gancho||'')
+   .replace(/\{\{negocio\}\}/g,l.negocio||'').replace(/\{\{empresa\}\}/g,l.negocio||'')
+   .replace(/\{\{contato\}\}/g,l.contato||l.negocio||'').replace(/\{\{nome\}\}/g,l.contato||l.negocio||'')
+   .replace(/\{\{produto\}\}/g,(l.produto||l.interesse||'').replace('.AI',''));
+}
 function waLink(l,txt){let ph=(l.telefone||'').replace(/\D/g,'');if(ph&&!ph.startsWith('55'))ph='55'+ph;
   const t=encodeURIComponent(txt||'');return ph?`https://wa.me/${ph}?text=${t}`:(l.instagram?`https://instagram.com/${l.instagram.replace('@','')}`:'');}
 function tplsFor(l){return MODE==='b2b'?TPLS():TPLS().filter(t=>t.segmento===l.segmento||t.segmento==='Geral');}
@@ -586,6 +607,7 @@ function openLead(id){
      <div class="fg"><label>Próximo passo</label><input id="m_proximoPasso" value="${esc(l.proximoPasso)}" placeholder="${MODE==='b2b'?'Ex: Enviar proposta':'Ex: Mandar vídeo'}"></div>
      <div class="fg"><label>Data do próximo passo</label><input id="m_proximaData" type="date" value="${l.proximaData||''}"></div>
    </div>
+   <div class="fg"><label>💡 Gancho personalizado (o que você descobriu / resultado do cliente oculto)</label><textarea id="m_gancho" style="min-height:60px" placeholder="Ex: Vi que vocês têm 4,9 no Google e +1200 atendimentos/mês  ·  Testei agendar pelo WhatsApp ontem e não tive resposta">${esc(l.gancho||'')}</textarea><div class="muted" style="margin-top:4px">Entra na mensagem pelo atalho {{gancho}}. As aberturas já usam ele quando preenchido.</div></div>
    <div class="fg"><label>Tags (vírgula)</label><input id="m_tags" value="${esc((l.tags||[]).join(', '))}" placeholder="${MODE==='b2b'?'quente, decisor, indicação':'quente, indicação'}"></div>
    <div class="fg"><label>Notas</label><textarea id="m_notas">${esc(l.notas)}</textarea></div>
    ${l.ultimoContato?`<div class="muted">Último contato: ${l.ultimoContato} · criado ${l.createdAt||'—'}</div>`:''}`;
@@ -631,7 +653,7 @@ function saveLead(id,isNew){
   let l=LEADS().find(x=>x.id===id);
   if(!l){l=window._draft||{id};LEADS().push(l);}
   l.negocio=g('negocio');l.etapa=g('etapa');l.proximoPasso=g('proximoPasso');l.proximaData=g('proximaData');
-  l.notas=g('notas');l.tags=g('tags').split(',').map(t=>t.trim()).filter(Boolean);l.telefone=g('telefone');l.valor=+g('valor')||0;
+  l.notas=g('notas');l.gancho=g('gancho');l.tags=g('tags').split(',').map(t=>t.trim()).filter(Boolean);l.telefone=g('telefone');l.valor=+g('valor')||0;
   if(MODE==='local'){l.segmento=g('segmento');l.produto=g('produto');l.instagram=g('instagram');l.endereco=g('endereco');}
   else{l.contato=g('contato');l.cargo=g('cargo');l.origem=g('origem');l.email=g('email');l.interesse=g('interesse');l.proximaReuniao=g('proximaReuniao');}
   if(!l.createdAt)l.createdAt=today();
@@ -748,7 +770,8 @@ const HOME={
     ["Tarde · 10 min","Responda quem voltou, agende demos, mova os cards."],
     ["Demos","5-7 min cada. Comece pela barbearia (demo já pronta)."]],
   cadNote:"💡 Um segmento por dia no começo (seg = barbearia, ter = odonto...) pra ficar fluente no pitch.",
-  seq:[["Dia 0","Abertura","Primeiro toque","Se apresente (a gente não se conhece), diga o porquê (lançamos em Maringá uma solução pra dor que ele vive) e o porquê agora (estamos pegando os primeiros negócios da cidade). Fecha com um convite leve de 5 min.","#e0a83d"],
+  seq:[["Antes","Cliente oculto (opcional, mas poderoso)","Cliente oculto","Antes de abrir a conversa, teste o atendimento deles: agende como se fosse cliente pelo WhatsApp ou Insta. O que você sentir (demora, ninguém respondeu, resposta confusa) vira o gancho mais forte. Salva no campo Gancho do lead e usa o template Cliente oculto.","#2bb3a3"],
+    ["Dia 0","Abertura","Primeiro toque","Se apresente (a gente não se conhece), diga o porquê (lançamos em Maringá uma solução pra dor que ele vive) e o porquê agora (estamos pegando os primeiros negócios da cidade). Se tiver um gancho salvo, ele entra sozinho. Fecha com um convite leve de 5 min.","#e0a83d"],
     ["+2 dias","O vídeo, sem cobrar","Follow-up","Manda o vídeo do agente pra ele enxergar a saída. Sem \"e aí?\", sem pressão. A ideia é ajudar, não empurrar.","#4f8bf0"],
     ["+5 dias","Volta na dor com prova","Follow-up","Conecta de novo com a dor: \"sabe aquele cliente que some? Olha isso aqui resolvendo\". Um print ou um número de um caso parecido.","#9b6cf0"],
     ["+9 dias","Convite leve","Follow-up","Pergunta fácil de dar sim, sem peso: \"te mostro hoje ou amanhã, 5 minutinhos?\"","#3fb368"],
@@ -836,10 +859,10 @@ function renderHome(){
 function exportJSON(){dl('moove-crm-'+today()+'.json',JSON.stringify(DB,null,2),'application/json');toast('Backup completo baixado');}
 function exportCSV(){
   const L=LEADS();let h,rows;
-  if(MODE==='local'){h=['Negócio','Segmento','Produto','Etapa','Telefone','Instagram','Endereço','Próximo passo','Data','Tags','Notas'];
-    rows=L.map(l=>[l.negocio,l.segmento,l.produto,l.etapa,l.telefone,l.instagram,l.endereco,l.proximoPasso,l.proximaData,(l.tags||[]).join('|'),l.notas]);}
-  else{h=['Empresa','Contato','Cargo','Origem','Interesse','Etapa','Valor','Telefone','E-mail','Próxima reunião','Próximo passo','Data','Tags','Notas'];
-    rows=L.map(l=>[l.negocio,l.contato,l.cargo,l.origem,l.interesse,l.etapa,l.valor,l.telefone,l.email,l.proximaReuniao,l.proximoPasso,l.proximaData,(l.tags||[]).join('|'),l.notas]);}
+  if(MODE==='local'){h=['Negócio','Segmento','Produto','Etapa','Telefone','Instagram','Endereço','Gancho','Próximo passo','Data','Tags','Notas'];
+    rows=L.map(l=>[l.negocio,l.segmento,l.produto,l.etapa,l.telefone,l.instagram,l.endereco,l.gancho,l.proximoPasso,l.proximaData,(l.tags||[]).join('|'),l.notas]);}
+  else{h=['Empresa','Contato','Cargo','Origem','Interesse','Etapa','Valor','Telefone','E-mail','Próxima reunião','Gancho','Próximo passo','Data','Tags','Notas'];
+    rows=L.map(l=>[l.negocio,l.contato,l.cargo,l.origem,l.interesse,l.etapa,l.valor,l.telefone,l.email,l.proximaReuniao,l.gancho,l.proximoPasso,l.proximaData,(l.tags||[]).join('|'),l.notas]);}
   const csv=[h.join(','),...rows.map(r=>r.map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');
   dl('moove-'+MODE+'-'+today()+'.csv',csv,'text/csv');toast('CSV baixado');}
 function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();
