@@ -160,7 +160,7 @@ tbody tr{cursor:pointer}
     </div>
     <div class="box" style="margin-top:16px">
       <h3>✉️ Cadência de mensagens · o que enviar e quando</h3>
-      <div class="muted" style="margin-bottom:14px;font-size:12px">A sequência de toques. Cada passo aponta o template a usar (aba 💬 Templates). O CRM já agenda o próximo toque quando você registra contato.</div>
+      <div class="muted" style="margin-bottom:14px;font-size:12px">A sequência de toques. Cada passo aponta o template a usar (aba 💬 Templates). <b>Regra:</b> toda mensagem tem um <b>porquê</b> (por que você está falando com ele) e um <b>porquê agora</b> (por que vale responder hoje). O CRM já agenda o próximo toque quando você registra contato.</div>
       <div id="homeSeq"></div>
       <div style="border-top:1px solid var(--line);margin-top:8px;padding-top:14px">
         <b style="font-size:13px" id="homeSeqPosH">Depois da demo</b>
@@ -207,7 +207,7 @@ tbody tr{cursor:pointer}
 
   <section class="view" id="templates">
     <h2 class="title">Templates de mensagem</h2>
-    <div class="sub" id="tplSub">Editáveis. Atalhos: <code>{{negocio}}</code>, <code>{{contato}}</code>, <code>{{produto}}</code>. O botão WhatsApp já preenche e abre a conversa.</div>
+    <div class="sub" id="tplSub">Editáveis. Atalhos: <code>{{nome}}</code>, <code>{{saudacao}}</code> (vira bom dia/boa tarde/boa noite), <code>{{negocio}}</code>, <code>{{contato}}</code>, <code>{{produto}}</code>. O botão WhatsApp já preenche e abre a conversa.</div>
     <div style="margin-bottom:14px"><button class="btn primary sm" onclick="openTpl()">+ Novo template</button></div>
     <div id="tplList"></div>
   </section>
@@ -236,7 +236,7 @@ const PRODUTOS={"Lava.AI":"#4f8bf0","Sorria.AI":"#3fb368","Realce.AI":"#9b6cf0",
 const ORIGENS={"Network":"#4f8bf0","Indicação":"#3fb368","Inbound":"#9b6cf0","Evento":"#e0a83d","Frio":"#9aa3b2","Outro":"#9aa3b2"};
 const PRECO=197;
 const KEY="moove_crm_v3";
-const TPL_VERSION=2; // bump quando os templates padrão mudarem -> atualiza nos apps já existentes (1x)
+const TPL_VERSION=3; // bump quando os templates padrão mudarem -> atualiza nos apps já existentes (1x)
 let MODE=localStorage.getItem('moove_mode')||'local';
 
 const CFG={
@@ -298,28 +298,28 @@ function seedLeads(){return SEED_LEADS.map((r,i)=>({
 }));}
 
 const SEED_TPL_LOCAL=[
- ["Lava · abertura","Estética automotiva","Primeiro toque","Oi, tudo bem? Aqui é a Marina, da Moove, sou daqui de Maringá mesmo.. posso te fazer uma pergunta rápida? Quando o pátio enche e o telefone não para, sobra alguém aí pra responder cliente no WhatsApp e ainda avisar quando o carro fica pronto? Quase todo lava-rápido que eu converso vive essa correria.. a gente montou uma coisa que cuida bem disso, e eu ia adorar te mostrar. Você tem uns 5 minutinhos essa semana?"],
- ["Lava · isca de vídeo","Estética automotiva","Primeiro toque","Oi! Sou a Marina, da Moove, aqui de Maringá.. sei que seu dia é corrido, então em vez de encher sua paciência eu te mando um vídeo de 1 minuto, dá pra ver no intervalo. É uma IA respondendo cliente e organizando a agenda dentro do WhatsApp, do jeitinho que ficaria aí na {{negocio}}. Posso mandar? Se não fizer sentido pra você, sem problema nenhum 💜"],
- ["Lava · follow-up","Estética automotiva","Follow-up","Oi, passando só pra não te deixar no vácuo.. imagino que sua semana tá cheia. Quer que eu te mande aquele vídeo de 1 minuto? É só pra você ver funcionando, sem compromisso nenhum. Se não for a hora agora, me fala que eu te procuro mais pra frente 🍀"],
- ["Sorria · abertura","Odontologia","Primeiro toque","Oi! Sou a Marina, da Moove, aqui de Maringá.. deixa eu te perguntar uma coisa, o quanto incomoda quando o paciente simplesmente não aparece e fica aquele buraco na agenda? Vejo que isso pesa bastante nas clínicas.. a gente criou uma atendente de IA que confirma e remarca sozinha no WhatsApp, e ainda chama o paciente de volta pra limpeza na época certa. Posso te mostrar como ficaria aí na {{negocio}}? São uns 5 minutos só."],
- ["Sorria · follow-up","Odontologia","Follow-up","Oi, tudo bem? Só voltando aqui devagar, sem querer te apertar.. se quiser, te mando um exemplo rápido de como a IA confirma uma consulta sozinha, pra você sentir como seria. Qualquer coisa a gente marca uma conversa de 5 min no horário que for melhor pra você 💜"],
- ["Realce · abertura","Estética","Primeiro toque","Oi! Aqui é a Marina, da Moove, daqui de Maringá.. te faço uma pergunta? No corrido do dia, como você acompanha quem tá na sessão 3 de 10 e quem já passou da hora de voltar pro retoque e acabou sumindo? Isso escapa tão fácil.. a gente fez um sistema que cuida disso e ainda organiza o antes/depois por cliente, tudo no WhatsApp. Posso te mostrar rapidinho como ficaria na {{negocio}}?"],
- ["Realce · follow-up","Estética","Follow-up","Oi, passando pra não sumir 🍀 se quiser, te mando um print rapidinho de como fica o controle de pacote e o antes/depois organizado por cliente.. acho que você vai gostar de ver. Se for a hora, a gente marca uma conversa curtinha, sem pressa."],
- ["Corta · abertura","Barbearia","Primeiro toque","Fala! Aqui é a Marina, da Moove, daqui de Maringá.. deixa eu te perguntar duas coisas que vejo travar quase toda barbearia: quantos clientes seus somem e não voltam, e quanto tempo você perde parando o corte pra responder agendamento no zap? A gente criou uma coisa que cuida dos dois, marca sozinha e ainda chama de volta quem sumiu. Te mostro funcionando em 5 min?"],
- ["Corta · isca de vídeo","Barbearia","Primeiro toque","Fala! Sou a Marina, da Moove.. sei que no meio do corte não dá pra parar pra ler textão, então te mando um vídeo de 1 minuto: é a IA marcando, criando o horário na agenda e até remarcando sozinha, dentro do WhatsApp. É o que rodaria aí na {{negocio}}. Posso te mandar?"],
- ["Corta · follow-up","Barbearia","Follow-up","E aí, conseguiu dar uma olhada? Sem pressa.. se quiser eu te mando um vídeo curtinho da agenda separada por barbeiro, dá pra ver rapidinho. Se fizer sentido a gente marca uma demo de 5 min 🍀"],
- ["Pós-demo (todos)","Geral","Pós-demo","Obrigada demais pelo tempo de hoje 💜 gostei muito de te mostrar.. resumindo o que você viu: a IA atendendo seu cliente no WhatsApp e o painel com tudo num lugar só. Fica R$197 por mês com tudo rodando (ou R$297 se quiser com a sua logo e as suas cores). Consigo deixar pronto e no ar em poucos dias.. quer que eu já comece a montar a conta da {{negocio}} pra você ver rodando com os seus próprios dados?"]
+ ["Lava · abertura","Estética automotiva","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI. Lançamos faz pouco aqui em Maringá uma solução pra lava-rápido e estética automotiva, focada em duas dores do dia a dia: cliente que manda mensagem e fica sem resposta no corre, e a bagunça de anotar agendamento e cobrança na mão.\nTe procuro agora porque estamos começando pelos negócios daqui da cidade, montando os primeiros casos em Maringá, e a {{negocio}} tem a cara de um deles. Faz sentido eu te mostrar como funciona em uns 5 minutinhos? Pode ser por aqui mesmo."],
+ ["Lava · isca de vídeo","Estética automotiva","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI. Lançamos faz pouco em Maringá uma solução pra lava-rápido e, em vez de te explicar por texto, queria te mandar um vídeo de 1 minuto mostrando ela respondendo cliente e organizando a agenda dentro do WhatsApp.\nComo estamos apresentando pros negócios daqui primeiro, ia adorar ter a sua opinião. Posso te mandar?"],
+ ["Lava · follow-up","Estética automotiva","Follow-up","{{nome}}, {{saudacao}}! Voltando aqui com calma, sem querer te apertar.\nComo estamos pegando só os primeiros negócios de Maringá agora, não queria que a {{negocio}} ficasse de fora sem ao menos ver funcionando. Quer que eu te mande aquele vídeo de 1 minuto? Se não for a hora, me avisa que eu te procuro mais pra frente."],
+ ["Sorria · abertura","Odontologia","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI. Lançamos faz pouco em Maringá uma atendente de inteligência artificial pra clínicas odontológicas, pensada pra dois perrengues comuns: o paciente que falta sem avisar e deixa o buraco na agenda, e a recepção sobrecarregada que não dá conta de confirmar e remarcar todo mundo.\nTe escrevo agora porque estamos implantando nas primeiras clínicas daqui da cidade, e gostaria que a {{negocio}} conhecesse antes. Posso te mostrar em uns 5 minutos como ficaria na prática?"],
+ ["Sorria · follow-up","Odontologia","Follow-up","{{nome}}, {{saudacao}}! Só retomando com calma.\nSe quiser, te mando um exemplo rápido da IA confirmando uma consulta sozinha, pra você sentir como funciona. Estamos implantando nas primeiras clínicas daqui de Maringá agora, e seria ótimo ter a {{negocio}} junto. Qualquer coisa marco uns 5 minutos no melhor horário pra você."],
+ ["Realce · abertura","Estética","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI. Lançamos faz pouco em Maringá uma solução pra clínicas de estética, pensada pra duas coisas que escapam fácil no corrido: o controle de pacote (quem está na sessão 3 de 10) e o cliente que fez o procedimento e some na hora do retoque.\nTe procuro agora porque estamos começando pelas clínicas daqui da cidade, e queria que a {{negocio}} fosse uma das primeiras a ver. Posso te mostrar como funciona em uns 5 minutinhos?"],
+ ["Realce · follow-up","Estética","Follow-up","{{nome}}, {{saudacao}}! Passando pra não sumir.\nSe quiser, te mando um print de como fica o controle de pacote e o antes/depois organizado por cliente, acho que vale a olhada. Como estamos começando pelas clínicas de Maringá agora, queria muito que a {{negocio}} conhecesse antes."],
+ ["Corta · abertura","Barbearia","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI. Lançamos faz pouco em Maringá uma solução pra barbearias, focada em duas dores que aparecem em quase toda: o cliente que some e não volta, e o tempo que se perde respondendo agendamento no meio do corte.\nTe escrevo agora porque estamos montando os primeiros casos aqui em Maringá, e a {{negocio}} tem tudo pra ser um deles. Faz sentido eu te mostrar funcionando em uns 5 minutos?"],
+ ["Corta · isca de vídeo","Barbearia","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI. Lançamos faz pouco em Maringá uma solução pra barbearias e, em vez de explicar por texto, queria te mandar um vídeo de 1 minuto: é a IA marcando, criando o horário na agenda e até remarcando sozinha, dentro do WhatsApp.\nComo estamos mostrando pros negócios daqui primeiro, ia adorar te mostrar. Posso mandar?"],
+ ["Corta · follow-up","Barbearia","Follow-up","{{nome}}, {{saudacao}}! Retomando com calma, sem pressa.\nQuer que eu te mande um vídeo curto da agenda separada por barbeiro? Estamos montando os primeiros casos aqui de Maringá agora, e a {{negocio}} encaixa demais. Se fizer sentido, marco uma demo de 5 minutos."],
+ ["Pós-demo (todos)","Geral","Pós-demo","{{nome}}, {{saudacao}}! Obrigada pelo tempo de hoje, gostei muito de te mostrar.\nResumindo o que você viu: a IA atendendo seu cliente no WhatsApp e o painel com tudo num lugar só. Fica R$197 por mês com tudo rodando (ou R$297 com a sua logo e as suas cores). Como estamos montando os primeiros casos de Maringá agora, consigo te dar atenção total na implantação e deixar tudo pronto em poucos dias. Quer que eu já comece a montar a conta da {{negocio}}?"]
 ];
 const SEED_TPL_B2B=[
- ["Acionar contato (network)","Acionar","Opa {{contato}}, tudo bem?? Faz um tempão.. tava aqui pensando em você. Tô tocando um projeto novo na Moove e lembrei daquele perrengue que a gente já comentou, de [atendimento / processo manual que consome o time].. queria muito te contar pessoalmente, sem te vender nada. Topa um café ou uma call rápida essa semana?"],
- ["Pedir indicação","Acionar","{{contato}}, beleza? Preciso de uma força sua.. tô ajudando empresas a tirar da mão aquele trabalho repetitivo de atendimento e agendamento, que toma o tempo do time todo. Você conhece alguém que vive reclamando disso? Não precisa vender nada, só me apresentar.. qualquer nome já me ajuda demais 🍀"],
- ["Convite pra reunião","Reunião","{{contato}}, queria te roubar uns 20 minutos pra te mostrar uma coisa que acho que conversa demais com o que vocês vivem aí na {{empresa}}.. prefiro te mostrar do que ficar explicando por texto. Fica melhor quarta de manhã ou quinta no fim do dia?"],
- ["Confirmar reunião","Reunião","{{contato}}, passando só pra confirmar a nossa de amanhã às [hora] 🙌 te mando o link por aqui. Tô animado pra te mostrar, até lá!"],
- ["Resumo pós-reunião","Pós-reunião","{{contato}}, que conversa boa hoje, obrigado de verdade 💜 fiquei pensando aqui no que você falou sobre [a dor específica que ele citou].. é exatamente o tipo de coisa que dá pra resolver. Pra deixar combinado: o próximo passo é [x], e eu te mando a proposta certinha até [data]."],
- ["Envio de proposta","Proposta","{{contato}}, segue a proposta do jeito que a gente conversou.. tentei deixar bem no ponto do que você precisa, sem encher de coisa que não te serve: [link]. Qualquer detalhe a gente ajusta junto. Posso te ligar [dia] pra ver o que você achou?"],
- ["Follow-up proposta 1","Follow-up","{{contato}}, tudo certo? Sei que a correria é grande aí, então só passando devagar.. conseguiu dar uma olhada? Se tiver algum ponto que não fechou pra você, me fala sem cerimônia que a gente acerta."],
- ["Follow-up proposta 2 (valor)","Follow-up","{{contato}}, lembrei de você.. aquele ponto que mais te incomodava, de [dor], é justamente o primeiro que a gente resolve. Imagina isso fora das suas costas já esse mês. Faz sentido destravar? Consigo priorizar a entrega de vocês."],
- ["Encerramento (break-up)","Reativação","{{contato}}, fica tranquilo, sei que timing é tudo.. vou parar de te cutucar por enquanto 🙂 deixo a porta aberta e te procuro mais pra frente. Se aquela dor aparecer de novo, é só me chamar que eu retomo na hora 🍀"]
+ ["Acionar contato (network)","Acionar","{{contato}}, {{saudacao}}! Quanto tempo, espero que esteja tudo certo por aí.\nTe escrevo porque montamos na Moove uma solução de IA pra empresas, e pensando em quem entenderia o valor disso rápido, você foi um dos primeiros nomes que me veio. Estou apresentando pra um grupo pequeno de contatos agora, antes de abrir pra mais gente. Topa um café ou uma call rápida essa semana?"],
+ ["Pedir indicação","Acionar","{{contato}}, {{saudacao}}! Tudo bem? Queria te pedir uma força.\nA gente está ajudando empresas a tirar da mão aquele trabalho repetitivo de atendimento e agendamento, que consome o time todo. Como estou começando pela rede de contatos, você conhece alguém vivendo essa dor que valeria eu conversar? Não precisa vender nada, só me apresentar."],
+ ["Convite pra reunião","Reunião","{{contato}}, {{saudacao}}! Consigo te mostrar em uns 20 minutos uma coisa que acho que conversa demais com o momento da {{empresa}}. Prefiro te mostrar do que explicar por texto, rende bem mais. Fica melhor quarta de manhã ou quinta no fim do dia?"],
+ ["Confirmar reunião","Reunião","{{contato}}, {{saudacao}}! Passando pra confirmar a nossa conversa de amanhã às [hora]. Te mando o link por aqui. Até lá!"],
+ ["Resumo pós-reunião","Pós-reunião","{{contato}}, boa conversa a de hoje, obrigado pelo tempo.\nFiquei pensando no que você falou sobre [a dor específica que ele citou], é exatamente o tipo de coisa que dá pra resolver. Pra deixar combinado: o próximo passo é [x], e te mando a proposta até [data]."],
+ ["Envio de proposta","Proposta","{{contato}}, segue a proposta do jeito que conversamos. Foquei só no que faz sentido pra {{empresa}}, pra não te tomar tempo com o que não serve: [link]. Qualquer ponto a gente ajusta junto. Posso te ligar [dia] pra ver o que achou?"],
+ ["Follow-up proposta 1","Follow-up","{{contato}}, tudo certo? Sei da correria, então passando com calma. Conseguiu dar uma olhada na proposta? Se algum ponto não fechou pra você, me fala sem cerimônia que a gente acerta."],
+ ["Follow-up proposta 2 (valor)","Follow-up","{{contato}}, lembrei de você. Aquele ponto que mais te incomodava, de [dor], é o primeiro que a gente resolve. Vale a pena destravar isso ainda esse mês? Consigo priorizar a entrega de vocês agora."],
+ ["Encerramento (break-up)","Reativação","{{contato}}, fica tranquilo, sei que timing é tudo. Vou parar de te procurar por enquanto e deixo a porta aberta. Se aquela dor voltar a incomodar, é só me chamar que eu retomo na hora."]
 ];
 function seedTplLocal(){return SEED_TPL_LOCAL.map((t,i)=>({id:"T"+(Date.now()+i),nome:t[0],segmento:t[1],etapa:t[2],texto:t[3]}));}
 function seedTplB2B(){return SEED_TPL_B2B.map((t,i)=>({id:"TB"+(Date.now()+i),nome:t[0],segmento:"B2B",etapa:t[1],texto:t[2]}));}
@@ -544,7 +544,9 @@ function snooze(id,n){const l=LEADS().find(x=>x.id===id);const base=l.proximaDat
   base.setDate(base.getDate()+n);l.proximaData=base.toISOString().slice(0,10);save();renderAll();toast('Adiado '+n+' dias.');}
 
 /* ============ WHATSAPP ============ */
+function saudacao(){const h=new Date().getHours();return h<12?'bom dia':(h<18?'boa tarde':'boa noite');}
 function fill(txt,l){return(txt||'')
+  .replace(/\{\{saudacao\}\}/g,saudacao())
   .replace(/\{\{negocio\}\}/g,l.negocio||'').replace(/\{\{empresa\}\}/g,l.negocio||'')
   .replace(/\{\{contato\}\}/g,l.contato||l.negocio||'').replace(/\{\{nome\}\}/g,l.contato||l.negocio||'')
   .replace(/\{\{produto\}\}/g,(l.produto||l.interesse||'').replace('.AI',''));}
@@ -746,7 +748,7 @@ const HOME={
     ["Tarde · 10 min","Responda quem voltou, agende demos, mova os cards."],
     ["Demos","5-7 min cada. Comece pela barbearia (demo já pronta)."]],
   cadNote:"💡 Um segmento por dia no começo (seg = barbearia, ter = odonto...) pra ficar fluente no pitch.",
-  seq:[["Dia 0","Abertura pela dor","Primeiro toque","Comece por uma pergunta sobre a dor que ele já vive (cliente que some, agenda na cabeça, telefone que não para), nunca pelo produto. Só depois ofereça mostrar, ou já manda a isca do vídeo.","#e0a83d"],
+  seq:[["Dia 0","Abertura","Primeiro toque","Se apresente (a gente não se conhece), diga o porquê (lançamos em Maringá uma solução pra dor que ele vive) e o porquê agora (estamos pegando os primeiros negócios da cidade). Fecha com um convite leve de 5 min.","#e0a83d"],
     ["+2 dias","O vídeo, sem cobrar","Follow-up","Manda o vídeo do agente pra ele enxergar a saída. Sem \"e aí?\", sem pressão. A ideia é ajudar, não empurrar.","#4f8bf0"],
     ["+5 dias","Volta na dor com prova","Follow-up","Conecta de novo com a dor: \"sabe aquele cliente que some? Olha isso aqui resolvendo\". Um print ou um número de um caso parecido.","#9b6cf0"],
     ["+9 dias","Convite leve","Follow-up","Pergunta fácil de dar sim, sem peso: \"te mostro hoje ou amanhã, 5 minutinhos?\"","#3fb368"],
@@ -770,7 +772,7 @@ const HOME={
     ["2x na semana","Revise o pipeline: nada parado sem data de próximo passo."],
     ["Proposta enviada","Já agende o follow-up na hora (não confie na memória)."]],
   cadNote:"💡 Regra de ouro: nunca saia de uma reunião sem o próximo passo agendado, com data, aqui no CRM.",
-  seq:[["Dia 0","Acionar contato","Acionar","Mensagem pessoal reativando o contato. Pede um café/call, não vende ainda.","#9aa3b2"],
+  seq:[["Dia 0","Acionar contato","Acionar","Retoma o contato com porquê (montamos uma solução e lembrei de você) e porquê agora (apresentando pra um grupo pequeno antes de abrir). Pede um café/call, não vende ainda.","#9aa3b2"],
     ["+2 dias","Convite pra reunião","Reunião","Oferece 2 horários fechados (\"quarta 10h ou quinta 16h?\"). Facilita o sim.","#4f8bf0"],
     ["Véspera","Confirmar reunião","Reunião","Confirma e manda o link. Reduz o no-show.","#9b6cf0"],
     ["Pós-reunião (mesmo dia)","Resumo + próximo passo","Pós-reunião","Cite a dor que ELE falou, com as palavras dele. Mostra que você ouviu. Aí o que combinaram + a proposta com data.","#e0a83d"],
