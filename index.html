@@ -834,6 +834,12 @@ const COCHECK=[
  ["👻","Te cobraram depois, se você sumiu?","Some no meio da conversa e veja se eles retomam. → a IA reativa quem some."],
  ["🙂","Tom do atendimento","Simpático, frio, robótico, demorado? → a IA responde rápido e no jeito da marca."]
 ];
+const CASES=[
+ ["🚗","Lava-car","Cliente nova, primeira vez. Carro: Onix branco, hatch. Quer lavagem completa (por dentro e por fora).","\"Que serviço?\" → Queria uma lavagem completa, por dentro e por fora. Fazem higienização interna também? · \"Qual carro?\" → Um Onix, hatch, branco. · \"Quando?\" → Essa semana, sexta de manhã se tiver. · \"Já é cliente?\" → Primeira vez. · \"Nome?\" → Marina."],
+ ["🦷","Odonto","Paciente nova, particular. Quer avaliação (dente sensível) e talvez limpeza.","\"Que atendimento?\" → Queria uma avaliação, tô com um dente sensível, e aproveitar pra fazer uma limpeza. · \"Convênio?\" → Particular. · \"Quando?\" → Essa semana, fim de tarde. · \"Primeira vez?\" → Sim."],
+ ["💆","Estética","Cliente nova. Quer limpeza de pele e saber de pacote.","\"Qual procedimento?\" → Queria fazer uma limpeza de pele e saber se têm pacote. Dá pra marcar uma avaliação? · \"Quando?\" → Essa semana, qualquer tarde. · \"Primeira vez?\" → Sim."],
+ ["💈","Barbearia","Cliente novo. Quer corte + barba.","\"Que serviço?\" → Queria corte e barba. · \"Com qual barbeiro?\" → Qualquer um que tiver. · \"Quando?\" → Sábado de manhã, dá? · \"Primeira vez?\" → Primeira vez aí."]
+];
 function seqRow(s){return `<div style="display:flex;gap:12px;margin-bottom:13px;align-items:flex-start">
   <span class="pill" style="background:${(s[4]||cfg().accent)}22;color:${s[4]||cfg().accent};min-width:74px;text-align:center;flex-shrink:0">${s[0]}</span>
   <div style="flex:1"><div style="font-size:13px;font-weight:700">${s[1]}${s[2]?` <span class="muted" style="font-weight:500;font-size:11px">→ template "${s[2]}"</span>`:''}</div>
@@ -879,7 +885,10 @@ function renderHome(){
   document.getElementById('homeMat').innerHTML=H.mat;
   // roteiro do cliente oculto (só no Local)
   const cobox=document.getElementById('homeCObox');
-  if(MODE==='local'){cobox.style.display='';document.getElementById('homeCO').innerHTML=COCHECK.map(c=>`<div style="display:flex;gap:11px;margin-bottom:11px;align-items:flex-start"><span style="font-size:17px;flex-shrink:0">${c[0]}</span><div><b style="font-size:13px">${c[1]}</b><div class="muted" style="font-size:12px">${c[2]}</div></div></div>`).join('');}
+  if(MODE==='local'){cobox.style.display='';
+    document.getElementById('homeCO').innerHTML=COCHECK.map(c=>`<div style="display:flex;gap:11px;margin-bottom:11px;align-items:flex-start"><span style="font-size:17px;flex-shrink:0">${c[0]}</span><div><b style="font-size:13px">${c[1]}</b><div class="muted" style="font-size:12px">${c[2]}</div></div></div>`).join('')
+      +`<div style="border-top:1px solid var(--line);margin-top:6px;padding-top:14px"><b style="font-size:13px">🎭 Casos prontos (pra não travar no teste)</b><div class="muted" style="font-size:12px;margin-bottom:10px">Sua persona e as respostas pras perguntas que eles fazem.</div>`
+      +CASES.map(c=>`<div style="margin-bottom:12px"><b style="font-size:13px">${c[0]} ${c[1]}</b><div class="muted" style="font-size:12px">${c[2]}</div><div class="muted" style="font-size:12px;margin-top:3px;color:#c4a6ff">${c[3]}</div></div>`).join('')+`</div>`;}
   else cobox.style.display='none';
 }
 
