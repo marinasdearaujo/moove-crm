@@ -138,6 +138,7 @@ tbody tr{cursor:pointer}
       <button onclick="exportJSON()">⬇️ Backup completo (JSON)</button>
       <button onclick="document.getElementById('importf').click()">⬆️ Importar JSON</button>
       <button onclick="exportCSV()">📄 Exportar CSV (workspace atual)</button>
+      <button onclick="resetTpl()">✉️ Restaurar templates padrão (workspace atual)</button>
       <button onclick="seedReset()">♻️ Restaurar leads-semente (Local)</button>
       <button onclick="wipe()" style="color:var(--red)">🗑️ Apagar tudo</button>
     </div>
@@ -158,7 +159,7 @@ tbody tr{cursor:pointer}
       <div class="box"><h3 id="homeCadH">⏱️ Cadência (rotina)</h3><div id="homeCad"></div></div>
     </div>
     <div class="box" style="margin-top:16px">
-      <h3>✉️ Cadência de mensagens — o que enviar e quando</h3>
+      <h3>✉️ Cadência de mensagens · o que enviar e quando</h3>
       <div class="muted" style="margin-bottom:14px;font-size:12px">A sequência de toques. Cada passo aponta o template a usar (aba 💬 Templates). O CRM já agenda o próximo toque quando você registra contato.</div>
       <div id="homeSeq"></div>
       <div style="border-top:1px solid var(--line);margin-top:8px;padding-top:14px">
@@ -195,7 +196,7 @@ tbody tr{cursor:pointer}
   </section>
 
   <section class="view" id="followups">
-    <h2 class="title">Follow-ups — não deixe esfriar</h2>
+    <h2 class="title">Follow-ups · não deixe esfriar</h2>
     <div class="sub">A regra de ouro: nenhum negócio ativo sem o próximo passo marcado (com data).</div>
     <div class="grid2">
       <div class="box"><h3>🔥 Atrasados / hoje</h3><div id="fuDue"></div></div>
@@ -235,6 +236,7 @@ const PRODUTOS={"Lava.AI":"#4f8bf0","Sorria.AI":"#3fb368","Realce.AI":"#9b6cf0",
 const ORIGENS={"Network":"#4f8bf0","Indicação":"#3fb368","Inbound":"#9b6cf0","Evento":"#e0a83d","Frio":"#9aa3b2","Outro":"#9aa3b2"};
 const PRECO=197;
 const KEY="moove_crm_v3";
+const TPL_VERSION=2; // bump quando os templates padrão mudarem -> atualiza nos apps já existentes (1x)
 let MODE=localStorage.getItem('moove_mode')||'local';
 
 const CFG={
@@ -296,28 +298,28 @@ function seedLeads(){return SEED_LEADS.map((r,i)=>({
 }));}
 
 const SEED_TPL_LOCAL=[
- ["Lava — abertura","Estética automotiva","Primeiro toque","Oi! Aqui é a Marina, da Moove, a gente é daqui de Maringá. Vi o trabalho de vocês e queria te mostrar uma coisa que criamos pra lava-rápido: um sistema que abre OS, agenda e avisa o cliente quando o carro tá pronto, tudo dentro do WhatsApp, sem planilha. Te mostro funcionando em 5 minutinhos? Pode ser por call ou eu passo aí."],
- ["Lava — isca de vídeo","Estética automotiva","Primeiro toque","Oi! Sou a Marina, da Moove (Maringá). Posso te mandar um vídeo de 1 minuto mostrando uma IA agendando e organizando tudo dentro do WhatsApp, do jeitinho que ficaria aí na {{negocio}}? Se curtir a gente marca, se não, sem problema nenhum."],
- ["Lava — follow-up","Estética automotiva","Follow-up","Oi! Só voltando aqui rapidinho. Te mando aquele vídeo de 1 min mostrando o sistema abrindo uma OS no WhatsApp? Se fizer sentido a gente marca, se não, tranquilo."],
- ["Sorria — abertura","Odontologia","Primeiro toque","Oi! Sou a Marina, da Moove (somos de Maringá). A gente criou uma atendente de IA pra consultório que agenda, confirma e remarca consulta sozinha no WhatsApp, por texto ou áudio, e ainda chama o paciente de volta pra limpeza no tempo certo. Posso te mostrar em 5 min como ficaria aí na {{negocio}}?"],
- ["Sorria — follow-up","Odontologia","Follow-up","Oi! Passando pra saber se você viu minha mensagem. Posso te mandar um exemplo de como a IA confirma uma consulta? Se preferir, marco uma demo rapidinha no horário que for melhor pra você."],
- ["Realce — abertura","Estética","Primeiro toque","Oi! Aqui é a Marina, da Moove, daqui de Maringá. Mostro pra você um sistema pra clínica de estética que controla pacote (sessão 3 de 10), organiza antes/depois por cliente e ainda lembra o retoque no tempo certo, tudo via WhatsApp. Te mostro funcionando em 5 min?"],
- ["Realce — follow-up","Estética","Follow-up","Oi! Só retomando. Quer que eu te mande um print rápido de como fica o controle de pacote e o antes/depois? Se curtir, a gente marca uma demo curtinha."],
- ["Corta — abertura","Barbearia","Primeiro toque","Fala! Aqui é a Marina, da Moove (Maringá). Criamos um sistema pra barbearia com agenda separada por barbeiro, um portfólio que mostra pro cliente o corte que o próprio barbeiro já fez, e que reativa cliente que sumiu. Roda tudo no WhatsApp. Posso te mostrar em 5 min?"],
- ["Corta — isca de vídeo","Barbearia","Primeiro toque","Fala! Sou a Marina, da Moove. Te mando um vídeo de 1 min da nossa IA agendando, criando o horário na agenda e até remarcando sozinha, dentro do WhatsApp? É o que rodaria aí na {{negocio}}."],
- ["Corta — follow-up","Barbearia","Follow-up","E aí, conseguiu ver? Te mando um vídeo curtinho da agenda funcionando por barbeiro? Se fizer sentido marco uma demo rápida."],
- ["Pós-demo (todos)","Geral","Pós-demo","Obrigada pelo tempo! Como combinei: você viu a IA atendendo no WhatsApp e o painel completo. Fica R$197/mês com tudo rodando (ou R$297 com a sua logo e suas cores). Consigo deixar configurado e no ar em poucos dias. Quer que eu já comece a montar a conta da {{negocio}}?"]
+ ["Lava · abertura","Estética automotiva","Primeiro toque","Oi, tudo bem? Aqui é a Marina, da Moove, sou daqui de Maringá mesmo.. posso te fazer uma pergunta rápida? Quando o pátio enche e o telefone não para, sobra alguém aí pra responder cliente no WhatsApp e ainda avisar quando o carro fica pronto? Quase todo lava-rápido que eu converso vive essa correria.. a gente montou uma coisa que cuida bem disso, e eu ia adorar te mostrar. Você tem uns 5 minutinhos essa semana?"],
+ ["Lava · isca de vídeo","Estética automotiva","Primeiro toque","Oi! Sou a Marina, da Moove, aqui de Maringá.. sei que seu dia é corrido, então em vez de encher sua paciência eu te mando um vídeo de 1 minuto, dá pra ver no intervalo. É uma IA respondendo cliente e organizando a agenda dentro do WhatsApp, do jeitinho que ficaria aí na {{negocio}}. Posso mandar? Se não fizer sentido pra você, sem problema nenhum 💜"],
+ ["Lava · follow-up","Estética automotiva","Follow-up","Oi, passando só pra não te deixar no vácuo.. imagino que sua semana tá cheia. Quer que eu te mande aquele vídeo de 1 minuto? É só pra você ver funcionando, sem compromisso nenhum. Se não for a hora agora, me fala que eu te procuro mais pra frente 🍀"],
+ ["Sorria · abertura","Odontologia","Primeiro toque","Oi! Sou a Marina, da Moove, aqui de Maringá.. deixa eu te perguntar uma coisa, o quanto incomoda quando o paciente simplesmente não aparece e fica aquele buraco na agenda? Vejo que isso pesa bastante nas clínicas.. a gente criou uma atendente de IA que confirma e remarca sozinha no WhatsApp, e ainda chama o paciente de volta pra limpeza na época certa. Posso te mostrar como ficaria aí na {{negocio}}? São uns 5 minutos só."],
+ ["Sorria · follow-up","Odontologia","Follow-up","Oi, tudo bem? Só voltando aqui devagar, sem querer te apertar.. se quiser, te mando um exemplo rápido de como a IA confirma uma consulta sozinha, pra você sentir como seria. Qualquer coisa a gente marca uma conversa de 5 min no horário que for melhor pra você 💜"],
+ ["Realce · abertura","Estética","Primeiro toque","Oi! Aqui é a Marina, da Moove, daqui de Maringá.. te faço uma pergunta? No corrido do dia, como você acompanha quem tá na sessão 3 de 10 e quem já passou da hora de voltar pro retoque e acabou sumindo? Isso escapa tão fácil.. a gente fez um sistema que cuida disso e ainda organiza o antes/depois por cliente, tudo no WhatsApp. Posso te mostrar rapidinho como ficaria na {{negocio}}?"],
+ ["Realce · follow-up","Estética","Follow-up","Oi, passando pra não sumir 🍀 se quiser, te mando um print rapidinho de como fica o controle de pacote e o antes/depois organizado por cliente.. acho que você vai gostar de ver. Se for a hora, a gente marca uma conversa curtinha, sem pressa."],
+ ["Corta · abertura","Barbearia","Primeiro toque","Fala! Aqui é a Marina, da Moove, daqui de Maringá.. deixa eu te perguntar duas coisas que vejo travar quase toda barbearia: quantos clientes seus somem e não voltam, e quanto tempo você perde parando o corte pra responder agendamento no zap? A gente criou uma coisa que cuida dos dois, marca sozinha e ainda chama de volta quem sumiu. Te mostro funcionando em 5 min?"],
+ ["Corta · isca de vídeo","Barbearia","Primeiro toque","Fala! Sou a Marina, da Moove.. sei que no meio do corte não dá pra parar pra ler textão, então te mando um vídeo de 1 minuto: é a IA marcando, criando o horário na agenda e até remarcando sozinha, dentro do WhatsApp. É o que rodaria aí na {{negocio}}. Posso te mandar?"],
+ ["Corta · follow-up","Barbearia","Follow-up","E aí, conseguiu dar uma olhada? Sem pressa.. se quiser eu te mando um vídeo curtinho da agenda separada por barbeiro, dá pra ver rapidinho. Se fizer sentido a gente marca uma demo de 5 min 🍀"],
+ ["Pós-demo (todos)","Geral","Pós-demo","Obrigada demais pelo tempo de hoje 💜 gostei muito de te mostrar.. resumindo o que você viu: a IA atendendo seu cliente no WhatsApp e o painel com tudo num lugar só. Fica R$197 por mês com tudo rodando (ou R$297 se quiser com a sua logo e as suas cores). Consigo deixar pronto e no ar em poucos dias.. quer que eu já comece a montar a conta da {{negocio}} pra você ver rodando com os seus próprios dados?"]
 ];
 const SEED_TPL_B2B=[
- ["Acionar contato (network)","Acionar","Opa {{contato}}, tudo bem? Faz um tempo! Tô tocando um projeto novo aqui na Moove, com IA pra empresas, e lembrei de você. Topa um café ou uma call rápida essa semana pra eu te mostrar? Acho que pode fazer sentido pro que vocês estão fazendo aí na {{empresa}}."],
- ["Pedir indicação","Acionar","{{contato}}, beleza? Tô levando uma solução de IA pra empresas e queria te pedir uma força: você conhece alguém que tá penando com [atendimento / agendamento / processo manual] e que valeria eu conversar? Qualquer indicação ajuda demais."],
- ["Convite pra reunião","Reunião","{{contato}}, consigo te mostrar em uns 20 min como a gente tá usando IA pra [resultado concreto]. Quarta 10h ou quinta 16h, qual fica melhor pra você?"],
- ["Confirmar reunião","Reunião","Passando pra confirmar nossa conversa amanhã às [hora]. Te mando o link por aqui. Até lá, {{contato}}!"],
- ["Resumo pós-reunião","Pós-reunião","{{contato}}, valeu demais pela conversa hoje! Resumão do que falamos: [pontos]. O próximo passo combinado é [x]. Te envio a proposta até [data]."],
- ["Envio de proposta","Proposta","{{contato}}, segue a proposta conforme conversamos: [link]. Tentei deixar bem direto ao ponto. Posso te ligar [dia] pra alinhar os detalhes e ver como destravamos?"],
- ["Follow-up proposta 1","Follow-up","{{contato}}, conseguiu dar uma olhada na proposta? Fico à disposição pra ajustar qualquer ponto que precise."],
- ["Follow-up proposta 2 (valor)","Follow-up","{{contato}}, só reforçando o ganho principal: [resultado/número]. Faz sentido a gente destravar isso ainda esse mês? Consigo priorizar a entrega de vocês."],
- ["Encerramento (break-up)","Reativação","{{contato}}, imagino que talvez o timing não esteja ideal agora. Vou deixar em aberto e te procuro mais pra frente, pode ser? Se mudar alguma coisa, é só me chamar que retomo na hora."]
+ ["Acionar contato (network)","Acionar","Opa {{contato}}, tudo bem?? Faz um tempão.. tava aqui pensando em você. Tô tocando um projeto novo na Moove e lembrei daquele perrengue que a gente já comentou, de [atendimento / processo manual que consome o time].. queria muito te contar pessoalmente, sem te vender nada. Topa um café ou uma call rápida essa semana?"],
+ ["Pedir indicação","Acionar","{{contato}}, beleza? Preciso de uma força sua.. tô ajudando empresas a tirar da mão aquele trabalho repetitivo de atendimento e agendamento, que toma o tempo do time todo. Você conhece alguém que vive reclamando disso? Não precisa vender nada, só me apresentar.. qualquer nome já me ajuda demais 🍀"],
+ ["Convite pra reunião","Reunião","{{contato}}, queria te roubar uns 20 minutos pra te mostrar uma coisa que acho que conversa demais com o que vocês vivem aí na {{empresa}}.. prefiro te mostrar do que ficar explicando por texto. Fica melhor quarta de manhã ou quinta no fim do dia?"],
+ ["Confirmar reunião","Reunião","{{contato}}, passando só pra confirmar a nossa de amanhã às [hora] 🙌 te mando o link por aqui. Tô animado pra te mostrar, até lá!"],
+ ["Resumo pós-reunião","Pós-reunião","{{contato}}, que conversa boa hoje, obrigado de verdade 💜 fiquei pensando aqui no que você falou sobre [a dor específica que ele citou].. é exatamente o tipo de coisa que dá pra resolver. Pra deixar combinado: o próximo passo é [x], e eu te mando a proposta certinha até [data]."],
+ ["Envio de proposta","Proposta","{{contato}}, segue a proposta do jeito que a gente conversou.. tentei deixar bem no ponto do que você precisa, sem encher de coisa que não te serve: [link]. Qualquer detalhe a gente ajusta junto. Posso te ligar [dia] pra ver o que você achou?"],
+ ["Follow-up proposta 1","Follow-up","{{contato}}, tudo certo? Sei que a correria é grande aí, então só passando devagar.. conseguiu dar uma olhada? Se tiver algum ponto que não fechou pra você, me fala sem cerimônia que a gente acerta."],
+ ["Follow-up proposta 2 (valor)","Follow-up","{{contato}}, lembrei de você.. aquele ponto que mais te incomodava, de [dor], é justamente o primeiro que a gente resolve. Imagina isso fora das suas costas já esse mês. Faz sentido destravar? Consigo priorizar a entrega de vocês."],
+ ["Encerramento (break-up)","Reativação","{{contato}}, fica tranquilo, sei que timing é tudo.. vou parar de te cutucar por enquanto 🙂 deixo a porta aberta e te procuro mais pra frente. Se aquela dor aparecer de novo, é só me chamar que eu retomo na hora 🍀"]
 ];
 function seedTplLocal(){return SEED_TPL_LOCAL.map((t,i)=>({id:"T"+(Date.now()+i),nome:t[0],segmento:t[1],etapa:t[2],texto:t[3]}));}
 function seedTplB2B(){return SEED_TPL_B2B.map((t,i)=>({id:"TB"+(Date.now()+i),nome:t[0],segmento:"B2B",etapa:t[1],texto:t[2]}));}
@@ -328,18 +330,22 @@ const FB_PATH="moove_crm/data";
 const DEVICE=(()=>{let d=localStorage.getItem('moove_device');if(!d){d=Math.random().toString(36).slice(2,9);localStorage.setItem('moove_device',d);}return d;})();
 let applyingRemote=false,pushTimer=null;
 
-function freshDB(){return{boards:{local:{leads:seedLeads(),goals:{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}}},templates:{local:seedTplLocal(),b2b:seedTplB2B()},_updatedAt:0};}
+function freshDB(){return{boards:{local:{leads:seedLeads(),goals:{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}}},templates:{local:seedTplLocal(),b2b:seedTplB2B()},_tplVersion:TPL_VERSION,_updatedAt:0};}
+function refreshTpl(d){ // atualiza os templates padrão quando a versão muda (não toca em leads/etapas)
+  if(d._tplVersion!==TPL_VERSION){d.templates={local:seedTplLocal(),b2b:seedTplB2B()};d._tplVersion=TPL_VERSION;}
+  return d;
+}
 function migrate(d){
   if(!d)return freshDB();
   if(d.boards){ // já é v3
     d.boards.local=d.boards.local||{leads:[],goals:{toques:80,demos:12,fechamentos:4}};
     d.boards.b2b=d.boards.b2b||{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}};
     d.templates=d.templates||{}; d.templates.local=d.templates.local||seedTplLocal(); d.templates.b2b=d.templates.b2b||seedTplB2B();
-    return d;
+    return refreshTpl(d);
   }
   if(d.leads){ // v2 antigo -> migra pra boards.local
-    return{boards:{local:{leads:d.leads,goals:d.goals||{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}}},
-      templates:{local:d.templates||seedTplLocal(),b2b:seedTplB2B()},_updatedAt:d._updatedAt||0};
+    return refreshTpl({boards:{local:{leads:d.leads,goals:d.goals||{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}}},
+      templates:{local:d.templates||seedTplLocal(),b2b:seedTplB2B()},_updatedAt:d._updatedAt||0});
   }
   return freshDB();
 }
@@ -551,7 +557,7 @@ function waBtn(l){
   return '';
 }
 function openWA(id){const l=LEADS().find(x=>x.id===id);const tpls=tplsFor(l);
-  let html=`<div class="modal"><h3>WhatsApp — ${esc(l.negocio)} <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
+  let html=`<div class="modal"><h3>WhatsApp · ${esc(l.negocio)} <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
     <div class="fg"><label>Template</label><select id="waTpl" onchange="waPrev('${id}')">${tpls.map(t=>`<option value="${t.id}">${esc(t.nome)}</option>`).join('')}</select></div>
     <div class="fg"><label>Mensagem (edite à vontade)</label><textarea id="waMsg" style="min-height:140px"></textarea></div>
     <div class="modal-foot"><button class="btn ghost" onclick="copyMsg()">📋 Copiar</button>
@@ -657,7 +663,7 @@ function openTpl(){
   const segOpts=MODE==='b2b'?['B2B']:['Geral','Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza'];
   const etapaOpts=MODE==='b2b'?['Acionar','Reunião','Pós-reunião','Proposta','Follow-up','Reativação']:['Primeiro toque','Follow-up','Pós-demo','Reativação'];
   let html=`<div class="modal"><h3>Novo template <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
-   <div class="fg"><label>Nome</label><input id="t_nome" placeholder="Ex: ${MODE==='b2b'?'Follow-up proposta':'Lava — reativação'}"></div>
+   <div class="fg"><label>Nome</label><input id="t_nome" placeholder="Ex: ${MODE==='b2b'?'Follow-up proposta':'Lava · reativação'}"></div>
    <div class="row2"><div class="fg"><label>Categoria</label><select id="t_seg">${segOpts.map(s=>`<option>${s}</option>`).join('')}</select></div>
    <div class="fg"><label>Etapa</label><select id="t_etapa">${etapaOpts.map(s=>`<option>${s}</option>`).join('')}</select></div></div>
    <div class="fg"><label>Texto (atalhos: {{empresa}}, {{contato}}, {{negocio}}, {{produto}})</label><textarea id="t_texto" style="min-height:120px"></textarea></div>
@@ -740,15 +746,15 @@ const HOME={
     ["Tarde · 10 min","Responda quem voltou, agende demos, mova os cards."],
     ["Demos","5-7 min cada. Comece pela barbearia (demo já pronta)."]],
   cadNote:"💡 Um segmento por dia no começo (seg = barbearia, ter = odonto...) pra ficar fluente no pitch.",
-  seq:[["Dia 0","Abertura","Primeiro toque","Mensagem curta + oferta de mostrar em 5 min. Ou já manda a isca: \"te mando um vídeo de 1 min?\"","#e0a83d"],
-    ["+2 dias","Follow-up 1 · o vídeo","Follow-up","Manda o Reels de 1 min do agente. Não cobra resposta, só mostra.","#4f8bf0"],
-    ["+5 dias","Follow-up 2 · prova","Follow-up","Print do painel ou um número concreto. Foco em valor, não em \"e aí?\".","#9b6cf0"],
-    ["+9 dias","Convite direto","Follow-up","Pergunta fácil de dar sim: \"te mostro hoje ou amanhã, 5 minutinhos?\"","#3fb368"],
-    ["+14 dias","Encerramento","Reativação","\"Não quero insistir, fico à disposição.\" O break-up costuma destravar resposta.","#e25563"]],
+  seq:[["Dia 0","Abertura pela dor","Primeiro toque","Comece por uma pergunta sobre a dor que ele já vive (cliente que some, agenda na cabeça, telefone que não para), nunca pelo produto. Só depois ofereça mostrar, ou já manda a isca do vídeo.","#e0a83d"],
+    ["+2 dias","O vídeo, sem cobrar","Follow-up","Manda o vídeo do agente pra ele enxergar a saída. Sem \"e aí?\", sem pressão. A ideia é ajudar, não empurrar.","#4f8bf0"],
+    ["+5 dias","Volta na dor com prova","Follow-up","Conecta de novo com a dor: \"sabe aquele cliente que some? Olha isso aqui resolvendo\". Um print ou um número de um caso parecido.","#9b6cf0"],
+    ["+9 dias","Convite leve","Follow-up","Pergunta fácil de dar sim, sem peso: \"te mostro hoje ou amanhã, 5 minutinhos?\"","#3fb368"],
+    ["+14 dias","Recuo elegante","Reativação","Sem aperto nenhum: \"não quero te incomodar, fico por aqui à disposição\". O recuo costuma destravar a resposta.","#e25563"]],
   posH:"Depois da demo",
-  pos:[["Mesmo dia","Resumo + proposta","Pós-demo","Resumo do que viu + preço (R$197/R$297) + \"quer que eu monte a conta?\".","#e0a83d"],
-    ["+2 dias","Follow-up proposta","Pós-demo","\"Conseguiu pensar? Tiro qualquer dúvida.\"","#4f8bf0"],
-    ["+5 dias","Última chamada","Reativação","\"Sigo à disposição. Se quiser, deixo rodando 7 dias pra você sentir.\"","#e25563"]],
+  pos:[["Mesmo dia","Resumo + proposta","Pós-demo","Agradece de verdade, retoma a dor dele e mostra ela resolvida. Aí o preço (R$197/R$297) e \"quer que eu já monte a conta?\".","#e0a83d"],
+    ["+2 dias","Follow-up leve","Pós-demo","\"Conseguiu pensar? Qualquer dúvida eu tiro, sem pressa.\"","#4f8bf0"],
+    ["+5 dias","Última, sem peso","Reativação","\"Sigo por aqui à disposição. Se quiser, deixo rodando uns dias pra você sentir na prática.\"","#e25563"]],
   mat:"Playbook, demo tela a tela e transcrições do agente em <b>Moove/Prospeccao-Maringa/</b>. Preço: <b>R$197/mês</b> · <b>R$297/mês</b> (marca branca). Contato: <b>44 98426-6280</b>."
  },
  b2b:{
@@ -767,10 +773,10 @@ const HOME={
   seq:[["Dia 0","Acionar contato","Acionar","Mensagem pessoal reativando o contato. Pede um café/call, não vende ainda.","#9aa3b2"],
     ["+2 dias","Convite pra reunião","Reunião","Oferece 2 horários fechados (\"quarta 10h ou quinta 16h?\"). Facilita o sim.","#4f8bf0"],
     ["Véspera","Confirmar reunião","Reunião","Confirma e manda o link. Reduz o no-show.","#9b6cf0"],
-    ["Pós-reunião (mesmo dia)","Resumo + próximo passo","Pós-reunião","Resumo do que foi falado + o que combinaram. Promete a proposta com data.","#e0a83d"],
-    ["+2 dias da reunião","Enviar proposta","Proposta","Proposta direta + sugere ligação pra alinhar detalhes.","#f0894f"],
-    ["+3 dias","Follow-up 1","Follow-up","\"Conseguiu olhar? Ajusto o que precisar.\"","#4f8bf0"],
-    ["+7 dias","Follow-up 2 (valor)","Follow-up","Reforça o ganho principal. \"Destravamos isso ainda esse mês?\"","#9b6cf0"],
+    ["Pós-reunião (mesmo dia)","Resumo + próximo passo","Pós-reunião","Cite a dor que ELE falou, com as palavras dele. Mostra que você ouviu. Aí o que combinaram + a proposta com data.","#e0a83d"],
+    ["+2 dias da reunião","Enviar proposta","Proposta","Proposta enxuta, só do que ele precisa. Sugere uma ligação rápida pra alinhar, não pra empurrar.","#f0894f"],
+    ["+3 dias","Follow-up leve","Follow-up","\"Conseguiu olhar? Se algo não fechou, me fala que a gente ajusta junto.\"","#4f8bf0"],
+    ["+7 dias","Volta na dor","Follow-up","Volta no ponto que mais incomodava ele e mostra resolvido. \"Imagina isso fora das suas costas já esse mês.\"","#9b6cf0"],
     ["+14 dias","Encerramento","Reativação","Break-up educado. Deixa a porta aberta pra retomar depois.","#e25563"]],
   posH:"Regras de ouro do B2B",
   pos:[["✓","Decisor mapeado","","Anote no campo \"cargo\" quem assina. Vender pra quem não decide é perder tempo."],
@@ -837,6 +843,8 @@ function exportCSV(){
 function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();
   r.onload=e=>{try{const d=JSON.parse(e.target.result);DB=migrate(d);save();renderAll();toast('Importado!');}catch(x){toast('Erro ao ler arquivo');}};
   r.readAsText(f);inp.value='';}
+function resetTpl(){if(!confirm('Restaurar os templates padrão deste workspace? Substitui os atuais (mantém leads e etapas).'))return;
+  DB.templates[MODE]=MODE==='b2b'?seedTplB2B():seedTplLocal();save();renderTpl();toast('Templates restaurados');}
 function seedReset(){if(!confirm('Adiciona os 23 leads-semente no workspace Local. Continuar?'))return;
   const exist=new Set(DB.boards.local.leads.map(l=>l.negocio));seedLeads().forEach(l=>{if(!exist.has(l.negocio))DB.boards.local.leads.push(l);});save();renderAll();toast('Leads-semente adicionados');}
 function wipe(){if(!confirm('Apagar TODOS os dados (Local + B2B)? Não volta.'))return;localStorage.removeItem(KEY);DB=freshDB();save();renderAll();toast('Tudo apagado');}
