@@ -167,6 +167,11 @@ tbody tr{cursor:pointer}
         <div id="homeSeqPos" style="margin-top:10px"></div>
       </div>
     </div>
+    <div class="box" id="homeCObox" style="margin-top:16px">
+      <h3>🕵️ Roteiro do cliente oculto · o que medir</h3>
+      <div class="muted" style="margin-bottom:14px;font-size:12px">Você manda uma mensagem se passando por cliente e avalia os pontos abaixo. Cada falha vira um argumento (e o gancho da abordagem). Anote o resultado no campo Gancho do lead.</div>
+      <div id="homeCO"></div>
+    </div>
     <div class="box" style="margin-top:16px"><h3>📚 Apoio</h3><div class="muted" id="homeMat" style="line-height:1.9"></div></div>
   </section>
 
@@ -236,7 +241,7 @@ const PRODUTOS={"Lava.AI":"#4f8bf0","Sorria.AI":"#3fb368","Realce.AI":"#9b6cf0",
 const ORIGENS={"Network":"#4f8bf0","Indicação":"#3fb368","Inbound":"#9b6cf0","Evento":"#e0a83d","Frio":"#9aa3b2","Outro":"#9aa3b2"};
 const PRECO=197;
 const KEY="moove_crm_v3";
-const TPL_VERSION=4; // bump quando os templates padrão mudarem -> atualiza nos apps já existentes (1x)
+const TPL_VERSION=5; // bump quando os templates padrão mudarem -> atualiza nos apps já existentes (1x)
 let MODE=localStorage.getItem('moove_mode')||'local';
 
 const CFG={
@@ -323,7 +328,11 @@ const SEED_TPL_LOCAL=[
  ["Corta · abertura","Barbearia","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI.{{?gancho}} {{gancho}}.{{/gancho}} Lançamos faz pouco em Maringá uma solução pra barbearias, focada em duas dores que aparecem em quase toda: o cliente que some e não volta, e o tempo que se perde respondendo agendamento no meio do corte.\nTe escrevo agora porque estamos montando os primeiros casos aqui em Maringá, e a {{negocio}} tem tudo pra ser um deles. Faz sentido eu te mostrar funcionando em uns 5 minutos?"],
  ["Corta · isca de vídeo","Barbearia","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI.{{?gancho}} {{gancho}}.{{/gancho}} Lançamos faz pouco em Maringá uma solução pra barbearias e, em vez de explicar por texto, queria te mandar um vídeo de 1 minuto: é a IA marcando, criando o horário na agenda e até remarcando sozinha, dentro do WhatsApp.\nComo estamos mostrando pros negócios daqui primeiro, ia adorar te mostrar. Posso mandar?"],
  ["Corta · follow-up","Barbearia","Follow-up","{{nome}}, {{saudacao}}! Retomando com calma, sem pressa.\nQuer que eu te mande um vídeo curto da agenda separada por barbeiro? Estamos montando os primeiros casos aqui de Maringá agora, e a {{negocio}} encaixa demais. Se fizer sentido, marco uma demo de 5 minutos."],
- ["Cliente oculto","Geral","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI.{{?gancho}} Vou ser bem sincera com você: {{gancho}}.{{/gancho}} Foi justamente isso que me fez querer te chamar, porque é o tipo de coisa que a gente resolve. Lançamos faz pouco em Maringá uma solução que cuida do atendimento e da agenda dentro do WhatsApp, sem deixar cliente sem resposta. Posso te mostrar em uns 5 minutos como funcionaria aí na {{negocio}}?"],
+ ["Cliente oculto · teste (lava)","Estética automotiva","Cliente oculto","Oi, bom dia! Vi vocês e queria saber como funciona pra agendar uma lavagem completa, e quanto fica. Tem horário essa semana?"],
+ ["Cliente oculto · teste (odonto)","Odontologia","Cliente oculto","Olá, bom dia! Gostaria de marcar uma avaliação. Vocês têm horário essa semana? E como funciona o atendimento de vocês?"],
+ ["Cliente oculto · teste (estética)","Estética","Cliente oculto","Oi, tudo bem? Queria saber sobre os procedimentos de vocês e como faço pra agendar uma avaliação. Tem horário nos próximos dias?"],
+ ["Cliente oculto · teste (barbearia)","Barbearia","Cliente oculto","Oi, tudo bem? Queria marcar um corte pra essa semana, como faço pra agendar? E quais horários vocês têm?"],
+ ["Abertura · após cliente oculto","Geral","Primeiro toque","{{nome}}, {{saudacao}}!\nA gente ainda não se conhece, sou a Marina, sócia da Moove AI.{{?gancho}} Vou ser bem sincera com você: {{gancho}}.{{/gancho}} Foi justamente isso que me fez querer te chamar, porque é o tipo de coisa que a gente resolve. Lançamos faz pouco em Maringá uma solução que cuida do atendimento e da agenda dentro do WhatsApp, sem deixar cliente sem resposta. Posso te mostrar em uns 5 minutos como funcionaria aí na {{negocio}}?"],
  ["Pós-demo (todos)","Geral","Pós-demo","{{nome}}, {{saudacao}}! Obrigada pelo tempo de hoje, gostei muito de te mostrar.\nResumindo o que você viu: a IA atendendo seu cliente no WhatsApp e o painel com tudo num lugar só. Fica R$197 por mês com tudo rodando (ou R$297 com a sua logo e as suas cores). Como estamos montando os primeiros casos de Maringá agora, consigo te dar atenção total na implantação e deixar tudo pronto em poucos dias. Quer que eu já comece a montar a conta da {{negocio}}?"]
 ];
 const SEED_TPL_B2B=[
@@ -685,7 +694,7 @@ function copyTpl(id){navigator.clipboard.writeText(TPLS().find(t=>t.id===id).tex
 function delTpl(id){if(!confirm('Excluir template?'))return;DB.templates[MODE]=TPLS().filter(t=>t.id!==id);save();renderTpl();}
 function openTpl(){
   const segOpts=MODE==='b2b'?['B2B']:['Geral','Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza'];
-  const etapaOpts=MODE==='b2b'?['Acionar','Reunião','Pós-reunião','Proposta','Follow-up','Reativação']:['Primeiro toque','Follow-up','Pós-demo','Reativação'];
+  const etapaOpts=MODE==='b2b'?['Acionar','Reunião','Pós-reunião','Proposta','Follow-up','Reativação']:['Cliente oculto','Primeiro toque','Follow-up','Pós-demo','Reativação'];
   let html=`<div class="modal"><h3>Novo template <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
    <div class="fg"><label>Nome</label><input id="t_nome" placeholder="Ex: ${MODE==='b2b'?'Follow-up proposta':'Lava · reativação'}"></div>
    <div class="row2"><div class="fg"><label>Categoria</label><select id="t_seg">${segOpts.map(s=>`<option>${s}</option>`).join('')}</select></div>
@@ -770,7 +779,7 @@ const HOME={
     ["Tarde · 10 min","Responda quem voltou, agende demos, mova os cards."],
     ["Demos","5-7 min cada. Comece pela barbearia (demo já pronta)."]],
   cadNote:"💡 Um segmento por dia no começo (seg = barbearia, ter = odonto...) pra ficar fluente no pitch.",
-  seq:[["Antes","Cliente oculto (opcional, mas poderoso)","Cliente oculto","Antes de abrir a conversa, teste o atendimento deles: agende como se fosse cliente pelo WhatsApp ou Insta. O que você sentir (demora, ninguém respondeu, resposta confusa) vira o gancho mais forte. Salva no campo Gancho do lead e usa o template Cliente oculto.","#2bb3a3"],
+  seq:[["Antes","Cliente oculto (você testando eles)","Cliente oculto · teste","Mande pra eles uma mensagem se passando por cliente (\"Oi, queria saber como agendar...\"), pelo WhatsApp ou Insta. Cronometre: responderam rápido? demoraram? sumiram? A resposta (ou a falta dela) vira o gancho mais forte. Anote no campo Gancho do lead e depois use a Abertura · após cliente oculto.","#2bb3a3"],
     ["Dia 0","Abertura","Primeiro toque","Se apresente (a gente não se conhece), diga o porquê (lançamos em Maringá uma solução pra dor que ele vive) e o porquê agora (estamos pegando os primeiros negócios da cidade). Se tiver um gancho salvo, ele entra sozinho. Fecha com um convite leve de 5 min.","#e0a83d"],
     ["+2 dias","O vídeo, sem cobrar","Follow-up","Manda o vídeo do agente pra ele enxergar a saída. Sem \"e aí?\", sem pressão. A ideia é ajudar, não empurrar.","#4f8bf0"],
     ["+5 dias","Volta na dor com prova","Follow-up","Conecta de novo com a dor: \"sabe aquele cliente que some? Olha isso aqui resolvendo\". Um print ou um número de um caso parecido.","#9b6cf0"],
@@ -810,6 +819,17 @@ const HOME={
   mat:"Dica: registre cada conversa em \"notas\" logo após acontecer. O follow-up bom é o que lembra do detalhe que o outro falou."
  }
 };
+const COCHECK=[
+ ["⏱️","Tempo até a 1ª resposta","Cronometre. Respondeu na hora, em horas, ou só no dia seguinte? → a IA responde na hora."],
+ ["🌙","Respondeu fora do horário?","Teste à noite e no fim de semana, que é quando o cliente decide. → a IA atende 24/7."],
+ ["📵","Respondeu, afinal?","Ou simplesmente ignoraram? Cliente sem resposta é venda que foi pro concorrente. → a IA nunca deixa no vácuo."],
+ ["🔁","Quantas mensagens até conseguir agendar","Vai-e-volta cansa o cliente. Contou quantas trocas? → a IA fecha em poucas mensagens."],
+ ["💬","Mandaram preço e horários, ou enrolaram?","\"Me liga\" / \"depois te falo\" perde gente. → a IA já informa e oferece horário."],
+ ["🎯","Foram proativos pra fechar?","Ofereceram horário e puxaram o agendamento, ou só responderam o mínimo? → a IA puxa o fechamento."],
+ ["✅","Confirmaram e pediram seus dados?","Anotaram nome, confirmaram o horário, mandariam lembrete? → a IA confirma e cadastra sozinha."],
+ ["👻","Te cobraram depois, se você sumiu?","Some no meio da conversa e veja se eles retomam. → a IA reativa quem some."],
+ ["🙂","Tom do atendimento","Simpático, frio, robótico, demorado? → a IA responde rápido e no jeito da marca."]
+];
 function seqRow(s){return `<div style="display:flex;gap:12px;margin-bottom:13px;align-items:flex-start">
   <span class="pill" style="background:${(s[4]||cfg().accent)}22;color:${s[4]||cfg().accent};min-width:74px;text-align:center;flex-shrink:0">${s[0]}</span>
   <div style="flex:1"><div style="font-size:13px;font-weight:700">${s[1]}${s[2]?` <span class="muted" style="font-weight:500;font-size:11px">→ template "${s[2]}"</span>`:''}</div>
@@ -853,6 +873,10 @@ function renderHome(){
   document.getElementById('homeSeqPosH').textContent=H.posH;
   document.getElementById('homeSeqPos').innerHTML=H.pos.map(seqRow).join('');
   document.getElementById('homeMat').innerHTML=H.mat;
+  // roteiro do cliente oculto (só no Local)
+  const cobox=document.getElementById('homeCObox');
+  if(MODE==='local'){cobox.style.display='';document.getElementById('homeCO').innerHTML=COCHECK.map(c=>`<div style="display:flex;gap:11px;margin-bottom:11px;align-items:flex-start"><span style="font-size:17px;flex-shrink:0">${c[0]}</span><div><b style="font-size:13px">${c[1]}</b><div class="muted" style="font-size:12px">${c[2]}</div></div></div>`).join('');}
+  else cobox.style.display='none';
 }
 
 /* ============ BACKUP ============ */
