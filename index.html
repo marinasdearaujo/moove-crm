@@ -123,6 +123,10 @@ tbody tr{cursor:pointer}
     <button id="wsB2B" onclick="setMode('b2b')">🤝 B2B</button>
     <button id="wsOps" onclick="setMode('ops')">🚀 Operação</button>
   </div>
+  <div class="ws" id="opsType" style="display:none">
+    <button id="otSaas" onclick="setOpsType('saas')">SaaS</button>
+    <button id="otCustom" onclick="setOpsType('custom')">Personalizado</button>
+  </div>
   <nav>
     <button class="tab active" data-view="inicio">🏠 Início</button>
     <button class="tab" data-view="pipeline">📋 Pipeline</button>
@@ -271,12 +275,34 @@ const CFG={
     dim1Label:"produto",dim2Label:"plano"
   }
 };
+// Operação tem DOIS processos: SaaS (produto pronto) e Personalizado (agente sob medida)
+let opsType=localStorage.getItem('moove_ops_type')||'saas';
+const OPS_STAGES={
+  saas:[{k:"A implantar",c:"#9aa3b2"},{k:"Onboarding",c:"#4f8bf0"},{k:"Configuração",c:"#9b6cf0"},{k:"Testes",c:"#e0a83d"},{k:"No ar",c:"#3fb368"},{k:"Acompanhamento",c:"#2bb3a3"},{k:"Churn",c:"#e25563"}],
+  custom:[{k:"A iniciar",c:"#9aa3b2"},{k:"Descoberta / escopo",c:"#4f8bf0"},{k:"Desenho da solução",c:"#9b6cf0"},{k:"Desenvolvimento",c:"#f0894f"},{k:"Testes / homologação",c:"#e0a83d"},{k:"No ar",c:"#3fb368"},{k:"Acompanhamento",c:"#2bb3a3"},{k:"Churn",c:"#e25563"}]
+};
+const OPS_TERMINAL=["No ar","Acompanhamento","Churn"];
+const OPS_NEXT={
+  saas:{"A implantar":"Agendar onboarding com o cliente (em até 48h)","Onboarding":"Coletar logo, cores, serviços com preços, horários e nº do WhatsApp","Configuração":"Montar painel na marca + conectar WhatsApp + treinar a IA","Testes":"Rodar testes (agendar, remarcar, cancelar) e ajustar","No ar":"Go-live: avisar o cliente e acompanhar a 1ª semana","Acompanhamento":"Check-in mensal de sucesso","Churn":""},
+  custom:{"A iniciar":"Agendar a reunião de descoberta com o cliente","Descoberta / escopo":"Mapear o processo e definir exatamente o que o agente vai fazer","Desenho da solução":"Desenhar os fluxos e listar as integrações necessárias","Desenvolvimento":"Construir o agente conforme o escopo aprovado","Testes / homologação":"Rodar testes e validar com o cliente (homologação)","No ar":"Go-live: subir em produção e acompanhar de perto","Acompanhamento":"Check-in de sucesso e ajustes finos","Churn":""}
+};
 function cfg(){return CFG[MODE];}
-function stages(){return cfg().stages;}
+function stages(){return MODE==='ops'?OPS_STAGES[opsType]:cfg().stages;}
+function stagesFor(type){return MODE==='ops'?OPS_STAGES[type||opsType]:cfg().stages;}
 function firstStage(){return stages()[0].k;}
-function stageColor(k){const s=stages().find(x=>x.k===k);return s?s.c:'#888';}
-function isTerminal(k){return (cfg().terminal||[]).includes(k);}
-const OPS_NEXT={"A implantar":"Agendar onboarding com o cliente (em até 48h)","Onboarding":"Coletar logo, cores, serviços com preços, horários e nº do WhatsApp","Configuração":"Montar painel na marca + conectar WhatsApp + treinar a IA","Testes":"Rodar testes (agendar, remarcar, cancelar) e ajustar","No ar":"Go-live: avisar o cliente e acompanhar a 1ª semana","Acompanhamento":"Check-in mensal de sucesso","Churn":""};
+function stageColor(k){const s=(OPS_STAGES.saas.concat(OPS_STAGES.custom,cfg().stages||[])).find(x=>x.k===k);return s?s.c:'#888';}
+function isTerminal(k){return MODE==='ops'?OPS_TERMINAL.includes(k):(cfg().terminal||[]).includes(k);}
+function setOpsType(t){opsType=t;localStorage.setItem('moove_ops_type',t);renderAll();}
+const OPS_STRAT={
+  saas:[["1","Onboarding","Assim que fecha, agende uma conversa e colete tudo: logo, cores, serviços com preços, horários e o número de WhatsApp.","#4f8bf0"],
+    ["2","Configuração","Monte o painel na cara da marca, conecte o WhatsApp e treine a IA com os serviços e o tom de voz.","#9b6cf0"],
+    ["3","Testes","Rode conversas de teste (agendar, remarcar, cancelar) e ajuste antes de soltar.","#e0a83d"],
+    ["4","No ar + Acompanhamento","Go-live, acompanhe a primeira semana de perto e depois faça check-in mensal de sucesso.","#3fb368"]],
+  custom:[["1","Descoberta / escopo","Entenda o processo do cliente e defina exatamente o que o agente vai fazer e onde ele encaixa.","#4f8bf0"],
+    ["2","Desenho da solução","Desenhe os fluxos da conversa e liste as integrações necessárias (agenda, sistemas, APIs).","#9b6cf0"],
+    ["3","Desenvolvimento + homologação","Construa o agente, rode os testes e valide com o cliente antes de soltar.","#e0a83d"],
+    ["4","No ar + Acompanhamento","Go-live em produção, acompanhe de perto e faça os ajustes finos no começo.","#3fb368"]]
+};
 function B(){return DB.boards[MODE];}
 function LEADS(){return B().leads;}
 function GOALS(){return B().goals;}
@@ -442,6 +468,9 @@ function applyTheme(){
   document.getElementById('wsLocal').classList.toggle('on',MODE==='local');
   document.getElementById('wsB2B').classList.toggle('on',MODE==='b2b');
   document.getElementById('wsOps').classList.toggle('on',MODE==='ops');
+  const ot=document.getElementById('opsType');ot.style.display=MODE==='ops'?'flex':'none';
+  document.getElementById('otSaas').classList.toggle('on',opsType==='saas');
+  document.getElementById('otCustom').classList.toggle('on',opsType==='custom');
 }
 
 /* ============ NAV ============ */
@@ -484,6 +513,7 @@ function pipeFiltered(){
   const f1=document.getElementById('pSeg')?.value||'',f2=document.getElementById('pProd')?.value||'';
   const ft=document.getElementById('pTag')?.value||'',hot=document.getElementById('pHot')?.checked;
   return LEADS().filter(l=>{
+    if(MODE==='ops'&&(l.tipo||'saas')!==opsType)return false;
     if(f1&&dim1(l)!==f1)return false;
     if(showDim2()&&f2&&dim2(l)!==f2)return false;
     if(ft&&!(l.tags||[]).includes(ft))return false;
@@ -505,9 +535,10 @@ function renderBoard(){
     drop.ondrop=e=>{e.preventDefault();col.classList.remove('over');
       const id=e.dataTransfer.getData('id');const l=LEADS().find(x=>x.id===id);
       if(l&&l.etapa!==s.k){l.etapa=s.k;l.ultimoContato=today();
-        if(MODE==='ops'&&OPS_NEXT[s.k]!==undefined){ // automação: cada etapa já define o próximo passo
-          l.proximoPasso=OPS_NEXT[s.k];
-          if(OPS_NEXT[s.k]){const d=new Date();d.setDate(d.getDate()+2);l.proximaData=d.toISOString().slice(0,10);}else l.proximaData='';
+        if(MODE==='ops'){ // automação: cada etapa já define o próximo passo (por tipo)
+          const nx=OPS_NEXT[l.tipo||opsType]||{};
+          if(nx[s.k]!==undefined){l.proximoPasso=nx[s.k];
+            if(nx[s.k]){const d=new Date();d.setDate(d.getDate()+2);l.proximaData=d.toISOString().slice(0,10);}else l.proximaData='';}
         }
         save();renderAll();toast('Movido pra '+s.k);}};
     b.appendChild(col);
@@ -551,6 +582,7 @@ function renderTable(){
   const q=(document.getElementById('search').value||'').toLowerCase();
   const f1=document.getElementById('fSeg').value,fe=document.getElementById('fEtapa').value,fp=document.getElementById('fProd').value;
   let rows=LEADS().filter(l=>{
+    if(MODE==='ops'&&(l.tipo||'saas')!==opsType)return false;
     if(f1&&dim1(l)!==f1)return false;if(fe&&l.etapa!==fe)return false;
     if(showDim2()&&fp&&dim2(l)!==fp)return false;
     if(q){const blob=(l.negocio+(l.contato||'')+(l.responsavel||'')+(l.telefone||'')+(l.instagram||'')+(l.notas||'')+(l.gancho||'')+(l.endereco||'')+(l.tags||[]).join(' ')).toLowerCase();if(!blob.includes(q))return false;}
@@ -640,7 +672,7 @@ function openLead(id){
   let l;
   if(id){l=LEADS().find(x=>x.id===id);}
   else if(MODE==='local'){l={id:uid('L'),negocio:'',segmento:'Barbearia',produto:'Corta.AI',telefone:'',instagram:'',endereco:'',etapa:firstStage(),notas:'',tags:[],proximoPasso:'Primeiro toque',proximaData:'',ultimoContato:'',valor:PRECO,createdAt:today()};}
-  else if(MODE==='ops'){l={id:uid('O'),negocio:'',contato:'',telefone:'',produto:'Corta.AI',plano:'Standard',implResp:'',inicio:today(),golive:'',etapa:firstStage(),notas:'',tags:[],proximoPasso:OPS_NEXT[firstStage()],proximaData:'',ultimoContato:'',valor:PRECO,createdAt:today()};}
+  else if(MODE==='ops'){l={id:uid('O'),negocio:'',contato:'',telefone:'',tipo:opsType,produto:opsType==='saas'?'Corta.AI':'',plano:opsType==='saas'?'Standard':'',implResp:'',inicio:today(),golive:'',etapa:firstStage(),notas:'',tags:[],proximoPasso:OPS_NEXT[opsType][firstStage()],proximaData:'',ultimoContato:'',valor:opsType==='saas'?PRECO:0,createdAt:today()};}
   else{l={id:uid('B'),negocio:'',contato:'',cargo:'',telefone:'',email:'',origem:'Network',interesse:'',etapa:firstStage(),notas:'',tags:[],proximoPasso:'Acionar contato',proximaData:'',proximaReuniao:'',ultimoContato:'',valor:0,createdAt:today()};}
   const isNew=!id;
   const stageSel=`<select id="m_etapa">${stages().map(s=>`<option ${s.k===l.etapa?'selected':''}>${s.k}</option>`).join('')}</select>`;
@@ -668,7 +700,8 @@ function openLead(id){
      <div class="row2"><div class="fg"><label>Etapa</label>${stageSel}</div>
        <div class="fg"><label>${cfg().valueLabel}</label><input id="m_valor" type="number" value="${l.valor||PRECO}"></div></div>`;
   }else if(MODE==='ops'){
-    fields=`<div class="row2">
+    fields=`<div class="fg"><label>Tipo de implementação</label><select id="m_tipo">${[['saas','SaaS (produto pronto)'],['custom','Agente personalizado']].map(t=>`<option value="${t[0]}" ${(l.tipo||opsType)===t[0]?'selected':''}>${t[1]}</option>`).join('')}</select></div>
+     <div class="row2">
        <div class="fg"><label>Cliente *</label><input id="m_negocio" value="${esc(l.negocio)}"></div>
        <div class="fg"><label>Contato (pessoa)</label><input id="m_contato" value="${esc(l.contato||'')}" placeholder="Quem fala com você"></div></div>
      <div class="row2">
@@ -716,7 +749,7 @@ function saveLead(id,isNew){
   l.negocio=g('negocio');l.etapa=g('etapa');l.proximoPasso=g('proximoPasso');l.proximaData=g('proximaData');
   l.notas=g('notas');if(g('gancho')!==undefined)l.gancho=g('gancho');l.tags=g('tags').split(',').map(t=>t.trim()).filter(Boolean);l.telefone=g('telefone');l.valor=+g('valor')||0;
   if(MODE==='local'){l.segmento=g('segmento');l.produto=g('produto');l.instagram=g('instagram');l.endereco=g('endereco');l.responsavel=g('responsavel');}
-  else if(MODE==='ops'){l.contato=g('contato');l.produto=g('produto');l.plano=g('plano');l.implResp=g('implResp');l.inicio=g('inicio');l.golive=g('golive');}
+  else if(MODE==='ops'){l.tipo=g('tipo');l.contato=g('contato');l.produto=g('produto');l.plano=g('plano');l.implResp=g('implResp');l.inicio=g('inicio');l.golive=g('golive');}
   else{l.contato=g('contato');l.cargo=g('cargo');l.origem=g('origem');l.email=g('email');l.interesse=g('interesse');l.proximaReuniao=g('proximaReuniao');}
   if(!l.createdAt)l.createdAt=today();
   save();closeOv();renderAll();toast(isNew?'Criado':'Salvo');
@@ -725,11 +758,13 @@ function delLead(id){if(!confirm('Excluir?'))return;B().leads=LEADS().filter(x=>
 function moveToOps(id){
   const src=LEADS().find(x=>x.id===id);if(!src)return;
   if(src._opsId){setMode('ops');closeOv();toast('Esse cliente já está na Implementação');return;}
+  const tipo=(MODE==='local'||PRODUTOS[src.produto])?'saas':'custom';
+  const first=OPS_STAGES[tipo][0].k;
   const ops={id:uid('O'),negocio:src.negocio,contato:src.contato||src.responsavel||'',telefone:src.telefone||'',
-    produto:src.produto||'Corta.AI',plano:(+src.valor>=297?'Premium':'Standard'),valor:+src.valor||PRECO,
-    implResp:'',inicio:today(),golive:'',etapa:'A implantar',proximoPasso:OPS_NEXT['A implantar'],proximaData:'',
+    tipo:tipo,produto:tipo==='saas'?(src.produto||'Corta.AI'):'',plano:tipo==='saas'?(+src.valor>=297?'Premium':'Standard'):'',valor:+src.valor||(tipo==='saas'?PRECO:0),
+    implResp:'',inicio:today(),golive:'',etapa:first,proximoPasso:OPS_NEXT[tipo][first],proximaData:'',
     notas:src.notas||'',tags:[],ultimoContato:'',createdAt:today(),origemVenda:MODE};
-  DB.boards.ops.leads.push(ops);src._opsId=ops.id;save();closeOv();setMode('ops');toast('Cliente enviado pra Implementação 🚀');
+  DB.boards.ops.leads.push(ops);src._opsId=ops.id;opsType=tipo;localStorage.setItem('moove_ops_type',tipo);save();closeOv();setMode('ops');toast('Cliente enviado pra Implementação 🚀');
 }
 
 /* ============ TEMPLATES ============ */
@@ -776,7 +811,7 @@ function goalBar(lab,val,goal){const pct=goal?Math.min(val/goal*100,100):0;const
   return`<div class="bar goal"><div class="lab">${lab}</div><div class="track"><div class="fill ${over?'over':''}" style="width:${pct}%"></div></div><div class="num">${val}/${goal}</div></div>`;}
 function brl(n){return 'R$ '+(+n||0).toLocaleString('pt-BR');}
 function renderAnalytics(){
-  const L=LEADS();const m=today().slice(0,7);const cnt=k=>L.filter(l=>l.etapa===k).length;
+  const L=MODE==='ops'?LEADS().filter(l=>(l.tipo||'saas')===opsType):LEADS();const m=today().slice(0,7);const cnt=k=>L.filter(l=>l.etapa===k).length;
   const fechados=cnt('Fechado');const ac=cfg().accent;
   const max=Math.max(...stages().map(s=>cnt(s.k)),1);
   document.getElementById('funnel').innerHTML=stages().map(s=>bar(s.k,cnt(s.k),max,s.c)).join('');
@@ -796,12 +831,12 @@ function renderAnalytics(){
     document.getElementById('anaBox2').innerHTML=segs.map(s=>bar(s,L.filter(l=>l.segmento===s).length,smax,ac)).join('')||'<div class="empty">—</div>';
   }else if(MODE==='ops'){
     const noar=L.filter(l=>["No ar","Acompanhamento"].includes(l.etapa)).length;
-    const implantando=L.filter(l=>["A implantar","Onboarding","Configuração","Testes"].includes(l.etapa)).length;
+    const implantando=L.filter(l=>!isTerminal(l.etapa)).length;
     const churn=cnt('Churn');
     const golivesMes=L.filter(l=>l.golive&&l.golive.slice(0,7)===m).length;
     const mrrAtivo=L.filter(l=>["No ar","Acompanhamento"].includes(l.etapa)).reduce((s,l)=>s+(+l.valor||0),0);
     document.getElementById('kpis').innerHTML=kpi(L.length,'Clientes')+kpi(implantando,'Em implantação','blue')+kpi(noar,'No ar','green')+kpi(churn,'Churn','')+kpi(brl(mrrAtivo),'MRR ativo','green')+kpi(golivesMes+' este mês','Go-lives','gold');
-    document.getElementById('goals').innerHTML=goalBar('Go-lives no mês',golivesMes,g.golive||0)+goalBar('Em onboarding',cnt('Onboarding'),g.onboarding||0);
+    document.getElementById('goals').innerHTML=goalBar('Go-lives no mês',golivesMes,g.golive||0)+goalBar('Em implantação',implantando,g.onboarding||0);
     document.getElementById('anaBox1H').textContent='Por produto';
     const prods=Object.keys(PRODUTOS);const pmax=Math.max(...prods.map(p=>L.filter(l=>l.produto===p).length),1);
     document.getElementById('anaBox1').innerHTML=prods.map(p=>bar(p.replace('.AI',''),L.filter(l=>l.produto===p).length,pmax,PRODUTOS[p])).join('');
@@ -947,7 +982,7 @@ function seqRow(s){return `<div style="display:flex;gap:12px;margin-bottom:13px;
 function renderHome(){
   const H=HOME[MODE];const ac=cfg().accent;
   const hh=new Date().getHours();const oi=hh<12?"Bom dia":(hh<18?"Boa tarde":"Boa noite");
-  const L=LEADS();const cnt=k=>L.filter(l=>l.etapa===k).length;
+  const L=MODE==='ops'?LEADS().filter(l=>(l.tipo||'saas')===opsType):LEADS();const cnt=k=>L.filter(l=>l.etapa===k).length;
   const due=L.filter(l=>!isTerminal(l.etapa)).filter(l=>{if(l.proximaData)return daysBetween(today(),l.proximaData)<=0;return l.etapa!==firstStage()&&!l.proximaData;});
   document.getElementById('homeHero').innerHTML=`<div class="box" style="background:linear-gradient(135deg,#1e222c,#171a21);margin-bottom:18px">
     <div style="font-size:22px;font-weight:800">${oi}, ${H.hero[0]} 👋</div>
@@ -957,7 +992,7 @@ function renderHome(){
   if(MODE==='local'){const demos=L.filter(l=>["Demo agendada","Proposta enviada","Fechado"].includes(l.etapa)).length;
     const mrr=L.filter(l=>l.etapa==='Fechado').reduce((s,l)=>s+(+l.valor||PRECO),0);
     document.getElementById('homeKpis').innerHTML=kpi(L.length,'Leads')+kpi(cnt('A contatar'),'A contatar')+kpi(demos,'Demos','blue')+kpi(fechados,'Fechados','green')+kpi(brl(mrr),'MRR fechado','green');
-  }else if(MODE==='ops'){const implantando=L.filter(l=>["A implantar","Onboarding","Configuração","Testes"].includes(l.etapa)).length;
+  }else if(MODE==='ops'){const implantando=L.filter(l=>!isTerminal(l.etapa)).length;
     const noar=L.filter(l=>["No ar","Acompanhamento"].includes(l.etapa)).length;
     const mrrAtivo=L.filter(l=>["No ar","Acompanhamento"].includes(l.etapa)).reduce((s,l)=>s+(+l.valor||0),0);
     document.getElementById('homeKpis').innerHTML=kpi(L.length,'Clientes')+kpi(implantando,'Em implantação','blue')+kpi(noar,'No ar','green')+kpi(cnt('Churn'),'Churn')+kpi(brl(mrrAtivo),'MRR ativo','green');
@@ -969,13 +1004,14 @@ function renderHome(){
   const g=GOALS();const m=today().slice(0,7);
   if(MODE==='local'){const demos=L.filter(l=>["Demo agendada","Proposta enviada","Fechado"].includes(l.etapa)).length;const toquesMes=L.filter(l=>l.ultimoContato&&l.ultimoContato.slice(0,7)===m).length;
     document.getElementById('homeGoals').innerHTML=goalBar('Toques no mês',toquesMes,g.toques||0)+goalBar('Demos',demos,g.demos||0)+goalBar('Fechamentos',fechados,g.fechamentos||0);
-  }else if(MODE==='ops'){const golivesMes=L.filter(l=>l.golive&&l.golive.slice(0,7)===m).length;
-    document.getElementById('homeGoals').innerHTML=goalBar('Go-lives no mês',golivesMes,g.golive||0)+goalBar('Em onboarding',cnt('Onboarding'),g.onboarding||0);
+  }else if(MODE==='ops'){const golivesMes=L.filter(l=>l.golive&&l.golive.slice(0,7)===m).length;const emimpl=L.filter(l=>!isTerminal(l.etapa)).length;
+    document.getElementById('homeGoals').innerHTML=goalBar('Go-lives no mês',golivesMes,g.golive||0)+goalBar('Em implantação',emimpl,g.onboarding||0);
   }else{const reun=L.filter(l=>["Reunião feita","Proposta enviada","Negociação","Fechado"].includes(l.etapa)).length;const props=L.filter(l=>["Proposta enviada","Negociação","Fechado"].includes(l.etapa)).length;
     document.getElementById('homeGoals').innerHTML=goalBar('Reuniões',reun,g.reunioes||0)+goalBar('Propostas',props,g.propostas||0)+goalBar('Fechamentos',fechados,g.fechamentos||0);}
   // estratégia
-  document.getElementById('homeStratH').textContent=H.stratH;
-  document.getElementById('homeStrat').innerHTML=H.strat.map(s=>`<div style="display:flex;gap:10px;margin-bottom:12px">
+  document.getElementById('homeStratH').textContent=MODE==='ops'?(opsType==='custom'?'🧭 O processo do agente personalizado':'🧭 O processo de implementação (SaaS)'):H.stratH;
+  const stratArr=MODE==='ops'?OPS_STRAT[opsType]:H.strat;
+  document.getElementById('homeStrat').innerHTML=stratArr.map(s=>`<div style="display:flex;gap:10px;margin-bottom:12px">
     <span class="pill" style="background:${s[3]}22;color:${s[3]};height:fit-content">${s[0].replace('.AI','')}</span>
     <div><b style="font-size:13px">${s[1]}</b><div class="muted" style="font-size:12px">${s[2]}</div></div></div>`).join('');
   // cadência rotina
