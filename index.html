@@ -119,7 +119,7 @@ tbody tr{cursor:pointer}
 <header>
   <div class="logo"><span class="dot">M</span><div>Moove CRM<small id="wsSub">Prospecção · Maringá</small></div></div>
   <div class="ws">
-    <button id="wsLocal" class="on" onclick="setMode('local')">🏪 Local</button>
+    <button id="wsLocal" class="on" onclick="setMode('local')">🏪 SaaS</button>
     <button id="wsB2B" onclick="setMode('b2b')">🤝 B2B</button>
     <button id="wsOps" onclick="setMode('ops')">🚀 Operação</button>
   </div>
@@ -144,7 +144,7 @@ tbody tr{cursor:pointer}
       <button onclick="document.getElementById('importf').click()">⬆️ Importar JSON</button>
       <button onclick="exportCSV()">📄 Exportar CSV (workspace atual)</button>
       <button onclick="resetTpl()">✉️ Restaurar templates padrão (workspace atual)</button>
-      <button onclick="seedReset()">♻️ Restaurar leads-semente (Local)</button>
+      <button onclick="seedReset()">♻️ Restaurar leads-semente (SaaS)</button>
       <button onclick="wipe()" style="color:var(--red)">🗑️ Apagar tudo</button>
     </div>
     <input type="file" id="importf" accept=".json" class="hide" onchange="importJSON(this)">
@@ -251,8 +251,8 @@ let MODE=localStorage.getItem('moove_mode')||'local';
 
 const CFG={
   local:{
-    accent:"#e0a83d",accent2:"#f3c969",sub:"Prospecção · Maringá",addLabel:"+ Novo lead",
-    pipeTitle:"Pipeline de vendas (Local)",
+    accent:"#e0a83d",accent2:"#f3c969",sub:"SaaS · Prospecção Maringá",addLabel:"+ Novo lead",
+    pipeTitle:"Pipeline de vendas (SaaS)",
     stages:[{k:"A contatar",c:"#9aa3b2"},{k:"Contato feito",c:"#4f8bf0"},{k:"Demo agendada",c:"#9b6cf0"},{k:"Proposta enviada",c:"#e0a83d"},{k:"Fechado",c:"#3fb368"},{k:"Perdido",c:"#e25563"}],
     terminal:["Fechado","Perdido"],
     valueLabel:"Valor mensal estimado (R$)",defaultValue:PRECO,
@@ -861,7 +861,7 @@ function renderAnalytics(){
   }
 }
 function openGoals(){const g=GOALS();let html;
-  if(MODE==='local'){html=`<div class="modal"><h3>Metas do mês (Local) <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
+  if(MODE==='local'){html=`<div class="modal"><h3>Metas do mês (SaaS) <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
     <div class="fg"><label>Toques no mês</label><input id="g_a" type="number" value="${g.toques||0}"></div>
     <div class="fg"><label>Demos</label><input id="g_b" type="number" value="${g.demos||0}"></div>
     <div class="fg"><label>Fechamentos</label><input id="g_c" type="number" value="${g.fechamentos||0}"></div>
@@ -942,7 +942,7 @@ const HOME={
     ["3","Testes","Rode conversas de teste (agendar, remarcar, cancelar) e ajuste antes de soltar.","#e0a83d"],
     ["4","No ar + Acompanhamento","Go-live, acompanhe a primeira semana de perto e depois faça check-in mensal de sucesso.","#3fb368"]],
   cadH:"⏱️ Cadência (rotina da operação)",
-  cad:[["Ao fechar","No Local/B2B, no card Fechado, clique em Enviar pra Implementação. Agende o onboarding em até 48h."],
+  cad:[["Ao fechar","No SaaS/B2B, no card Fechado, clique em Enviar pra Implementação. Agende o onboarding em até 48h."],
     ["Durante","Ao mover o card de etapa, o próximo passo já é preenchido sozinho. Siga ele."],
     ["No ar","Acompanhe de perto os primeiros 7 dias, é onde o cliente decide se ama ou esfria."],
     ["Mensal","Check-in de sucesso com quem está em Acompanhamento, pra segurar a recorrência."]],
@@ -1051,7 +1051,7 @@ function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReade
   r.readAsText(f);inp.value='';}
 function resetTpl(){if(!confirm('Restaurar os templates padrão deste workspace? Substitui os atuais (mantém leads e etapas).'))return;
   DB.templates[MODE]=MODE==='b2b'?seedTplB2B():MODE==='ops'?seedTplOps():seedTplLocal();save();renderTpl();toast('Templates restaurados');}
-function seedReset(){if(!confirm('Adiciona os 23 leads-semente no workspace Local. Continuar?'))return;
+function seedReset(){if(!confirm('Adiciona os 23 leads-semente no workspace SaaS. Continuar?'))return;
   const exist=new Set(DB.boards.local.leads.map(l=>l.negocio));seedLeads().forEach(l=>{if(!exist.has(l.negocio))DB.boards.local.leads.push(l);});save();renderAll();toast('Leads-semente adicionados');}
 function wipe(){if(!confirm('Apagar TODOS os dados (Local + B2B)? Não volta.'))return;localStorage.removeItem(KEY);DB=freshDB();save();renderAll();toast('Tudo apagado');}
 function dl(name,content,type){const b=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
