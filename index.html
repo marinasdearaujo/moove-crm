@@ -30,17 +30,17 @@ textarea{resize:vertical;min-height:90px;line-height:1.5}
 .btn.wa:hover{filter:brightness(1.08)}
 
 header{display:flex;align-items:center;gap:14px;padding:14px 22px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;flex-wrap:wrap}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:.3px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:.3px;order:1}
 .logo .dot{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#1a1206;font-weight:900}
 .logo small{display:block;font-size:11px;color:var(--mut);font-weight:500;letter-spacing:0}
-.ws{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:3px}
+.ws{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:3px;order:2}
 .ws button{padding:7px 13px;background:transparent;color:var(--mut);border-radius:8px;font-size:13px}
 .ws button.on{background:var(--accent);color:#1a1206}
-nav{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+nav{display:flex;gap:4px;flex-wrap:wrap;order:4;flex-basis:100%;border-top:1px solid var(--line);padding-top:10px;margin-top:2px}
 .tab{padding:9px 15px;background:transparent;color:var(--mut);border-radius:10px;font-weight:600}
 .tab.active{background:var(--panel2);color:var(--accent2)}
 .tab:hover{color:var(--txt)}
-.actions{display:flex;gap:8px;align-items:center;position:relative}
+.actions{display:flex;gap:8px;align-items:center;position:relative;order:3;margin-left:auto}
 main{padding:22px;max-width:1500px;margin:0 auto}
 .view{display:none}.view.active{display:block}
 h2.title{font-size:20px;margin-bottom:4px}
