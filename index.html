@@ -121,6 +121,7 @@ tbody tr{cursor:pointer}
   <div class="ws">
     <button id="wsLocal" class="on" onclick="setMode('local')">🏪 Local</button>
     <button id="wsB2B" onclick="setMode('b2b')">🤝 B2B</button>
+    <button id="wsOps" onclick="setMode('ops')">🚀 Operação</button>
   </div>
   <nav>
     <button class="tab active" data-view="inicio">🏠 Início</button>
@@ -241,7 +242,7 @@ const PRODUTOS={"Lava.AI":"#4f8bf0","Sorria.AI":"#3fb368","Realce.AI":"#9b6cf0",
 const ORIGENS={"Network":"#4f8bf0","Indicação":"#3fb368","Inbound":"#9b6cf0","Evento":"#e0a83d","Frio":"#9aa3b2","Outro":"#9aa3b2"};
 const PRECO=197;
 const KEY="moove_crm_v3";
-const TPL_VERSION=7; // bump quando os templates padrão mudarem -> atualiza nos apps já existentes (1x)
+const TPL_VERSION=8; // bump quando os templates padrão mudarem -> atualiza nos apps já existentes (1x)
 let MODE=localStorage.getItem('moove_mode')||'local';
 
 const CFG={
@@ -249,6 +250,7 @@ const CFG={
     accent:"#e0a83d",accent2:"#f3c969",sub:"Prospecção · Maringá",addLabel:"+ Novo lead",
     pipeTitle:"Pipeline de vendas (Local)",
     stages:[{k:"A contatar",c:"#9aa3b2"},{k:"Contato feito",c:"#4f8bf0"},{k:"Demo agendada",c:"#9b6cf0"},{k:"Proposta enviada",c:"#e0a83d"},{k:"Fechado",c:"#3fb368"},{k:"Perdido",c:"#e25563"}],
+    terminal:["Fechado","Perdido"],
     valueLabel:"Valor mensal estimado (R$)",defaultValue:PRECO,
     dim1Label:"segmento",dim2Label:"produto"
   },
@@ -256,15 +258,25 @@ const CFG={
     accent:"#4f8bf0",accent2:"#7eacf6",sub:"Negociações B2B · Higor",addLabel:"+ Novo negócio",
     pipeTitle:"Pipeline B2B (Higor)",
     stages:[{k:"Contato iniciado",c:"#9aa3b2"},{k:"Reunião agendada",c:"#4f8bf0"},{k:"Reunião feita",c:"#9b6cf0"},{k:"Proposta enviada",c:"#e0a83d"},{k:"Negociação",c:"#f0894f"},{k:"Fechado",c:"#3fb368"},{k:"Perdido",c:"#e25563"}],
+    terminal:["Fechado","Perdido"],
     valueLabel:"Valor do negócio (R$)",defaultValue:0,
     dim1Label:"origem",dim2Label:"interesse"
+  },
+  ops:{
+    accent:"#2bb3a3",accent2:"#5fd0c4",sub:"Implementação · Operação",addLabel:"+ Novo cliente",
+    pipeTitle:"Pipeline de Implementação (Operação)",
+    stages:[{k:"A implantar",c:"#9aa3b2"},{k:"Onboarding",c:"#4f8bf0"},{k:"Configuração",c:"#9b6cf0"},{k:"Testes",c:"#e0a83d"},{k:"No ar",c:"#3fb368"},{k:"Acompanhamento",c:"#2bb3a3"},{k:"Churn",c:"#e25563"}],
+    terminal:["No ar","Acompanhamento","Churn"],
+    valueLabel:"Valor mensal (R$)",defaultValue:PRECO,
+    dim1Label:"produto",dim2Label:"plano"
   }
 };
 function cfg(){return CFG[MODE];}
 function stages(){return cfg().stages;}
 function firstStage(){return stages()[0].k;}
 function stageColor(k){const s=stages().find(x=>x.k===k);return s?s.c:'#888';}
-function isTerminal(k){return k==="Fechado"||k==="Perdido";}
+function isTerminal(k){return (cfg().terminal||[]).includes(k);}
+const OPS_NEXT={"A implantar":"Agendar onboarding com o cliente (em até 48h)","Onboarding":"Coletar logo, cores, serviços com preços, horários e nº do WhatsApp","Configuração":"Montar painel na marca + conectar WhatsApp + treinar a IA","Testes":"Rodar testes (agendar, remarcar, cancelar) e ajustar","No ar":"Go-live: avisar o cliente e acompanhar a 1ª semana","Acompanhamento":"Check-in mensal de sucesso","Churn":""};
 function B(){return DB.boards[MODE];}
 function LEADS(){return B().leads;}
 function GOALS(){return B().goals;}
@@ -347,8 +359,15 @@ const SEED_TPL_B2B=[
  ["Follow-up proposta 2 (valor)","Follow-up","{{contato}}, lembrei de você. Aquele ponto que mais te incomodava, de [dor], é o primeiro que a gente resolve. Vale a pena destravar isso ainda esse mês? Consigo priorizar a entrega de vocês agora."],
  ["Encerramento (break-up)","Reativação","{{contato}}, fica tranquilo, sei que timing é tudo. Vou parar de te procurar por enquanto e deixo a porta aberta. Se aquela dor voltar a incomodar, é só me chamar que eu retomo na hora."]
 ];
+const SEED_TPL_OPS=[
+ ["Boas-vindas","Boas-vindas","{{nome}}, {{saudacao}}! Que alegria ter a {{empresa}} com a gente 💜 Vou cuidar de deixar tudo no ar rapidinho. Pra começar, me manda quando puder: a logo de vocês, as cores da marca, a lista de serviços com os preços, os horários de funcionamento e o número de WhatsApp que vai usar o atendimento. Com isso eu já monto tudo."],
+ ["Lembrete de coleta","Coleta","{{nome}}, tudo bem? Pra eu terminar de montar o sistema de vocês, ainda falta: [o que faltar]. Quando puder me mandar, eu já deixo no ar 🙌"],
+ ["Está no ar","Go-live","{{nome}}, está no ar! 🎉 A IA já está atendendo no WhatsApp de vocês. Qualquer ajuste é só me chamar. Vou acompanhar de perto essa primeira semana com vocês."],
+ ["Check-in 7 dias","Acompanhamento","{{nome}}, como foi a primeira semana com a IA? Quero saber o que está funcionando bem e o que dá pra deixar ainda melhor pra vocês 💜"]
+];
 function seedTplLocal(){return SEED_TPL_LOCAL.map((t,i)=>({id:"T"+(Date.now()+i),nome:t[0],segmento:t[1],etapa:t[2],texto:t[3]}));}
 function seedTplB2B(){return SEED_TPL_B2B.map((t,i)=>({id:"TB"+(Date.now()+i),nome:t[0],segmento:"B2B",etapa:t[1],texto:t[2]}));}
+function seedTplOps(){return SEED_TPL_OPS.map((t,i)=>({id:"TO"+(Date.now()+i),nome:t[0],segmento:"Operação",etapa:t[1],texto:t[2]}));}
 
 /* ============ FIREBASE (REST) ============ */
 const FB_URL="https://rifa-mae-default-rtdb.firebaseio.com";
@@ -356,9 +375,10 @@ const FB_PATH="moove_crm/data";
 const DEVICE=(()=>{let d=localStorage.getItem('moove_device');if(!d){d=Math.random().toString(36).slice(2,9);localStorage.setItem('moove_device',d);}return d;})();
 let applyingRemote=false,pushTimer=null;
 
-function freshDB(){return{boards:{local:{leads:seedLeads(),goals:{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}}},templates:{local:seedTplLocal(),b2b:seedTplB2B()},_tplVersion:TPL_VERSION,_enrichV:1,_updatedAt:0};}
+const GOALS_OPS={golive:4,onboarding:6};
+function freshDB(){return{boards:{local:{leads:seedLeads(),goals:{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}},ops:{leads:[],goals:{...GOALS_OPS}}},templates:{local:seedTplLocal(),b2b:seedTplB2B(),ops:seedTplOps()},_tplVersion:TPL_VERSION,_enrichV:1,_updatedAt:0};}
 function refreshTpl(d){ // atualiza os templates padrão quando a versão muda (não toca em leads/etapas)
-  if(d._tplVersion!==TPL_VERSION){d.templates={local:seedTplLocal(),b2b:seedTplB2B()};d._tplVersion=TPL_VERSION;}
+  if(d._tplVersion!==TPL_VERSION){d.templates={local:seedTplLocal(),b2b:seedTplB2B(),ops:seedTplOps()};d._tplVersion=TPL_VERSION;}
   return d;
 }
 function migrate(d){
@@ -366,12 +386,13 @@ function migrate(d){
   if(d.boards){ // já é v3
     d.boards.local=d.boards.local||{leads:[],goals:{toques:80,demos:12,fechamentos:4}};
     d.boards.b2b=d.boards.b2b||{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}};
-    d.templates=d.templates||{}; d.templates.local=d.templates.local||seedTplLocal(); d.templates.b2b=d.templates.b2b||seedTplB2B();
+    d.boards.ops=d.boards.ops||{leads:[],goals:{...GOALS_OPS}};
+    d.templates=d.templates||{}; d.templates.local=d.templates.local||seedTplLocal(); d.templates.b2b=d.templates.b2b||seedTplB2B(); d.templates.ops=d.templates.ops||seedTplOps();
     return enrich(refreshTpl(d));
   }
   if(d.leads){ // v2 antigo -> migra pra boards.local
-    return enrich(refreshTpl({boards:{local:{leads:d.leads,goals:d.goals||{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}}},
-      templates:{local:d.templates||seedTplLocal(),b2b:seedTplB2B()},_updatedAt:d._updatedAt||0}));
+    return enrich(refreshTpl({boards:{local:{leads:d.leads,goals:d.goals||{toques:80,demos:12,fechamentos:4}},b2b:{leads:[],goals:{reunioes:8,propostas:5,fechamentos:2}},ops:{leads:[],goals:{...GOALS_OPS}}},
+      templates:{local:d.templates||seedTplLocal(),b2b:seedTplB2B(),ops:seedTplOps()},_updatedAt:d._updatedAt||0}));
   }
   return freshDB();
 }
@@ -420,6 +441,7 @@ function applyTheme(){
   document.getElementById('pipeTitle').textContent=c.pipeTitle;
   document.getElementById('wsLocal').classList.toggle('on',MODE==='local');
   document.getElementById('wsB2B').classList.toggle('on',MODE==='b2b');
+  document.getElementById('wsOps').classList.toggle('on',MODE==='ops');
 }
 
 /* ============ NAV ============ */
@@ -433,14 +455,15 @@ function toggleMenu(e){e.stopPropagation();document.getElementById('menu').class
 document.body.onclick=()=>document.getElementById('menu').classList.remove('open');
 
 /* ============ HELPERS DE DIMENSÃO ============ */
-function dim1(l){return MODE==='local'?(l.segmento||''):(l.origem||'');}      // segmento / origem
-function dim2(l){return MODE==='local'?(l.produto||''):(l.interesse||'');}    // produto / interesse
+function dim1(l){return MODE==='local'?(l.segmento||''):MODE==='ops'?(l.produto||''):(l.origem||'');}   // segmento / produto / origem
+function dim2(l){return MODE==='local'?(l.produto||''):MODE==='ops'?(l.plano||''):(l.interesse||'');}   // produto / plano / interesse
 function pill(l){ // rótulo colorido no card
-  if(MODE==='local'){const p=l.produto||'';return{txt:p.replace('.AI',''),c:PRODUTOS[p]||'#888'};}
+  if(MODE==='local'||MODE==='ops'){const p=l.produto||'';return{txt:p.replace('.AI','')||'—',c:PRODUTOS[p]||'#888'};}
   const o=l.origem||'—';return{txt:o,c:ORIGENS[o]||cfg().accent};
 }
-function dim1Opts(){return MODE==='local'?[...new Set(LEADS().map(l=>l.segmento).filter(Boolean))].sort():Object.keys(ORIGENS);}
-function dim2Opts(){return MODE==='local'?Object.keys(PRODUTOS):[...new Set(LEADS().map(l=>l.interesse).filter(Boolean))].sort();}
+function dim1Opts(){return MODE==='local'?[...new Set(LEADS().map(l=>l.segmento).filter(Boolean))].sort():MODE==='ops'?Object.keys(PRODUTOS):Object.keys(ORIGENS);}
+function dim2Opts(){return MODE==='local'?Object.keys(PRODUTOS):MODE==='ops'?['Standard','Premium']:[...new Set(LEADS().map(l=>l.interesse).filter(Boolean))].sort();}
+function showDim2(){return MODE!=='b2b';}
 
 /* ============ PIPELINE ============ */
 function fuState(l){
@@ -453,7 +476,7 @@ function fuState(l){
 function fillPipeFilters(){
   setOpts('pSeg',dim1Opts(),`Todos · ${cfg().dim1Label}`);
   const d2=document.getElementById('pProd');
-  if(MODE==='local'){d2.style.display='';setOpts('pProd',dim2Opts(),'Todos os produtos');}else{d2.style.display='none';d2.value='';}
+  if(showDim2()){d2.style.display='';setOpts('pProd',dim2Opts(),`Todos · ${cfg().dim2Label}`);}else{d2.style.display='none';d2.value='';}
   setOpts('pTag',[...new Set(LEADS().flatMap(l=>l.tags||[]))].sort(),'Todas as tags');
 }
 function pipeFiltered(){
@@ -462,7 +485,7 @@ function pipeFiltered(){
   const ft=document.getElementById('pTag')?.value||'',hot=document.getElementById('pHot')?.checked;
   return LEADS().filter(l=>{
     if(f1&&dim1(l)!==f1)return false;
-    if(MODE==='local'&&f2&&l.produto!==f2)return false;
+    if(showDim2()&&f2&&dim2(l)!==f2)return false;
     if(ft&&!(l.tags||[]).includes(ft))return false;
     if(hot&&fuState(l)!=='due')return false;
     if(q){const blob=(l.negocio+(l.contato||'')+(l.responsavel||'')+(l.telefone||'')+(l.instagram||'')+(l.notas||'')+(l.gancho||'')+(l.tags||[]).join(' ')).toLowerCase();if(!blob.includes(q))return false;}
@@ -481,7 +504,12 @@ function renderBoard(){
     drop.ondragleave=()=>col.classList.remove('over');
     drop.ondrop=e=>{e.preventDefault();col.classList.remove('over');
       const id=e.dataTransfer.getData('id');const l=LEADS().find(x=>x.id===id);
-      if(l&&l.etapa!==s.k){l.etapa=s.k;l.ultimoContato=today();save();renderAll();toast('Movido pra '+s.k);}};
+      if(l&&l.etapa!==s.k){l.etapa=s.k;l.ultimoContato=today();
+        if(MODE==='ops'&&OPS_NEXT[s.k]!==undefined){ // automação: cada etapa já define o próximo passo
+          l.proximoPasso=OPS_NEXT[s.k];
+          if(OPS_NEXT[s.k]){const d=new Date();d.setDate(d.getDate()+2);l.proximaData=d.toISOString().slice(0,10);}else l.proximaData='';
+        }
+        save();renderAll();toast('Movido pra '+s.k);}};
     b.appendChild(col);
   });
 }
@@ -499,6 +527,7 @@ function cardEl(l){
   else if(l.proximoPasso){nextHtml=`<div class="next">▫️ ${l.proximoPasso}</div>`;}
   let meta;
   if(MODE==='local'){meta=l.telefone?'📞 '+l.telefone:(l.instagram?'📷 '+l.instagram:'<span style="color:#e25563">sem contato</span>');if(l.responsavel)meta='👤 '+esc(l.responsavel)+' · '+meta;}
+  else if(MODE==='ops'){const parts=[];if(l.plano)parts.push((l.plano==='Premium'?'⭐ ':'')+esc(l.plano));if(+l.valor>0)parts.push('R$ '+(+l.valor).toLocaleString('pt-BR'));if(l.implResp)parts.push('🛠 '+esc(l.implResp));if(l.golive)parts.push('🚀 '+l.golive);meta=parts.join(' · ')||(l.contato?'👤 '+esc(l.contato):'<span style="color:#9aa3b2">sem dados</span>');}
   else{const parts=[];if(l.contato)parts.push('👤 '+l.contato);if(+l.valor>0)parts.push('💰 R$ '+(+l.valor).toLocaleString('pt-BR'));if(!parts.length&&l.telefone)parts.push('📞 '+l.telefone);meta=parts.join(' · ')||'<span style="color:#9aa3b2">sem dados</span>';}
   c.innerHTML=`<div class="nm">${esc(l.negocio)}<span class="pill" style="background:${p.c}22;color:${p.c}">${esc(p.txt)}</span></div>
     <div class="meta">${meta}</div>${nextHtml}
@@ -514,7 +543,7 @@ function fillFilters(){
   setOpts('fSeg',dim1Opts(),`Todos · ${cfg().dim1Label}`);
   setOpts('fEtapa',stages().map(s=>s.k),'Todas as etapas');
   const fp=document.getElementById('fProd');
-  if(MODE==='local'){fp.style.display='';setOpts('fProd',Object.keys(PRODUTOS),'Todos os produtos');}else{fp.style.display='none';fp.value='';}
+  if(showDim2()){fp.style.display='';setOpts('fProd',dim2Opts(),`Todos · ${cfg().dim2Label}`);}else{fp.style.display='none';fp.value='';}
 }
 function setOpts(id,arr,allLabel){const s=document.getElementById(id);if(!s)return;const v=s.value;
   s.innerHTML=`<option value="">${allLabel||'Todos'}</option>`+arr.map(a=>`<option ${a===v?'selected':''}>${a}</option>`).join('');}
@@ -523,13 +552,14 @@ function renderTable(){
   const f1=document.getElementById('fSeg').value,fe=document.getElementById('fEtapa').value,fp=document.getElementById('fProd').value;
   let rows=LEADS().filter(l=>{
     if(f1&&dim1(l)!==f1)return false;if(fe&&l.etapa!==fe)return false;
-    if(MODE==='local'&&fp&&l.produto!==fp)return false;
+    if(showDim2()&&fp&&dim2(l)!==fp)return false;
     if(q){const blob=(l.negocio+(l.contato||'')+(l.responsavel||'')+(l.telefone||'')+(l.instagram||'')+(l.notas||'')+(l.gancho||'')+(l.endereco||'')+(l.tags||[]).join(' ')).toLowerCase();if(!blob.includes(q))return false;}
     return true;
   });
   rows.sort((a,b)=>(((a[sortK]||'')>(b[sortK]||''))?1:-1)*sortDir);
   const head=document.getElementById('tblHead');
   if(MODE==='local'){head.innerHTML=`<tr><th onclick="sortBy('negocio')">Negócio</th><th onclick="sortBy('segmento')">Segmento</th><th onclick="sortBy('produto')">Produto</th><th onclick="sortBy('etapa')">Etapa</th><th>Contato</th><th onclick="sortBy('proximaData')">Próximo passo</th></tr>`;}
+  else if(MODE==='ops'){head.innerHTML=`<tr><th onclick="sortBy('negocio')">Cliente</th><th onclick="sortBy('produto')">Produto</th><th onclick="sortBy('plano')">Plano</th><th onclick="sortBy('etapa')">Etapa</th><th onclick="sortBy('golive')">Go-live</th><th onclick="sortBy('proximaData')">Próximo passo</th></tr>`;}
   else{head.innerHTML=`<tr><th onclick="sortBy('negocio')">Empresa</th><th onclick="sortBy('contato')">Contato</th><th onclick="sortBy('origem')">Origem</th><th onclick="sortBy('etapa')">Etapa</th><th onclick="sortBy('valor')">Valor</th><th onclick="sortBy('proximaData')">Próximo passo</th></tr>`;}
   const tb=document.getElementById('tblBody');
   tb.innerHTML=rows.length?rows.map(l=>{
@@ -537,6 +567,7 @@ function renderTable(){
     let nd=l.proximaData?(()=>{const d=daysBetween(today(),l.proximaData);return `<span style="color:${d<0?'#e25563':(d<=2?'#f3c969':'#9aa3b2')}">${esc(l.proximoPasso||'follow-up')} · ${l.proximaData}</span>`;})():'<span class="muted">—</span>';
     const etapaCell=`<span class="pill" style="background:${sc}22;color:${sc}">${l.etapa}</span>`;
     if(MODE==='local'){return `<tr onclick="openLead('${l.id}')"><td><b>${esc(l.negocio)}</b></td><td>${esc(l.segmento||'')}</td><td><span class="pill" style="background:${p.c}22;color:${p.c}">${esc(p.txt)}</span></td><td>${etapaCell}</td><td>${esc(l.telefone||l.instagram||'')||'<span class="muted">—</span>'}</td><td>${nd}</td></tr>`;}
+    if(MODE==='ops'){return `<tr onclick="openLead('${l.id}')"><td><b>${esc(l.negocio)}</b></td><td><span class="pill" style="background:${p.c}22;color:${p.c}">${esc(p.txt)}</span></td><td>${esc(l.plano||'')||'<span class="muted">—</span>'}</td><td>${etapaCell}</td><td>${l.golive||'<span class="muted">—</span>'}</td><td>${nd}</td></tr>`;}
     return `<tr onclick="openLead('${l.id}')"><td><b>${esc(l.negocio)}</b></td><td>${esc(l.contato||'')||'<span class="muted">—</span>'}</td><td><span class="pill" style="background:${p.c}22;color:${p.c}">${esc(p.txt)}</span></td><td>${etapaCell}</td><td>${+l.valor>0?'R$ '+(+l.valor).toLocaleString('pt-BR'):'<span class="muted">—</span>'}</td><td>${nd}</td></tr>`;
   }).join(''):'<tr><td colspan="6" class="empty">Nada por aqui ainda.</td></tr>';
 }
@@ -583,7 +614,7 @@ function fill(txt,l){
 }
 function waLink(l,txt){let ph=(l.telefone||'').replace(/\D/g,'');if(ph&&!ph.startsWith('55'))ph='55'+ph;
   const t=encodeURIComponent(txt||'');return ph?`https://wa.me/${ph}?text=${t}`:(l.instagram?`https://instagram.com/${l.instagram.replace('@','')}`:'');}
-function tplsFor(l){return MODE==='b2b'?TPLS():TPLS().filter(t=>t.segmento===l.segmento||t.segmento==='Geral');}
+function tplsFor(l){return (MODE==='b2b'||MODE==='ops')?TPLS():TPLS().filter(t=>t.segmento===l.segmento||t.segmento==='Geral');}
 function waBtn(l){
   if(l.telefone)return `<button class="btn sm wa" onclick="openWA('${l.id}')">💬 WhatsApp</button>`;
   if(l.instagram)return `<a class="btn sm" style="background:#c13584;color:#fff" href="https://instagram.com/${l.instagram.replace('@','')}" target="_blank">📷 Instagram</a>`;
@@ -609,6 +640,7 @@ function openLead(id){
   let l;
   if(id){l=LEADS().find(x=>x.id===id);}
   else if(MODE==='local'){l={id:uid('L'),negocio:'',segmento:'Barbearia',produto:'Corta.AI',telefone:'',instagram:'',endereco:'',etapa:firstStage(),notas:'',tags:[],proximoPasso:'Primeiro toque',proximaData:'',ultimoContato:'',valor:PRECO,createdAt:today()};}
+  else if(MODE==='ops'){l={id:uid('O'),negocio:'',contato:'',telefone:'',produto:'Corta.AI',plano:'Standard',implResp:'',inicio:today(),golive:'',etapa:firstStage(),notas:'',tags:[],proximoPasso:OPS_NEXT[firstStage()],proximaData:'',ultimoContato:'',valor:PRECO,createdAt:today()};}
   else{l={id:uid('B'),negocio:'',contato:'',cargo:'',telefone:'',email:'',origem:'Network',interesse:'',etapa:firstStage(),notas:'',tags:[],proximoPasso:'Acionar contato',proximaData:'',proximaReuniao:'',ultimoContato:'',valor:0,createdAt:today()};}
   const isNew=!id;
   const stageSel=`<select id="m_etapa">${stages().map(s=>`<option ${s.k===l.etapa?'selected':''}>${s.k}</option>`).join('')}</select>`;
@@ -617,7 +649,7 @@ function openLead(id){
      <div class="fg"><label>Próximo passo</label><input id="m_proximoPasso" value="${esc(l.proximoPasso)}" placeholder="${MODE==='b2b'?'Ex: Enviar proposta':'Ex: Mandar vídeo'}"></div>
      <div class="fg"><label>Data do próximo passo</label><input id="m_proximaData" type="date" value="${l.proximaData||''}"></div>
    </div>
-   <div class="fg"><label>💡 Gancho personalizado (o que você descobriu / resultado do cliente oculto)</label><textarea id="m_gancho" style="min-height:60px" placeholder="Ex: Vi que vocês têm 4,9 no Google e +1200 atendimentos/mês  ·  Testei agendar pelo WhatsApp ontem e não tive resposta">${esc(l.gancho||'')}</textarea><div class="muted" style="margin-top:4px">Entra na mensagem pelo atalho {{gancho}}. As aberturas já usam ele quando preenchido.</div></div>
+   ${MODE!=='ops'?`<div class="fg"><label>💡 Gancho personalizado (o que você descobriu / resultado do cliente oculto)</label><textarea id="m_gancho" style="min-height:60px" placeholder="Ex: Vi que vocês têm 4,9 no Google e +1200 atendimentos/mês  ·  Testei agendar pelo WhatsApp ontem e não tive resposta">${esc(l.gancho||'')}</textarea><div class="muted" style="margin-top:4px">Entra na mensagem pelo atalho {{gancho}}. As aberturas já usam ele quando preenchido.</div></div>`:''}
    <div class="fg"><label>Tags (vírgula)</label><input id="m_tags" value="${esc((l.tags||[]).join(', '))}" placeholder="${MODE==='b2b'?'quente, decisor, indicação':'quente, indicação'}"></div>
    <div class="fg"><label>Notas</label><textarea id="m_notas">${esc(l.notas)}</textarea></div>
    ${l.ultimoContato?`<div class="muted">Último contato: ${l.ultimoContato} · criado ${l.createdAt||'—'}</div>`:''}`;
@@ -635,6 +667,21 @@ function openLead(id){
        <div class="fg"><label>Endereço</label><input id="m_endereco" value="${esc(l.endereco)}"></div></div>
      <div class="row2"><div class="fg"><label>Etapa</label>${stageSel}</div>
        <div class="fg"><label>${cfg().valueLabel}</label><input id="m_valor" type="number" value="${l.valor||PRECO}"></div></div>`;
+  }else if(MODE==='ops'){
+    fields=`<div class="row2">
+       <div class="fg"><label>Cliente *</label><input id="m_negocio" value="${esc(l.negocio)}"></div>
+       <div class="fg"><label>Contato (pessoa)</label><input id="m_contato" value="${esc(l.contato||'')}" placeholder="Quem fala com você"></div></div>
+     <div class="row2">
+       <div class="fg"><label>Produto contratado</label><select id="m_produto">${Object.keys(PRODUTOS).map(p=>`<option ${p===l.produto?'selected':''}>${p}</option>`).join('')}</select></div>
+       <div class="fg"><label>Plano</label><select id="m_plano">${['Standard','Premium'].map(p=>`<option ${p===l.plano?'selected':''}>${p}</option>`).join('')}</select></div></div>
+     <div class="row2">
+       <div class="fg"><label>Telefone / WhatsApp do cliente</label><input id="m_telefone" value="${esc(l.telefone)}" placeholder="(44) 9xxxx-xxxx"></div>
+       <div class="fg"><label>🛠 Responsável pela implantação</label><input id="m_implResp" value="${esc(l.implResp||'')}" placeholder="Higor / Marina"></div></div>
+     <div class="row2">
+       <div class="fg"><label>Data de início</label><input id="m_inicio" type="date" value="${l.inicio||''}"></div>
+       <div class="fg"><label>Data de go-live</label><input id="m_golive" type="date" value="${l.golive||''}"></div></div>
+     <div class="row2"><div class="fg"><label>Etapa</label>${stageSel}</div>
+       <div class="fg"><label>${cfg().valueLabel}</label><input id="m_valor" type="number" value="${l.valor||PRECO}"></div></div>`;
   }else{
     fields=`<div class="row2">
        <div class="fg"><label>Empresa *</label><input id="m_negocio" value="${esc(l.negocio)}"></div>
@@ -650,11 +697,13 @@ function openLead(id){
        <div class="fg"><label>${cfg().valueLabel}</label><input id="m_valor" type="number" value="${l.valor||0}"></div></div>
      <div class="fg"><label>Data da próxima reunião</label><input id="m_proximaReuniao" type="date" value="${l.proximaReuniao||''}"></div>`;
   }
-  let html=`<div class="modal"><h3>${isNew?(MODE==='b2b'?'Novo negócio':'Novo lead'):esc(l.negocio)||'Editar'} <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
+  const novoTit=MODE==='b2b'?'Novo negócio':MODE==='ops'?'Novo cliente':'Novo lead';
+  let html=`<div class="modal"><h3>${isNew?novoTit:esc(l.negocio)||'Editar'} <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
    ${fields}${common}
    <div class="modal-foot">
      <div style="display:flex;gap:7px;flex-wrap:wrap">${!isNew?`<button class="btn danger sm" onclick="delLead('${l.id}')">Excluir</button>`:''}
-       ${!isNew&&l.telefone?`<button class="btn wa sm" onclick="saveLead('${l.id}',false);openWA('${l.id}')">💬 WhatsApp</button>`:''}</div>
+       ${!isNew&&l.telefone?`<button class="btn wa sm" onclick="saveLead('${l.id}',false);openWA('${l.id}')">💬 WhatsApp</button>`:''}
+       ${!isNew&&MODE!=='ops'&&l.etapa==='Fechado'?(l._opsId?`<button class="btn sm ghost" onclick="setMode('ops');closeOv()">✓ Já na Implementação</button>`:`<button class="btn sm" style="background:#2bb3a3;color:#06231f" onclick="saveLead('${l.id}',false);moveToOps('${l.id}')">🚀 Enviar pra Implementação</button>`):''}</div>
      <div style="display:flex;gap:7px"><button class="btn ghost" onclick="closeOv()">Cancelar</button>
        <button class="btn primary" onclick="saveLead('${l.id}',${isNew})">Salvar</button></div></div></div>`;
   ov(html);window._draft=l;
@@ -665,19 +714,29 @@ function saveLead(id,isNew){
   let l=LEADS().find(x=>x.id===id);
   if(!l){l=window._draft||{id};LEADS().push(l);}
   l.negocio=g('negocio');l.etapa=g('etapa');l.proximoPasso=g('proximoPasso');l.proximaData=g('proximaData');
-  l.notas=g('notas');l.gancho=g('gancho');l.tags=g('tags').split(',').map(t=>t.trim()).filter(Boolean);l.telefone=g('telefone');l.valor=+g('valor')||0;
+  l.notas=g('notas');if(g('gancho')!==undefined)l.gancho=g('gancho');l.tags=g('tags').split(',').map(t=>t.trim()).filter(Boolean);l.telefone=g('telefone');l.valor=+g('valor')||0;
   if(MODE==='local'){l.segmento=g('segmento');l.produto=g('produto');l.instagram=g('instagram');l.endereco=g('endereco');l.responsavel=g('responsavel');}
+  else if(MODE==='ops'){l.contato=g('contato');l.produto=g('produto');l.plano=g('plano');l.implResp=g('implResp');l.inicio=g('inicio');l.golive=g('golive');}
   else{l.contato=g('contato');l.cargo=g('cargo');l.origem=g('origem');l.email=g('email');l.interesse=g('interesse');l.proximaReuniao=g('proximaReuniao');}
   if(!l.createdAt)l.createdAt=today();
   save();closeOv();renderAll();toast(isNew?'Criado':'Salvo');
 }
 function delLead(id){if(!confirm('Excluir?'))return;B().leads=LEADS().filter(x=>x.id!==id);save();closeOv();renderAll();toast('Excluído');}
+function moveToOps(id){
+  const src=LEADS().find(x=>x.id===id);if(!src)return;
+  if(src._opsId){setMode('ops');closeOv();toast('Esse cliente já está na Implementação');return;}
+  const ops={id:uid('O'),negocio:src.negocio,contato:src.contato||src.responsavel||'',telefone:src.telefone||'',
+    produto:src.produto||'Corta.AI',plano:(+src.valor>=297?'Premium':'Standard'),valor:+src.valor||PRECO,
+    implResp:'',inicio:today(),golive:'',etapa:'A implantar',proximoPasso:OPS_NEXT['A implantar'],proximaData:'',
+    notas:src.notas||'',tags:[],ultimoContato:'',createdAt:today(),origemVenda:MODE};
+  DB.boards.ops.leads.push(ops);src._opsId=ops.id;save();closeOv();setMode('ops');toast('Cliente enviado pra Implementação 🚀');
+}
 
 /* ============ TEMPLATES ============ */
 function renderTpl(){
   const list=document.getElementById('tplList');list.innerHTML='';
-  const groupKey=MODE==='b2b'?'etapa':'segmento';
-  const order=MODE==='b2b'?['Acionar','Reunião','Pós-reunião','Proposta','Follow-up','Reativação']:['Geral','Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza'];
+  const groupKey=MODE==='local'?'segmento':'etapa';
+  const order=MODE==='b2b'?['Acionar','Reunião','Pós-reunião','Proposta','Follow-up','Reativação']:MODE==='ops'?['Boas-vindas','Coleta','Go-live','Acompanhamento']:['Geral','Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza'];
   const groups=[...new Set(TPLS().map(t=>t[groupKey]))].sort((a,b)=>order.indexOf(a)-order.indexOf(b));
   groups.forEach(gr=>{
     const ts=TPLS().filter(t=>t[groupKey]===gr);if(!ts.length)return;
@@ -696,8 +755,8 @@ function editTpl(id,v){TPLS().find(t=>t.id===id).texto=v;save();}
 function copyTpl(id){navigator.clipboard.writeText(TPLS().find(t=>t.id===id).texto);toast('Copiado!');}
 function delTpl(id){if(!confirm('Excluir template?'))return;DB.templates[MODE]=TPLS().filter(t=>t.id!==id);save();renderTpl();}
 function openTpl(){
-  const segOpts=MODE==='b2b'?['B2B']:['Geral','Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza'];
-  const etapaOpts=MODE==='b2b'?['Acionar','Reunião','Pós-reunião','Proposta','Follow-up','Reativação']:['Cliente oculto','Chegar no decisor','Primeiro toque','Follow-up','Pós-demo','Reativação'];
+  const segOpts=MODE==='b2b'?['B2B']:MODE==='ops'?['Operação']:['Geral','Barbearia','Odontologia','Estética','Estética automotiva','Salão de beleza'];
+  const etapaOpts=MODE==='b2b'?['Acionar','Reunião','Pós-reunião','Proposta','Follow-up','Reativação']:MODE==='ops'?['Boas-vindas','Coleta','Go-live','Acompanhamento']:['Cliente oculto','Chegar no decisor','Primeiro toque','Follow-up','Pós-demo','Reativação'];
   let html=`<div class="modal"><h3>Novo template <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
    <div class="fg"><label>Nome</label><input id="t_nome" placeholder="Ex: ${MODE==='b2b'?'Follow-up proposta':'Lava · reativação'}"></div>
    <div class="row2"><div class="fg"><label>Categoria</label><select id="t_seg">${segOpts.map(s=>`<option>${s}</option>`).join('')}</select></div>
@@ -735,6 +794,20 @@ function renderAnalytics(){
     document.getElementById('anaBox2H').textContent='Por segmento';
     const segs=[...new Set(L.map(l=>l.segmento))];const smax=Math.max(...segs.map(s=>L.filter(l=>l.segmento===s).length),1);
     document.getElementById('anaBox2').innerHTML=segs.map(s=>bar(s,L.filter(l=>l.segmento===s).length,smax,ac)).join('')||'<div class="empty">—</div>';
+  }else if(MODE==='ops'){
+    const noar=L.filter(l=>["No ar","Acompanhamento"].includes(l.etapa)).length;
+    const implantando=L.filter(l=>["A implantar","Onboarding","Configuração","Testes"].includes(l.etapa)).length;
+    const churn=cnt('Churn');
+    const golivesMes=L.filter(l=>l.golive&&l.golive.slice(0,7)===m).length;
+    const mrrAtivo=L.filter(l=>["No ar","Acompanhamento"].includes(l.etapa)).reduce((s,l)=>s+(+l.valor||0),0);
+    document.getElementById('kpis').innerHTML=kpi(L.length,'Clientes')+kpi(implantando,'Em implantação','blue')+kpi(noar,'No ar','green')+kpi(churn,'Churn','')+kpi(brl(mrrAtivo),'MRR ativo','green')+kpi(golivesMes+' este mês','Go-lives','gold');
+    document.getElementById('goals').innerHTML=goalBar('Go-lives no mês',golivesMes,g.golive||0)+goalBar('Em onboarding',cnt('Onboarding'),g.onboarding||0);
+    document.getElementById('anaBox1H').textContent='Por produto';
+    const prods=Object.keys(PRODUTOS);const pmax=Math.max(...prods.map(p=>L.filter(l=>l.produto===p).length),1);
+    document.getElementById('anaBox1').innerHTML=prods.map(p=>bar(p.replace('.AI',''),L.filter(l=>l.produto===p).length,pmax,PRODUTOS[p])).join('');
+    document.getElementById('anaBox2H').textContent='MRR ativo por produto (R$)';
+    const vmax=Math.max(...prods.map(p=>L.filter(l=>l.produto===p&&["No ar","Acompanhamento"].includes(l.etapa)).reduce((a,l)=>a+(+l.valor||0),0)),1);
+    document.getElementById('anaBox2').innerHTML=prods.map(p=>{const v=L.filter(l=>l.produto===p&&["No ar","Acompanhamento"].includes(l.etapa)).reduce((a,l)=>a+(+l.valor||0),0);return bar(p.replace('.AI',''),v,vmax,PRODUTOS[p],brl(v));}).join('');
   }else{
     const reun=L.filter(l=>["Reunião feita","Proposta enviada","Negociação","Fechado"].includes(l.etapa)).length;
     const props=L.filter(l=>["Proposta enviada","Negociação","Fechado"].includes(l.etapa)).length;
@@ -758,13 +831,17 @@ function openGoals(){const g=GOALS();let html;
     <div class="fg"><label>Demos</label><input id="g_b" type="number" value="${g.demos||0}"></div>
     <div class="fg"><label>Fechamentos</label><input id="g_c" type="number" value="${g.fechamentos||0}"></div>
     <div class="modal-foot"><button class="btn ghost" onclick="closeOv()">Cancelar</button><button class="btn primary" onclick="saveGoals('toques','demos','fechamentos')">Salvar</button></div></div>`;}
+  else if(MODE==='ops'){html=`<div class="modal"><h3>Metas do mês (Operação) <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
+    <div class="fg"><label>Go-lives no mês</label><input id="g_a" type="number" value="${g.golive||0}"></div>
+    <div class="fg"><label>Em onboarding</label><input id="g_b" type="number" value="${g.onboarding||0}"></div>
+    <div class="modal-foot"><button class="btn ghost" onclick="closeOv()">Cancelar</button><button class="btn primary" onclick="saveGoals('golive','onboarding')">Salvar</button></div></div>`;}
   else{html=`<div class="modal"><h3>Metas do mês (B2B) <button class="btn ghost sm" onclick="closeOv()">✕</button></h3>
     <div class="fg"><label>Reuniões</label><input id="g_a" type="number" value="${g.reunioes||0}"></div>
     <div class="fg"><label>Propostas</label><input id="g_b" type="number" value="${g.propostas||0}"></div>
     <div class="fg"><label>Fechamentos</label><input id="g_c" type="number" value="${g.fechamentos||0}"></div>
     <div class="modal-foot"><button class="btn ghost" onclick="closeOv()">Cancelar</button><button class="btn primary" onclick="saveGoals('reunioes','propostas','fechamentos')">Salvar</button></div></div>`;}
   ov(html);}
-function saveGoals(a,b,c){const G={};G[a]=+document.getElementById('g_a').value;G[b]=+document.getElementById('g_b').value;G[c]=+document.getElementById('g_c').value;
+function saveGoals(a,b,c){const G={};const gv=id=>{const e=document.getElementById(id);return e?+e.value:0;};G[a]=gv('g_a');G[b]=gv('g_b');if(c)G[c]=gv('g_c');
   DB.boards[MODE].goals=G;save();closeOv();renderAll();toast('Metas salvas');}
 
 /* ============ INÍCIO ============ */
@@ -821,6 +898,29 @@ const HOME={
     ["✓","Próximo passo sempre","","Todo negócio ativo tem data de próximo passo. Sem isso, ele esfria e morre."],
     ["✓","Proposta com prazo","","Toda proposta enviada tem follow-up agendado e uma data pra decisão."]],
   mat:"Dica: registre cada conversa em \"notas\" logo após acontecer. O follow-up bom é o que lembra do detalhe que o outro falou."
+ },
+ ops:{
+  hero:["equipe","Implementação dos clientes que fecharam. Aqui a venda vira cliente feliz (e recorrência)."],
+  stratH:"🧭 O processo de implementação",
+  strat:[["1","Onboarding","Assim que fecha, agende uma conversa e colete tudo: logo, cores, serviços com preços, horários e o número de WhatsApp.","#4f8bf0"],
+    ["2","Configuração","Monte o painel na cara da marca, conecte o WhatsApp e treine a IA com os serviços e o tom de voz.","#9b6cf0"],
+    ["3","Testes","Rode conversas de teste (agendar, remarcar, cancelar) e ajuste antes de soltar.","#e0a83d"],
+    ["4","No ar + Acompanhamento","Go-live, acompanhe a primeira semana de perto e depois faça check-in mensal de sucesso.","#3fb368"]],
+  cadH:"⏱️ Cadência (rotina da operação)",
+  cad:[["Ao fechar","No Local/B2B, no card Fechado, clique em Enviar pra Implementação. Agende o onboarding em até 48h."],
+    ["Durante","Ao mover o card de etapa, o próximo passo já é preenchido sozinho. Siga ele."],
+    ["No ar","Acompanhe de perto os primeiros 7 dias, é onde o cliente decide se ama ou esfria."],
+    ["Mensal","Check-in de sucesso com quem está em Acompanhamento, pra segurar a recorrência."]],
+  cadNote:"💡 Implementação boa = cliente que fica. O churn é o que come o MRR, então a 1ª semana é sagrada.",
+  seq:[["Dia 0","Boas-vindas","Boas-vindas","Mensagem calorosa de boas-vindas + o que vai acontecer + pedido das infos (logo, cores, serviços, horários, WhatsApp).","#4f8bf0"],
+    ["Coleta","Lembrete de coleta","Coleta","Se faltar algo, um lembrete leve do que ainda falta pra subir o sistema.","#9b6cf0"],
+    ["Go-live","Está no ar!","Go-live","Avisa que está rodando, se coloca à disposição e diz que vai acompanhar a primeira semana.","#3fb368"],
+    ["+7 dias","Check-in da 1ª semana","Acompanhamento","Pergunta como está sendo, recolhe o primeiro feedback e ajusta.","#2bb3a3"]],
+  posH:"O que dá pra automatizar (próximo nível)",
+  pos:[["⚙️","Ao entrar em Onboarding","","Disparar a mensagem de boas-vindas + o pedido de infos automaticamente.","#4f8bf0"],
+    ["⚙️","Ao entrar em No ar","","Mandar o aviso de go-live e já agendar o check-in de 7 dias sozinho.","#3fb368"],
+    ["⚙️","Em Acompanhamento","","Lembrete mensal de check-in de sucesso pra não esquecer ninguém.","#2bb3a3"]],
+  mat:"Por enquanto o app já preenche o próximo passo a cada etapa (uma automação simples). Os disparos automáticos de mensagem a gente liga depois, quando você quiser."
  }
 };
 const COCHECK=[
@@ -857,6 +957,10 @@ function renderHome(){
   if(MODE==='local'){const demos=L.filter(l=>["Demo agendada","Proposta enviada","Fechado"].includes(l.etapa)).length;
     const mrr=L.filter(l=>l.etapa==='Fechado').reduce((s,l)=>s+(+l.valor||PRECO),0);
     document.getElementById('homeKpis').innerHTML=kpi(L.length,'Leads')+kpi(cnt('A contatar'),'A contatar')+kpi(demos,'Demos','blue')+kpi(fechados,'Fechados','green')+kpi(brl(mrr),'MRR fechado','green');
+  }else if(MODE==='ops'){const implantando=L.filter(l=>["A implantar","Onboarding","Configuração","Testes"].includes(l.etapa)).length;
+    const noar=L.filter(l=>["No ar","Acompanhamento"].includes(l.etapa)).length;
+    const mrrAtivo=L.filter(l=>["No ar","Acompanhamento"].includes(l.etapa)).reduce((s,l)=>s+(+l.valor||0),0);
+    document.getElementById('homeKpis').innerHTML=kpi(L.length,'Clientes')+kpi(implantando,'Em implantação','blue')+kpi(noar,'No ar','green')+kpi(cnt('Churn'),'Churn')+kpi(brl(mrrAtivo),'MRR ativo','green');
   }else{const andamento=L.filter(l=>!isTerminal(l.etapa)&&l.etapa!==firstStage()).length;
     const valPipe=L.filter(l=>!isTerminal(l.etapa)).reduce((s,l)=>s+(+l.valor||0),0);
     document.getElementById('homeKpis').innerHTML=kpi(L.length,'Negócios')+kpi(andamento,'Em andamento','blue')+kpi(cnt('Reunião agendada'),'Reuniões marcadas','blue')+kpi(fechados,'Fechados','green')+kpi(brl(valPipe),'Valor no pipeline','gold');}
@@ -865,6 +969,8 @@ function renderHome(){
   const g=GOALS();const m=today().slice(0,7);
   if(MODE==='local'){const demos=L.filter(l=>["Demo agendada","Proposta enviada","Fechado"].includes(l.etapa)).length;const toquesMes=L.filter(l=>l.ultimoContato&&l.ultimoContato.slice(0,7)===m).length;
     document.getElementById('homeGoals').innerHTML=goalBar('Toques no mês',toquesMes,g.toques||0)+goalBar('Demos',demos,g.demos||0)+goalBar('Fechamentos',fechados,g.fechamentos||0);
+  }else if(MODE==='ops'){const golivesMes=L.filter(l=>l.golive&&l.golive.slice(0,7)===m).length;
+    document.getElementById('homeGoals').innerHTML=goalBar('Go-lives no mês',golivesMes,g.golive||0)+goalBar('Em onboarding',cnt('Onboarding'),g.onboarding||0);
   }else{const reun=L.filter(l=>["Reunião feita","Proposta enviada","Negociação","Fechado"].includes(l.etapa)).length;const props=L.filter(l=>["Proposta enviada","Negociação","Fechado"].includes(l.etapa)).length;
     document.getElementById('homeGoals').innerHTML=goalBar('Reuniões',reun,g.reunioes||0)+goalBar('Propostas',props,g.propostas||0)+goalBar('Fechamentos',fechados,g.fechamentos||0);}
   // estratégia
@@ -898,6 +1004,8 @@ function exportCSV(){
   const L=LEADS();let h,rows;
   if(MODE==='local'){h=['Negócio','Segmento','Produto','Etapa','Responsável','Telefone','Instagram','Endereço','Gancho','Próximo passo','Data','Tags','Notas'];
     rows=L.map(l=>[l.negocio,l.segmento,l.produto,l.etapa,l.responsavel,l.telefone,l.instagram,l.endereco,l.gancho,l.proximoPasso,l.proximaData,(l.tags||[]).join('|'),l.notas]);}
+  else if(MODE==='ops'){h=['Cliente','Contato','Produto','Plano','Etapa','Valor','Resp. implantação','Início','Go-live','Telefone','Próximo passo','Data','Tags','Notas'];
+    rows=L.map(l=>[l.negocio,l.contato,l.produto,l.plano,l.etapa,l.valor,l.implResp,l.inicio,l.golive,l.telefone,l.proximoPasso,l.proximaData,(l.tags||[]).join('|'),l.notas]);}
   else{h=['Empresa','Contato','Cargo','Origem','Interesse','Etapa','Valor','Telefone','E-mail','Próxima reunião','Gancho','Próximo passo','Data','Tags','Notas'];
     rows=L.map(l=>[l.negocio,l.contato,l.cargo,l.origem,l.interesse,l.etapa,l.valor,l.telefone,l.email,l.proximaReuniao,l.gancho,l.proximoPasso,l.proximaData,(l.tags||[]).join('|'),l.notas]);}
   const csv=[h.join(','),...rows.map(r=>r.map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');
@@ -906,7 +1014,7 @@ function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReade
   r.onload=e=>{try{const d=JSON.parse(e.target.result);DB=migrate(d);save();renderAll();toast('Importado!');}catch(x){toast('Erro ao ler arquivo');}};
   r.readAsText(f);inp.value='';}
 function resetTpl(){if(!confirm('Restaurar os templates padrão deste workspace? Substitui os atuais (mantém leads e etapas).'))return;
-  DB.templates[MODE]=MODE==='b2b'?seedTplB2B():seedTplLocal();save();renderTpl();toast('Templates restaurados');}
+  DB.templates[MODE]=MODE==='b2b'?seedTplB2B():MODE==='ops'?seedTplOps():seedTplLocal();save();renderTpl();toast('Templates restaurados');}
 function seedReset(){if(!confirm('Adiciona os 23 leads-semente no workspace Local. Continuar?'))return;
   const exist=new Set(DB.boards.local.leads.map(l=>l.negocio));seedLeads().forEach(l=>{if(!exist.has(l.negocio))DB.boards.local.leads.push(l);});save();renderAll();toast('Leads-semente adicionados');}
 function wipe(){if(!confirm('Apagar TODOS os dados (Local + B2B)? Não volta.'))return;localStorage.removeItem(KEY);DB=freshDB();save();renderAll();toast('Tudo apagado');}
