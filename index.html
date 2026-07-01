@@ -123,10 +123,6 @@ tbody tr{cursor:pointer}
     <button id="wsB2B" onclick="setMode('b2b')">🤝 B2B</button>
     <button id="wsOps" onclick="setMode('ops')">🚀 Operação</button>
   </div>
-  <div class="ws" id="opsType" style="display:none">
-    <button id="otSaas" onclick="setOpsType('saas')">SaaS</button>
-    <button id="otCustom" onclick="setOpsType('custom')">Personalizado</button>
-  </div>
   <nav>
     <button class="tab active" data-view="inicio">🏠 Início</button>
     <button class="tab" data-view="pipeline">📋 Pipeline</button>
@@ -183,6 +179,10 @@ tbody tr{cursor:pointer}
   <section class="view" id="pipeline">
     <h2 class="title" id="pipeTitle">Pipeline</h2>
     <div class="sub">Arraste os cards entre as etapas. Borda vermelha = parado / follow-up atrasado.</div>
+    <div class="ws" id="opsTypeBar" style="display:none;width:fit-content;margin-bottom:14px">
+      <button id="otSaas" onclick="setOpsType('saas')">🧩 SaaS (produto pronto)</button>
+      <button id="otCustom" onclick="setOpsType('custom')">🛠 Agente personalizado</button>
+    </div>
     <div class="filters">
       <input type="search" id="pSearch" placeholder="🔍 Buscar no pipeline..." oninput="renderBoard()">
       <select id="pSeg" onchange="renderBoard()"></select>
@@ -468,9 +468,6 @@ function applyTheme(){
   document.getElementById('wsLocal').classList.toggle('on',MODE==='local');
   document.getElementById('wsB2B').classList.toggle('on',MODE==='b2b');
   document.getElementById('wsOps').classList.toggle('on',MODE==='ops');
-  const ot=document.getElementById('opsType');ot.style.display=MODE==='ops'?'flex':'none';
-  document.getElementById('otSaas').classList.toggle('on',opsType==='saas');
-  document.getElementById('otCustom').classList.toggle('on',opsType==='custom');
 }
 
 /* ============ NAV ============ */
@@ -523,6 +520,10 @@ function pipeFiltered(){
   });
 }
 function renderBoard(){
+  const otb=document.getElementById('opsTypeBar');
+  if(otb){otb.style.display=MODE==='ops'?'flex':'none';
+    document.getElementById('otSaas').classList.toggle('on',opsType==='saas');
+    document.getElementById('otCustom').classList.toggle('on',opsType==='custom');}
   const b=document.getElementById('board');b.innerHTML='';const base=pipeFiltered();
   stages().forEach(s=>{
     const ls=base.filter(l=>l.etapa===s.k);
